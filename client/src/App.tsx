@@ -9,8 +9,11 @@ import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/dashboard";
 import Agents from "@/pages/agents";
 import CreateAgent from "@/pages/create-agent";
+import TestAgent from "@/pages/test-agent";
 import Prompts from "@/pages/prompts-new";
 import Settings from "@/pages/settings";
+import AdminAgents from "@/pages/admin-agents";
+import AdminUsers from "@/pages/admin-users";
 
 function Router() {
   return (
@@ -19,8 +22,12 @@ function Router() {
       <ProtectedRoute path="/" component={Dashboard} />
       <ProtectedRoute path="/agents" component={Agents} />
       <ProtectedRoute path="/create-agent" component={CreateAgent} />
+      <ProtectedRoute path="/agents/:id/test" component={TestAgent} />
+      <ProtectedRoute path="/test-agent" component={TestAgent} />
       <ProtectedRoute path="/prompts" component={Prompts} />
       <ProtectedRoute path="/settings" component={Settings} />
+      <ProtectedRoute path="/admin/agents" component={AdminAgents} />
+      <ProtectedRoute path="/admin/users" component={AdminUsers} />
       <Route component={NotFound} />
     </Switch>
   );

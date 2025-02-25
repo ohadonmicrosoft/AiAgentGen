@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { checkAuthenticated, checkAdmin, checkPermission, checkResourceOwnership } from "./middleware";
-import { testAgentResponse } from "./openai";
+import openaiService, { testAgentResponse } from "./openai";
 import { PERMISSIONS, ROLES, userRoleUpdateSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -285,9 +285,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             userId,
             username: user?.username
           }, message, {
-            promptTokens: response.usage?.prompt_tokens || 0,
-            completionTokens: response.usage?.completion_tokens || 0,
-            totalTokens: response.usage?.total_tokens || 0
+            promptTokens: response.usage ? Number(response.usage.prompt_tokens) : 0,
+            completionTokens: response.usage ? Number(response.usage.completion_tokens) : 0,
+            totalTokens: response.usage ? Number(response.usage.total_tokens) : 0
           });
         });
       }
