@@ -65,12 +65,13 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
   const sendMessageMutation = useMutation({
     mutationFn: async (values: FormValues) => {
       console.log('Sending non-streaming request with agent:', agent);
+      console.log('Message content:', values.message);
       const res = await apiRequest(
         "POST",
         "/api/agents/test",
         {
           agentId: agent.id,
-          systemPrompt: agent.systemPrompt,
+          systemPrompt: agent.systemPrompt || "You are an AI assistant. Help the user with their questions.",
           model: agent.model || 'gpt-4o',
           temperature: agent.temperature || 0.7,
           maxTokens: agent.maxTokens || 1000,
@@ -127,17 +128,18 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
     try {
       // Debug the agent info
       console.log('Streaming with agent:', agent);
+      console.log('Sending message:', message);
       
       const response = await fetch('/api/agents/test/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           agentId: agent.id,
-          systemPrompt: agent.systemPrompt,
+          systemPrompt: agent.systemPrompt || "You are an AI assistant. Help the user with their questions.",
           model: agent.model || 'gpt-4o',
           temperature: agent.temperature || 0.7,
           maxTokens: agent.maxTokens || 1000,
-          message
+          message: message
         }),
         credentials: 'include'
       });
