@@ -307,7 +307,16 @@ export default function Prompts() {
                     <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                       Cancel
                     </Button>
-                    <Button type="submit">Create Prompt</Button>
+                    <Button type="submit" disabled={createPromptMutation.isPending}>
+                      {createPromptMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Creating...
+                        </>
+                      ) : (
+                        "Create Prompt"
+                      )}
+                    </Button>
                   </DialogFooter>
                 </form>
               </Form>
@@ -328,10 +337,20 @@ export default function Prompts() {
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg">{prompt.title}</CardTitle>
-                      {prompt.isFavorite && <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />}
+                      <button 
+                        type="button" 
+                        onClick={() => handleToggleFavorite(prompt)}
+                        className="text-yellow-400 hover:text-yellow-500 focus:outline-none"
+                      >
+                        {prompt.isFavorite ? (
+                          <Star className="h-5 w-5 fill-yellow-400" />
+                        ) : (
+                          <StarOff className="h-5 w-5" />
+                        )}
+                      </button>
                     </div>
                     <div className="flex flex-wrap gap-1 mt-2">
-                      {prompt.tags.map(tag => (
+                      {Array.isArray(prompt.tags) && prompt.tags.map((tag: string) => (
                         <Badge key={tag} variant="secondary" className="text-xs">
                           {tag}
                         </Badge>
@@ -368,10 +387,16 @@ export default function Prompts() {
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg">{prompt.title}</CardTitle>
-                      <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                      <button 
+                        type="button" 
+                        onClick={() => handleToggleFavorite(prompt)}
+                        className="text-yellow-400 hover:text-yellow-500 focus:outline-none"
+                      >
+                        <Star className="h-5 w-5 fill-yellow-400" />
+                      </button>
                     </div>
                     <div className="flex flex-wrap gap-1 mt-2">
-                      {prompt.tags.map(tag => (
+                      {Array.isArray(prompt.tags) && prompt.tags.map((tag: string) => (
                         <Badge key={tag} variant="secondary" className="text-xs">
                           {tag}
                         </Badge>
