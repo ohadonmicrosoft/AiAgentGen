@@ -26,9 +26,13 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
   // Mutation for testing an agent
   const testAgentMutation = useMutation({
     mutationFn: async ({ config, message }: { config: any, message: string }) => {
+      console.log('Testing agent with config:', config, 'and message:', message);
       const res = await apiRequest("POST", "/api/agents/test", {
-        agentConfig: config,
-        userMessage: message
+        systemPrompt: config.systemPrompt,
+        model: config.model,
+        temperature: config.temperature,
+        maxTokens: config.maxTokens,
+        message: message
       });
       return res.json();
     },
