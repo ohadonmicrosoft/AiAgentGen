@@ -51,7 +51,7 @@ export default function AdminUsersPage() {
     error,
   } = useQuery<ApiUser[]>({
     queryKey: ["/api/admin/users"],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
   });
 
   // Fetch roles
@@ -60,7 +60,7 @@ export default function AdminUsersPage() {
     isLoading: rolesLoading,
   } = useQuery<string[]>({
     queryKey: ["/api/admin/roles"],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
   });
 
   // Fetch permissions
@@ -69,7 +69,7 @@ export default function AdminUsersPage() {
     isLoading: permissionsLoading,
   } = useQuery<string[]>({
     queryKey: ["/api/admin/permissions"],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
   });
 
   // Update user role mutation

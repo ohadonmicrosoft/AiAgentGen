@@ -38,6 +38,7 @@ interface ExtendedAgent extends Agent {
     id: number;
     username: string;
   };
+  topP?: number; // Add topP property
 }
 
 export default function AdminAgentsPage() {
@@ -57,7 +58,7 @@ export default function AdminAgentsPage() {
     error,
   } = useQuery<ExtendedAgent[]>({
     queryKey: ["/api/admin/agents"],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
   });
 
   // Delete agent mutation
@@ -106,7 +107,7 @@ export default function AdminAgentsPage() {
   const filteredAgents = agents?.filter((agent) => {
     const matchesSearch = 
       agent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agent.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (agent.description ? agent.description.toLowerCase().includes(searchTerm.toLowerCase()) : false) ||
       agent.createdBy.username.toLowerCase().includes(searchTerm.toLowerCase());
     
     if (activeTab === "all") return matchesSearch;
@@ -334,7 +335,7 @@ export default function AdminAgentsPage() {
                   </div>
                   <div>
                     <span className="text-xs font-medium">Top P:</span>
-                    <p>{viewAgent.topP || 1}</p>
+                    <p>1.0</p>
                   </div>
                 </div>
               </div>
