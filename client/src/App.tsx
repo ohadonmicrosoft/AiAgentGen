@@ -9,7 +9,7 @@ import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/dashboard";
 import Agents from "@/pages/agents";
 import CreateAgent from "@/pages/create-agent";
-import Prompts from "@/pages/prompts";
+import Prompts from "@/pages/prompts-new";
 import Settings from "@/pages/settings";
 
 function Router() {
