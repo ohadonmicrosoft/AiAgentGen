@@ -748,20 +748,15 @@ export class MemStorage implements IStorage {
   }
   
   async deleteConversation(id: number): Promise<void> {
-    // Delete all messages for this conversation
-    const messageIds: number[] = [];
-    
-    // Find all messages belonging to this conversation - using Array.from to avoid iteration issues
-    Array.from(this.messagesMap.entries()).forEach(([msgId, message]) => {
-      if (message.conversationId === id) {
-        messageIds.push(msgId);
-      }
-    });
+    // Get all messages in this conversation
+    const messages = this.getMessagesByConversationId(id);
     
     // Delete each message
-    for (const msgId of messageIds) {
-      this.messagesMap.delete(msgId);
-    }
+    messages.then(msgs => {
+      msgs.forEach(msg => {
+        this.messagesMap.delete(msg.id);
+      });
+    });
     
     // Delete the conversation
     this.conversationsMap.delete(id);
