@@ -91,6 +91,26 @@ export const prompts = pgTable("prompts", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Conversations table to store agent interaction history
+export const conversations = pgTable("conversations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  agentId: integer("agent_id").references(() => agents.id).notNull(),
+  title: text("title"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Messages table to store individual messages in conversations
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").references(() => conversations.id).notNull(),
+  role: text("role").notNull(), // 'user' or 'assistant'
+  content: text("content").notNull(),
+  tokenCount: integer("token_count"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -112,6 +132,17 @@ export const insertPromptSchema = createInsertSchema(prompts).omit({
   updatedAt: true,
 });
 
+export const insertConversationSchema = createInsertSchema(conversations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertMessageSchema = createInsertSchema(messages).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -121,6 +152,12 @@ export type Agent = typeof agents.$inferSelect;
 
 export type InsertPrompt = z.infer<typeof insertPromptSchema>;
 export type Prompt = typeof prompts.$inferSelect;
+
+export type InsertConversation = z.infer<typeof insertConversationSchema>;
+export type Conversation = typeof conversations.$inferSelect;
+
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type Message = typeof messages.$inferSelect;
 
 // Role and permission types
 export type Role = typeof ROLES[keyof typeof ROLES];

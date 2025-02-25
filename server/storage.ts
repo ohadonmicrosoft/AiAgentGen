@@ -1,4 +1,7 @@
-import { users, agents, prompts, ROLES, PERMISSIONS, ROLE_PERMISSIONS, type User, type InsertUser, type Agent, type InsertAgent, type Prompt, type InsertPrompt, type Role, type Permission } from "@shared/schema";
+import { users, agents, prompts, conversations, messages, ROLES, PERMISSIONS, ROLE_PERMISSIONS, 
+  type User, type InsertUser, type Agent, type InsertAgent, type Prompt, type InsertPrompt, 
+  type Conversation, type InsertConversation, type Message, type InsertMessage,
+  type Role, type Permission } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 import { eq, and } from "drizzle-orm";
