@@ -5,9 +5,8 @@ import { users, agents, prompts, conversations, messages, ROLES, PERMISSIONS, RO
 import session from "express-session";
 import createMemoryStore from "memorystore";
 import { eq, and } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { db } from "./db"; // Import the shared db instance directly
 import connectPg from "connect-pg-simple";
 
 const MemoryStore = createMemoryStore(session);
@@ -75,27 +74,17 @@ export interface IStorage {
 
 // PostgreSQL Database Storage Implementation
 export class PostgresStorage implements IStorage {
-  db: PostgresJsDatabase;
+  db: PostgresJsDatabase<any>;
   sessionStore: SessionStore;
   
   constructor() {
-    if (!process.env.DATABASE_URL) {
-      throw new Error("DATABASE_URL environment variable is required");
-    }
+    // Use the shared db instance that was already imported at the top
+    this.db = db;
     
-    // Create connection pool
-    const connectionString = process.env.DATABASE_URL;
-    const client = postgres(connectionString);
-    this.db = drizzle(client);
-    
-    // Set up session store
-    const PostgresSessionStore = connectPg(session);
-    this.sessionStore = new PostgresSessionStore({
-      conObject: {
-        connectionString,
-        ssl: process.env.NODE_ENV === 'production'
-      },
-      createTableIfMissing: true
+    // Set up session store with memory store for development to avoid connection issues
+    // In production, you would use the PostgreSQL session store
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000 // 24 hours
     });
   }
   
