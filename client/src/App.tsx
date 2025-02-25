@@ -24,6 +24,7 @@ function Router() {
       <ProtectedRoute path="/create-agent" component={CreateAgent} />
       <ProtectedRoute path="/agents/:id/test" component={TestAgent} />
       <ProtectedRoute path="/test-agent" component={TestAgent} />
+      <ProtectedRoute path="/test-agent/:id" component={TestAgent} />
       <ProtectedRoute path="/prompts" component={Prompts} />
       <ProtectedRoute path="/settings" component={Settings} />
       <ProtectedRoute path="/admin/agents" component={AdminAgents} />

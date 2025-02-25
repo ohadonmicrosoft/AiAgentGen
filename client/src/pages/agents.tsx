@@ -117,7 +117,7 @@ export default function Agents() {
                       lastUpdated: formatLastUpdated(agent.updatedAt)
                     }}
                     onEdit={() => navigate(`/agents/${agent.id}`)}
-                    onTest={() => {}}
+                    onTest={() => navigate(`/test-agent/${agent.id}`)}
                   />
                 ))}
                 {filteredAgents?.length === 0 && (
@@ -141,7 +141,7 @@ export default function Agents() {
                       lastUpdated: formatLastUpdated(agent.updatedAt)
                     }}
                     onEdit={() => navigate(`/agents/${agent.id}`)}
-                    onTest={() => {}}
+                    onTest={() => navigate(`/test-agent/${agent.id}`)}
                   />
                 ))}
                 {activeAgents?.length === 0 && (
@@ -165,7 +165,7 @@ export default function Agents() {
                       lastUpdated: formatLastUpdated(agent.updatedAt)
                     }}
                     onEdit={() => navigate(`/agents/${agent.id}`)}
-                    onTest={() => {}}
+                    onTest={() => navigate(`/test-agent/${agent.id}`)}
                   />
                 ))}
                 {draftAgents?.length === 0 && (
