@@ -115,10 +115,14 @@ export default function TestAgentPage() {
         </div>
         
         <Tabs defaultValue="test" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full md:w-[400px] grid-cols-2">
+          <TabsList className="grid w-full md:w-[600px] grid-cols-3">
             <TabsTrigger value="test">
               <Bot className="mr-2 h-4 w-4" />
               Test Agent
+            </TabsTrigger>
+            <TabsTrigger value="history">
+              <History className="mr-2 h-4 w-4" />
+              Conversation History
             </TabsTrigger>
             <TabsTrigger value="config">
               <Cog className="mr-2 h-4 w-4" />
@@ -128,6 +132,38 @@ export default function TestAgentPage() {
           
           <TabsContent value="test" className="space-y-4 pt-4">
             <AgentTester agent={currentAgent as Partial<Agent>} />
+          </TabsContent>
+          
+          <TabsContent value="history" className="space-y-4 pt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5 text-primary" />
+                  Conversation History
+                </CardTitle>
+                <CardDescription>
+                  View past conversations with this agent
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {id ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground mb-2">
+                      To manage conversation history, go to the Test Agent tab and use the History button.
+                    </p>
+                    <Button variant="outline" onClick={() => setActiveTab("test")}>
+                      Go to Test Agent
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground mb-2">
+                      You need to save this agent before you can use conversation history.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
           
           <TabsContent value="config" className="space-y-4 pt-4">

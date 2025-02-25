@@ -328,7 +328,28 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
   // Create a new conversation
   const startNewConversation = () => {
     const title = `Conversation ${new Date().toLocaleString()}`;
-    createConversationMutation.mutate(title);
+    
+    // First create the conversation
+    createConversationMutation.mutate(title, {
+      onSuccess: async (newConversation) => {
+        // If we have existing messages, save them to the new conversation
+        if (messages.length > 0) {
+          // Save each message in sequence to maintain order
+          for (const message of messages) {
+            await saveMessageMutation.mutateAsync({
+              role: message.role,
+              content: message.content,
+              tokenCount: message.role === 'assistant' ? tokenUsage?.totalTokens : undefined
+            });
+          }
+          
+          toast({
+            title: "Chat saved",
+            description: "Your conversation has been saved successfully.",
+          });
+        }
+      }
+    });
   };
 
   // Load a conversation history
@@ -442,13 +463,101 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
             <CardTitle className="flex items-center gap-2">
               <Bot className="h-5 w-5 text-primary" />
               Test: {agent.name || "Agent"}
+              {activeConversation && (
+                <Badge variant="outline" className="ml-2">
+                  {activeConversation.title}
+                </Badge>
+              )}
             </CardTitle>
             <CardDescription>
               Test your agent in real-time before deploying
             </CardDescription>
           </div>
-          <Badge>{agent.model || "gpt-4o"}</Badge>
+          <div className="flex gap-2">
+            {agent.id && ( // Only show conversation options if this is a real agent
+              <>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setShowConversations(!showConversations)}
+                  className="flex items-center gap-1"
+                >
+                  <Clock className="h-4 w-4" />
+                  History
+                </Button>
+                
+                {messages.length > 0 && !activeConversation && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={startNewConversation}
+                    className="flex items-center gap-1"
+                  >
+                    <Save className="h-4 w-4" />
+                    Save Chat
+                  </Button>
+                )}
+              </>
+            )}
+            <Badge>{agent.model || "gpt-4o"}</Badge>
+          </div>
         </div>
+        
+        {/* Conversation History Panel */}
+        {showConversations && (
+          <div className="mt-4 p-3 border rounded-md bg-muted/50">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-sm font-medium">Conversation History</h3>
+              <Button variant="default" size="sm" onClick={startNewConversation}>
+                New Conversation
+              </Button>
+            </div>
+            
+            {loadingConversations ? (
+              <div className="flex justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : conversations && conversations.length > 0 ? (
+              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
+                {conversations.map((conversation) => (
+                  <div 
+                    key={conversation.id} 
+                    className={`flex justify-between items-center p-2 rounded-md hover:bg-muted cursor-pointer ${
+                      activeConversation?.id === conversation.id ? 'bg-muted border-primary' : ''
+                    }`}
+                    onClick={() => loadConversation(conversation)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{conversation.title}</span>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteConversationMutation.mutate(conversation.id);
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-destructive">
+                          <path d="M3 6h18"></path>
+                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        </svg>
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-4 text-center text-sm text-muted-foreground">
+                No saved conversations. Start a new one to save your chat history.
+              </div>
+            )}
+          </div>
+        )}
       </CardHeader>
       
       <CardContent className="flex-grow">
