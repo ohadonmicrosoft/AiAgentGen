@@ -141,6 +141,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/prompts/:id", checkAuthenticated, async (req, res) => {
+    try {
+      const prompt = await storage.getPrompt(parseInt(req.params.id));
+      if (!prompt) {
+        return res.status(404).json({ error: "Prompt not found" });
+      }
+      
+      if (prompt.userId !== req.user!.id) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      res.json(prompt);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch prompt" });
+    }
+  });
+
+  app.put("/api/prompts/:id", checkAuthenticated, async (req, res) => {
+    try {
+      const promptId = parseInt(req.params.id);
+      const prompt = await storage.getPrompt(promptId);
+      
+      if (!prompt) {
+        return res.status(404).json({ error: "Prompt not found" });
+      }
+      
+      if (prompt.userId !== req.user!.id) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const updatedPrompt = await storage.updatePrompt(promptId, {
+        ...req.body,
+        updatedAt: new Date().toISOString()
+      });
+      
+      res.json(updatedPrompt);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update prompt" });
+    }
+  });
+
+  app.delete("/api/prompts/:id", checkAuthenticated, async (req, res) => {
+    try {
+      const promptId = parseInt(req.params.id);
+      const prompt = await storage.getPrompt(promptId);
+      
+      if (!prompt) {
+        return res.status(404).json({ error: "Prompt not found" });
+      }
+      
+      if (prompt.userId !== req.user!.id) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      await storage.deletePrompt(promptId);
+      res.sendStatus(204);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete prompt" });
+    }
+  });
+
   // Test an agent with OpenAI
   app.post("/api/agents/test", checkAuthenticated, async (req, res) => {
     try {

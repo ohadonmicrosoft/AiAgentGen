@@ -33,7 +33,7 @@ export const prompts = pgTable("prompts", {
   userId: integer("user_id").references(() => users.id).notNull(),
   title: text("title").notNull(),
   content: text("content").notNull(),
-  tags: text("tags"),
+  tags: text("tags").array(),
   isFavorite: boolean("is_favorite").default(false),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),

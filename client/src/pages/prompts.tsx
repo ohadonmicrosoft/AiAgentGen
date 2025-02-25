@@ -1,6 +1,6 @@
 import { useState } from "react";
 import MainLayout from "@/layouts/MainLayout";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,84 +12,219 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Search, Edit, Clock, Star, Tag } from "lucide-react";
-
-interface Prompt {
-  id: string;
-  title: string;
-  content: string;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-  isFavorite: boolean;
-}
+import { Plus, Search, Edit, Clock, Star, StarOff, Trash2, Loader2 } from "lucide-react";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+import { Prompt } from "@shared/schema";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const promptFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   content: z.string().min(10, "Prompt must be at least 10 characters"),
   tags: z.string().optional(),
+  isFavorite: z.boolean().default(false),
 });
 
 type PromptFormValues = z.infer<typeof promptFormSchema>;
 
 export default function Prompts() {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [currentPrompt, setCurrentPrompt] = useState<Prompt | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Mock data - would come from API in real implementation
-  const { data: prompts } = useQuery<Prompt[]>({
+  // Fetch prompts from API
+  const { data: prompts, isLoading: isLoadingPrompts } = useQuery<Prompt[]>({
     queryKey: ["/api/prompts"],
-    queryFn: () => ([
-      {
-        id: "1",
-        title: "Customer Greeting",
-        content: "You are a helpful customer service agent for a tech company. Greet the customer warmly and ask how you can help them today.",
-        tags: ["customer-service", "greeting"],
-        createdAt: "2023-05-15T10:30:00Z",
-        updatedAt: "2023-05-15T10:30:00Z",
-        isFavorite: true
-      },
-      {
-        id: "2",
-        title: "Product Recommendation",
-        content: "Based on the customer's preferences, recommend products from our catalog that match their needs. Be specific and provide reasons for each recommendation.",
-        tags: ["sales", "recommendation"],
-        createdAt: "2023-06-02T14:45:00Z",
-        updatedAt: "2023-06-10T09:15:00Z",
-        isFavorite: false
-      },
-      {
-        id: "3",
-        title: "Technical Support",
-        content: "You are a technical support specialist. Ask diagnostic questions to understand the user's problem, then provide step-by-step troubleshooting instructions.",
-        tags: ["technical", "support"],
-        createdAt: "2023-06-20T16:22:00Z",
-        updatedAt: "2023-06-22T11:05:00Z",
-        isFavorite: true
-      }
-    ]),
+    enabled: !!user,
   });
 
+  // Create new prompt mutation
+  const createPromptMutation = useMutation({
+    mutationFn: async (values: PromptFormValues) => {
+      const tagsArray = values.tags ? values.tags.split(',').map(tag => tag.trim()) : [];
+      const promptData = {
+        title: values.title,
+        content: values.content,
+        tags: tagsArray,
+        isFavorite: values.isFavorite,
+      };
+      
+      const res = await apiRequest("POST", "/api/prompts", promptData);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/prompts"] });
+      toast({
+        title: "Prompt created",
+        description: "Your prompt has been created successfully.",
+      });
+      form.reset();
+      setIsCreateDialogOpen(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error creating prompt",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update prompt mutation
+  const updatePromptMutation = useMutation({
+    mutationFn: async (values: PromptFormValues & { id: number }) => {
+      const { id, ...promptData } = values;
+      const tagsArray = values.tags ? values.tags.split(',').map(tag => tag.trim()) : [];
+      
+      const res = await apiRequest("PUT", `/api/prompts/${id}`, {
+        ...promptData,
+        tags: tagsArray,
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/prompts"] });
+      toast({
+        title: "Prompt updated",
+        description: "Your prompt has been updated successfully.",
+      });
+      editForm.reset();
+      setIsEditDialogOpen(false);
+      setCurrentPrompt(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error updating prompt",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Toggle favorite status mutation
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async ({ id, isFavorite }: { id: number, isFavorite: boolean }) => {
+      const res = await apiRequest("PUT", `/api/prompts/${id}`, {
+        isFavorite,
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/prompts"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error updating favorite status",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete prompt mutation
+  const deletePromptMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/prompts/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/prompts"] });
+      toast({
+        title: "Prompt deleted",
+        description: "Your prompt has been deleted successfully.",
+      });
+      setIsDeleteDialogOpen(false);
+      setCurrentPrompt(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error deleting prompt",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Create prompt form
   const form = useForm<PromptFormValues>({
     resolver: zodResolver(promptFormSchema),
     defaultValues: {
       title: "",
       content: "",
       tags: "",
+      isFavorite: false,
+    },
+  });
+
+  // Edit prompt form
+  const editForm = useForm<PromptFormValues & { id: number }>({
+    resolver: zodResolver(promptFormSchema.extend({
+      id: z.number(),
+    })),
+    defaultValues: {
+      id: 0,
+      title: "",
+      content: "",
+      tags: "",
+      isFavorite: false,
     },
   });
 
   const onSubmit = (values: PromptFormValues) => {
-    console.log(values);
-    // Here you would send the data to your API
-    form.reset();
-    setIsCreateDialogOpen(false);
+    createPromptMutation.mutate(values);
+  };
+
+  const onEditSubmit = (values: PromptFormValues & { id: number }) => {
+    updatePromptMutation.mutate(values);
+  };
+
+  const handleEditPrompt = (prompt: Prompt) => {
+    setCurrentPrompt(prompt);
+    editForm.reset({
+      id: prompt.id,
+      title: prompt.title,
+      content: prompt.content,
+      tags: Array.isArray(prompt.tags) ? prompt.tags.join(", ") : "",
+      isFavorite: prompt.isFavorite || false,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeletePrompt = (prompt: Prompt) => {
+    setCurrentPrompt(prompt);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (currentPrompt) {
+      deletePromptMutation.mutate(currentPrompt.id);
+    }
+  };
+
+  const handleToggleFavorite = (prompt: Prompt) => {
+    toggleFavoriteMutation.mutate({
+      id: prompt.id,
+      isFavorite: !(prompt.isFavorite || false),
+    });
   };
 
   const filteredPrompts = prompts?.filter(prompt => 
     prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
     prompt.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    prompt.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    (Array.isArray(prompt.tags) && prompt.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase())))
   );
   
   const favoritePrompts = filteredPrompts?.filter(prompt => prompt.isFavorite);

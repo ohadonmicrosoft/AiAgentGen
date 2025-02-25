@@ -1,5 +1,7 @@
+import { Request, Response, NextFunction } from "express";
+
 // Authentication middleware
-export function checkAuthenticated(req: any, res: any, next: any) {
+export function checkAuthenticated(req: Request, res: Response, next: NextFunction) {
   if (req.isAuthenticated()) {
     return next();
   }
