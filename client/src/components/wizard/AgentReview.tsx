@@ -79,22 +79,23 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
 
   const handleCreateAgent = async () => {
     if (preview) return;
+    
+    // Prepare data for API
+    const agentData = {
+      name: formData.name,
+      description: formData.description,
+      type: formData.type,
+      model: formData.model || "gpt-4o",
+      temperature: formData.temperature?.toString() || "0.7",
+      maxTokens: formData.maxTokens || 2048,
+      responseStyle: formData.responseStyle || "formal",
+      systemPrompt: formData.systemPrompt,
+      status: "draft" // Default to draft status
+    };
+    
+    console.log("Creating agent with data:", agentData);
     setIsSubmitting(true);
-    createAgentMutation.mutate(formData);
-    
-    // Update state based on mutation state
-    if (createAgentMutation.isPending) {
-      setIsSubmitting(true);
-    }
-    
-    if (createAgentMutation.isSuccess) {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-    }
-    
-    if (createAgentMutation.isError) {
-      setIsSubmitting(false);
-    }
+    createAgentMutation.mutate(agentData);
   };
   
   const handleTestAgent = () => {
@@ -106,9 +107,29 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
       return;
     }
     
+    // Ensure we have a system prompt
+    if (!formData.systemPrompt?.trim()) {
+      toast({
+        title: "System prompt required",
+        description: "Please go back and provide a system prompt for your agent.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Prepare agent config for testing
+    const agentConfig = {
+      systemPrompt: formData.systemPrompt,
+      model: formData.model || "gpt-4o",
+      temperature: formData.temperature || 0.7,
+      maxTokens: formData.maxTokens || 2048,
+      responseStyle: formData.responseStyle || "formal"
+    };
+    
+    console.log("Testing agent with config:", agentConfig);
     setIsTestingAgent(true);
     testAgentMutation.mutate({ 
-      config: formData, 
+      config: agentConfig, 
       message: testMessage
     });
   };

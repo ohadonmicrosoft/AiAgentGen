@@ -46,7 +46,7 @@ export default function Agents() {
   const { user } = useAuth();
   
   // Fetch agents from the API
-  const { data: agents, isLoading, error } = useQuery<Agent[]>({
+  const { data: agents, isLoading, error } = useQuery<AgentSchema[]>({
     queryKey: ["/api/agents"],
     enabled: !!user,
   });

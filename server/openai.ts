@@ -42,16 +42,26 @@ export async function generateResponse(
 
 export async function testAgentResponse(agent: any, userMessage: string) {
   try {
+    // Parse values to ensure correct types
+    const temperature = typeof agent.temperature === 'string' 
+      ? parseFloat(agent.temperature) 
+      : agent.temperature;
+      
+    const maxTokens = typeof agent.maxTokens === 'string' 
+      ? parseInt(agent.maxTokens) 
+      : agent.maxTokens;
+    
     return await generateResponse(
       agent.systemPrompt,
       userMessage,
       {
-        temperature: parseFloat(agent.temperature),
-        maxTokens: parseInt(agent.maxTokens),
-        model: agent.model
+        temperature: temperature || 0.7,
+        maxTokens: maxTokens || 2048,
+        model: agent.model || "gpt-4o"
       }
     );
   } catch (error: any) {
+    console.error("Agent testing error:", error);
     throw new Error(`Failed to test agent: ${error.message}`);
   }
 }

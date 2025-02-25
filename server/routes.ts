@@ -211,11 +211,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing agent configuration or user message" });
       }
       
+      console.log("Testing agent with configuration:", {
+        model: agentConfig.model,
+        temperature: agentConfig.temperature,
+        maxTokens: agentConfig.maxTokens,
+        responseStyle: agentConfig.responseStyle,
+      });
+      
       const response = await testAgentResponse(agentConfig, userMessage);
       res.json(response);
     } catch (error: any) {
       console.error("OpenAI test error:", error);
       res.status(500).json({ error: error.message || "Failed to test agent" });
+    }
+  });
+  
+  // Verify OpenAI API connection
+  app.get("/api/openai/verify", checkAuthenticated, async (req, res) => {
+    try {
+      const apiKey = await storage.getApiKey(req.user!.id);
+      
+      if (!apiKey && !process.env.OPENAI_API_KEY) {
+        return res.status(400).json({ 
+          error: "No API key found. Please add your OpenAI API key in the settings page." 
+        });
+      }
+      
+      // Just do a simple check with minimal tokens
+      const response = await testAgentResponse({
+        systemPrompt: "You are a helpful assistant.",
+        model: "gpt-4o",
+        temperature: 0.7,
+        maxTokens: 50
+      }, "Hello, are you working?");
+      
+      res.json({ 
+        status: "success", 
+        message: "Successfully connected to OpenAI API",
+        sample: response.content 
+      });
+    } catch (error: any) {
+      console.error("OpenAI verification error:", error);
+      res.status(500).json({ 
+        status: "error",
+        error: error.message || "Failed to verify OpenAI API connection" 
+      });
     }
   });
   
