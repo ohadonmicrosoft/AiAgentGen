@@ -658,6 +658,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Conversation History Management
   
+  // Create a new conversation
+  app.post("/api/conversations", checkAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const { agentId, title } = req.body;
+      console.log("[Conversations] Creating conversation for agent", agentId);
+      
+      if (!agentId) {
+        return res.status(400).json({ error: "Agent ID is required" });
+      }
+      
+      // Make sure agent exists
+      const agent = await storage.getAgent(parseInt(String(agentId)));
+      if (!agent) {
+        return res.status(404).json({ error: "Agent not found" });
+      }
+      
+      // Check if user has permission to use this agent
+      if (agent.userId !== userId && 
+          !await storage.hasPermission(userId, PERMISSIONS.USE_ANY_AGENT)) {
+        return res.status(403).json({ error: "You don't have permission to use this agent" });
+      }
+      
+      // Create the conversation
+      const conversation = await storage.createConversation({
+        userId,
+        agentId: parseInt(String(agentId)),
+        title: title || `Conversation ${new Date().toLocaleString()}`
+      });
+      
+      res.status(201).json(conversation);
+    } catch (error: any) {
+      console.error("[Conversations] Error creating conversation:", error);
+      res.status(500).json({ error: error.message || "Failed to create conversation" });
+    }
+  });
+
   // Get user's conversations
   app.get("/api/conversations", checkAuthenticated, async (req, res) => {
     try {
@@ -740,41 +777,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create a new conversation
-  app.post("/api/conversations", checkAuthenticated, async (req, res) => {
-    try {
-      const userId = req.user!.id;
-      const { agentId, title } = req.body;
-      console.log("[Conversations] Creating new conversation with agent", agentId);
-      
-      if (!agentId) {
-        return res.status(400).json({ error: "Agent ID is required" });
-      }
-      
-      // Check if agent exists and user has access to it
-      const agent = await storage.getAgent(agentId);
-      if (!agent) {
-        return res.status(404).json({ error: "Agent not found" });
-      }
-      
-      if (agent.userId !== userId && 
-          !await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT)) {
-        return res.status(403).json({ error: "You don't have permission to use this agent" });
-      }
-      
-      // Create conversation
-      const conversation = await storage.createConversation({
-        userId,
-        agentId,
-        title: title || `Conversation with ${agent.name}`
-      });
-      
-      res.status(201).json(conversation);
-    } catch (error: any) {
-      console.error("[Conversations] Error creating conversation:", error);
-      res.status(500).json({ error: error.message || "Failed to create conversation" });
-    }
-  });
+
 
   // Add a message to a conversation
   app.post("/api/conversations/:id/messages", checkAuthenticated, async (req, res) => {
