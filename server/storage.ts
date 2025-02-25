@@ -56,6 +56,19 @@ export interface IStorage {
   updatePrompt(id: number, prompt: Partial<Prompt>): Promise<Prompt>;
   deletePrompt(id: number): Promise<void>;
   
+  // Conversation history methods
+  getConversation(id: number): Promise<Conversation | undefined>;
+  getConversationsByUserId(userId: number): Promise<Conversation[]>;
+  getConversationsByAgentId(agentId: number): Promise<Conversation[]>;
+  createConversation(conversation: InsertConversation): Promise<Conversation>;
+  updateConversation(id: number, conversation: Partial<Conversation>): Promise<Conversation>;
+  deleteConversation(id: number): Promise<void>;
+  
+  // Message methods
+  getMessage(id: number): Promise<Message | undefined>;
+  getMessagesByConversationId(conversationId: number): Promise<Message[]>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  
   // Session store
   sessionStore: SessionStore;
 }
@@ -336,6 +349,85 @@ export class PostgresStorage implements IStorage {
   async deletePrompt(id: number): Promise<void> {
     await this.db.delete(prompts).where(eq(prompts.id, id));
   }
+  
+  // Conversation methods
+  async getConversation(id: number): Promise<Conversation | undefined> {
+    const results = await this.db.select().from(conversations).where(eq(conversations.id, id));
+    return results[0];
+  }
+  
+  async getConversationsByUserId(userId: number): Promise<Conversation[]> {
+    return await this.db.select()
+      .from(conversations)
+      .where(eq(conversations.userId, userId));
+  }
+  
+  async getConversationsByAgentId(agentId: number): Promise<Conversation[]> {
+    return await this.db.select()
+      .from(conversations)
+      .where(eq(conversations.agentId, agentId));
+  }
+  
+  async createConversation(insertConversation: InsertConversation): Promise<Conversation> {
+    const conversation = {
+      ...insertConversation,
+      title: insertConversation.title || null,
+      // createdAt and updatedAt will be set by the database defaultNow()
+    };
+    
+    const result = await this.db.insert(conversations).values(conversation).returning();
+    return result[0];
+  }
+  
+  async updateConversation(id: number, updates: Partial<Conversation>): Promise<Conversation> {
+    // Remove any timestamps from updates as they're handled by the database
+    const { createdAt, updatedAt, ...safeUpdates } = updates;
+    
+    const result = await this.db.update(conversations)
+      .set({
+        ...safeUpdates,
+        updatedAt: new Date() // PostgreSQL will handle the timestamp conversion
+      })
+      .where(eq(conversations.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error(`Conversation with id ${id} not found`);
+    }
+    
+    return result[0];
+  }
+  
+  async deleteConversation(id: number): Promise<void> {
+    // First delete all messages in this conversation
+    await this.db.delete(messages).where(eq(messages.conversationId, id));
+    // Then delete the conversation itself
+    await this.db.delete(conversations).where(eq(conversations.id, id));
+  }
+  
+  // Message methods
+  async getMessage(id: number): Promise<Message | undefined> {
+    const results = await this.db.select().from(messages).where(eq(messages.id, id));
+    return results[0];
+  }
+  
+  async getMessagesByConversationId(conversationId: number): Promise<Message[]> {
+    return await this.db.select()
+      .from(messages)
+      .where(eq(messages.conversationId, conversationId))
+      .orderBy(messages.createdAt);
+  }
+  
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const message = {
+      ...insertMessage,
+      tokenCount: insertMessage.tokenCount || null,
+      // createdAt will be set by the database defaultNow()
+    };
+    
+    const result = await this.db.insert(messages).values(message).returning();
+    return result[0];
+  }
 }
 
 // In-memory storage implementation for development and testing
@@ -344,10 +436,14 @@ export class MemStorage implements IStorage {
   private agentsMap: Map<number, Agent>;
   private promptsMap: Map<number, Prompt>;
   private apiKeysMap: Map<number, string>;
+  private conversationsMap: Map<number, Conversation>;
+  private messagesMap: Map<number, Message>;
   
   userIdCounter: number;
   agentIdCounter: number;
   promptIdCounter: number;
+  conversationIdCounter: number;
+  messageIdCounter: number;
   sessionStore: SessionStore;
 
   constructor() {
@@ -355,10 +451,14 @@ export class MemStorage implements IStorage {
     this.agentsMap = new Map();
     this.promptsMap = new Map();
     this.apiKeysMap = new Map();
+    this.conversationsMap = new Map();
+    this.messagesMap = new Map();
     
     this.userIdCounter = 1;
     this.agentIdCounter = 1;
     this.promptIdCounter = 1;
+    this.conversationIdCounter = 1;
+    this.messageIdCounter = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000, // prune expired entries every 24h
@@ -597,6 +697,101 @@ export class MemStorage implements IStorage {
 
   async deletePrompt(id: number): Promise<void> {
     this.promptsMap.delete(id);
+  }
+
+  // Conversation methods
+  async getConversation(id: number): Promise<Conversation | undefined> {
+    return this.conversationsMap.get(id);
+  }
+  
+  async getConversationsByUserId(userId: number): Promise<Conversation[]> {
+    return Array.from(this.conversationsMap.values()).filter(
+      (conversation) => conversation.userId === userId,
+    );
+  }
+  
+  async getConversationsByAgentId(agentId: number): Promise<Conversation[]> {
+    return Array.from(this.conversationsMap.values()).filter(
+      (conversation) => conversation.agentId === agentId,
+    );
+  }
+  
+  async createConversation(insertConversation: InsertConversation): Promise<Conversation> {
+    const id = this.conversationIdCounter++;
+    const now = new Date();
+    
+    const conversation: Conversation = { 
+      ...insertConversation, 
+      id,
+      title: insertConversation.title || null,
+      createdAt: now,
+      updatedAt: now
+    };
+    this.conversationsMap.set(id, conversation);
+    return conversation;
+  }
+  
+  async updateConversation(id: number, updates: Partial<Conversation>): Promise<Conversation> {
+    const conversation = this.conversationsMap.get(id);
+    if (!conversation) {
+      throw new Error(`Conversation with id ${id} not found`);
+    }
+    
+    const updatesWithTimestamp = {
+      ...updates,
+      updatedAt: new Date()
+    };
+    
+    const updatedConversation = { ...conversation, ...updatesWithTimestamp };
+    this.conversationsMap.set(id, updatedConversation);
+    return updatedConversation;
+  }
+  
+  async deleteConversation(id: number): Promise<void> {
+    // Delete all messages for this conversation
+    const messageIds: number[] = [];
+    
+    // Find all messages belonging to this conversation - using Array.from to avoid iteration issues
+    Array.from(this.messagesMap.entries()).forEach(([msgId, message]) => {
+      if (message.conversationId === id) {
+        messageIds.push(msgId);
+      }
+    });
+    
+    // Delete each message
+    for (const msgId of messageIds) {
+      this.messagesMap.delete(msgId);
+    }
+    
+    // Delete the conversation
+    this.conversationsMap.delete(id);
+  }
+  
+  // Message methods
+  async getMessage(id: number): Promise<Message | undefined> {
+    return this.messagesMap.get(id);
+  }
+  
+  async getMessagesByConversationId(conversationId: number): Promise<Message[]> {
+    const messages = Array.from(this.messagesMap.values())
+      .filter(message => message.conversationId === conversationId)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+      
+    return messages;
+  }
+  
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const id = this.messageIdCounter++;
+    const now = new Date();
+    
+    const message: Message = { 
+      ...insertMessage, 
+      id,
+      tokenCount: insertMessage.tokenCount || null,
+      createdAt: now
+    };
+    this.messagesMap.set(id, message);
+    return message;
   }
 }
 
