@@ -64,11 +64,16 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
   // Non-streaming response mutation
   const sendMessageMutation = useMutation({
     mutationFn: async (values: FormValues) => {
+      console.log('Sending non-streaming request with agent:', agent);
       const res = await apiRequest(
         "POST",
         "/api/agents/test",
         {
           agentId: agent.id,
+          systemPrompt: agent.systemPrompt,
+          model: agent.model || 'gpt-4o',
+          temperature: agent.temperature || 0.7,
+          maxTokens: agent.maxTokens || 1000,
           message: values.message,
           stream: false
         }
@@ -120,11 +125,18 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
     setMessages((prev) => [...prev, assistantMsg]);
     
     try {
+      // Debug the agent info
+      console.log('Streaming with agent:', agent);
+      
       const response = await fetch('/api/agents/test/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           agentId: agent.id,
+          systemPrompt: agent.systemPrompt,
+          model: agent.model || 'gpt-4o',
+          temperature: agent.temperature || 0.7,
+          maxTokens: agent.maxTokens || 1000,
           message
         }),
         credentials: 'include'

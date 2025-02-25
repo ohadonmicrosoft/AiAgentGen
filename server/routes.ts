@@ -239,7 +239,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/agents/test", checkAuthenticated, async (req, res) => {
     try {
       const userId = req.user!.id;
-      const { agentId, message, stream = false } = req.body;
+      const { agentId, message, systemPrompt, model, temperature, maxTokens, stream = false } = req.body;
+      
+      console.log('Non-stream request body:', {
+        agentId, message, systemPrompt, model, temperature, maxTokens
+      });
       
       if (!message) {
         return res.status(400).json({ error: "Message is required" });
@@ -247,8 +251,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get agent details if agentId is provided
       let agent;
-      if (agentId) {
+      if (agentId && !isNaN(parseInt(String(agentId)))) {
         agent = await storage.getAgent(parseInt(String(agentId)));
+        console.log('Found agent by ID:', agent);
         
         // Check if user can access this agent
         if (agent && agent.userId !== userId && 
@@ -257,10 +262,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } else {
         // Use a temporary agent configuration from request body
-        agent = req.body;
+        agent = {
+          systemPrompt,
+          model,
+          temperature,
+          maxTokens,
+          ...req.body
+        };
+        console.log('Using temporary agent:', agent);
       }
       
       if (!agent || !agent.systemPrompt) {
+        console.log('Invalid agent configuration:', agent);
         return res.status(400).json({ error: "Invalid agent configuration" });
       }
       
@@ -325,7 +338,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Streaming API for real-time agent responses
   app.post("/api/agents/test/stream", checkAuthenticated, async (req, res) => {
     const userId = req.user!.id;
-    const { agentId, message } = req.body;
+    const { agentId, message, systemPrompt, model, temperature, maxTokens } = req.body;
+    
+    console.log('Stream request body:', {
+      agentId, message, systemPrompt, model, temperature, maxTokens
+    });
     
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
@@ -334,8 +351,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Get agent details
       let agent;
-      if (agentId) {
+      if (agentId && !isNaN(parseInt(String(agentId)))) {
         agent = await storage.getAgent(parseInt(String(agentId)));
+        console.log('Found agent by ID:', agent);
         
         // Check if user can access this agent
         if (agent && agent.userId !== userId && 
@@ -344,10 +362,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } else {
         // Use a temporary agent configuration from request body
-        agent = req.body;
+        agent = {
+          systemPrompt,
+          model,
+          temperature,
+          maxTokens,
+          ...req.body
+        };
+        console.log('Using temporary agent:', agent);
       }
       
       if (!agent || !agent.systemPrompt) {
+        console.log('Invalid agent configuration:', agent);
         return res.status(400).json({ error: "Invalid agent configuration" });
       }
       
