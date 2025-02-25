@@ -165,6 +165,30 @@ export default function AuthPage() {
                     >
                       Create Dev Account
                     </Button>
+                    <Button 
+                      variant="secondary" 
+                      size="sm"
+                      className="flex-1 text-xs h-8"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch("/api/devlogin", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                            credentials: "include"
+                          });
+                          
+                          if (response.ok) {
+                            window.location.href = "/"; // Force reload to update auth state
+                          }
+                        } catch (error) {
+                          console.error("Dev quick login failed:", error);
+                        }
+                      }}
+                    >
+                      Quick Login
+                    </Button>
                   </div>
                 </CardFooter>
               </Card>

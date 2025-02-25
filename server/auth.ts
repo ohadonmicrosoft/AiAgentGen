@@ -89,7 +89,7 @@ export function setupAuth(app: Express) {
 
   app.post("/api/login", (req, res, next) => {
     console.log("[Auth] Login attempt:", req.body.username);
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", (err: any, user: SelectUser | false, info: any) => {
       if (err) {
         console.error("[Auth] Login error:", err);
         return next(err);
@@ -130,5 +130,33 @@ export function setupAuth(app: Express) {
       return res.json(req.user);
     }
     return res.sendStatus(401);
+  });
+  
+  // Developer login endpoint - for easy testing only
+  app.post("/api/devlogin", async (req, res, next) => {
+    console.log("[Auth] Developer login");
+    
+    // Try to find the developer user
+    let user = await storage.getUserByUsername("developer");
+    
+    // If developer user doesn't exist, create one
+    if (!user) {
+      console.log("[Auth] Creating developer user");
+      user = await storage.createUser({
+        username: "developer",
+        password: await hashPassword("password"),
+        email: "dev@example.com"
+      });
+    }
+    
+    // Log in
+    req.login(user, (err) => {
+      if (err) {
+        console.error("[Auth] Developer login failed:", err);
+        return next(err);
+      }
+      console.log("[Auth] Developer login successful");
+      return res.status(200).json(user);
+    });
   });
 }
