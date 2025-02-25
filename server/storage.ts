@@ -3,7 +3,8 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
-type SessionStore = ReturnType<typeof MemoryStore>;
+// Create a simpler type definition that avoids complications
+type SessionStore = any;
 
 export interface IStorage {
   // User methods
