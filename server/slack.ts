@@ -111,13 +111,15 @@ export async function notifyAgentCreated(agent: {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `*Created by:*\n${agent.username || `User #${agent.userId}`}`
+      text: `*Created by:*\n${agent.username || `User #${agent.userId}`}`,
+      emoji: false
     }
   });
   
   await sendSlackMessage({
     blocks: blocks as any,
-    text: `New agent "${agent.name}" created by ${agent.username || `User #${agent.userId}`}`
+    text: `New agent "${agent.name}" created by ${agent.username || `User #${agent.userId}`}`,
+    channel: defaultChannelId
   });
 }
 
@@ -162,7 +164,8 @@ export async function notifyAgentUsed(agent: {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*Query:*\n\`\`\`${query}\`\`\``
+        text: `*Query:*\n\`\`\`${query}\`\`\``,
+        emoji: false
       }
     }
   ];
@@ -186,7 +189,8 @@ export async function notifyAgentUsed(agent: {
   
   await sendSlackMessage({
     blocks,
-    text: `Agent "${agent.name}" was used by ${agent.username || `User #${agent.userId}`}`
+    text: `Agent "${agent.name}" was used by ${agent.username || `User #${agent.userId}`}`,
+    channel: defaultChannelId
   });
 }
 

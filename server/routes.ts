@@ -284,7 +284,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             name: agent.name,
             userId,
             username: user?.username
-          }, message, response.usage);
+          }, message, {
+            promptTokens: response.usage?.prompt_tokens || 0,
+            completionTokens: response.usage?.completion_tokens || 0,
+            totalTokens: response.usage?.total_tokens || 0
+          });
         });
       }
       
@@ -403,8 +407,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const response = await testAgentResponse({
         systemPrompt: "You are a helpful assistant.",
         model: "gpt-4o",
-        temperature: 0.7,
-        maxTokens: 50
+        temperature: "0.7",
+        maxTokens: "50"
       }, "Hello, are you working?");
       
       res.json({ 
