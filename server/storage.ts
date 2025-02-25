@@ -81,11 +81,15 @@ export class PostgresStorage implements IStorage {
     // Use the shared db instance that was already imported at the top
     this.db = db;
     
-    // Set up session store with memory store for development to avoid connection issues
-    // In production, you would use the PostgreSQL session store
+    // Always use memory store for sessions to avoid excessive database connections
+    // This is a safer approach, especially in environments with connection limits
     this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000 // 24 hours
+      checkPeriod: 3600000,  // Check for expired sessions every hour (instead of 24 hours)
+      max: 1000,             // Store maximum of 1000 sessions
+      stale: true            // Allow retrieval of expired sessions
     });
+    
+    console.log("[Storage] Using in-memory session store to reduce database load");
   }
   
   // User methods
@@ -456,8 +460,12 @@ export class MemStorage implements IStorage {
     this.messageIdCounter = 1;
     
     this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000, // prune expired entries every 24h
+      checkPeriod: 3600000,  // Check for expired sessions every hour 
+      max: 1000,             // Store maximum of 1000 sessions
+      stale: true            // Allow retrieval of expired sessions
     });
+    
+    console.log("[Storage] Using in-memory session store for MemStorage");
   }
 
   // User methods
