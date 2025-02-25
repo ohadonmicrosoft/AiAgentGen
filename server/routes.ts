@@ -279,16 +279,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send Slack notification for agent usage
       if (agent.id && process.env.SLACK_BOT_TOKEN && process.env.SLACK_CHANNEL_ID) {
         import('./slack').then(({ default: slackService }) => {
+          const tokenUsage = {
+            promptTokens: 0,
+            completionTokens: 0,
+            totalTokens: 0
+          };
+          
+          if (response.usage) {
+            // Handle different response formats
+            if (typeof response.usage.promptTokens === 'number') {
+              tokenUsage.promptTokens = response.usage.promptTokens;
+            } else if (typeof response.usage.prompt_tokens === 'number') {
+              tokenUsage.promptTokens = response.usage.prompt_tokens;
+            }
+            
+            if (typeof response.usage.completionTokens === 'number') {
+              tokenUsage.completionTokens = response.usage.completionTokens;
+            } else if (typeof response.usage.completion_tokens === 'number') {
+              tokenUsage.completionTokens = response.usage.completion_tokens;
+            }
+            
+            if (typeof response.usage.totalTokens === 'number') {
+              tokenUsage.totalTokens = response.usage.totalTokens;
+            } else if (typeof response.usage.total_tokens === 'number') {
+              tokenUsage.totalTokens = response.usage.total_tokens;
+            }
+          }
+          
           slackService.notifyAgentUsed({
             id: typeof agent.id === 'string' ? parseInt(agent.id) : agent.id,
             name: agent.name,
             userId,
             username: user?.username
-          }, message, {
-            promptTokens: response.usage ? Number(response.usage.promptTokens || response.usage.prompt_tokens) : 0,
-            completionTokens: response.usage ? Number(response.usage.completionTokens || response.usage.completion_tokens) : 0,
-            totalTokens: response.usage ? Number(response.usage.totalTokens || response.usage.total_tokens) : 0
-          });
+          }, message, tokenUsage);
         });
       }
       

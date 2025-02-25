@@ -148,17 +148,31 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
           break;
         }
         
-        // Decode the stream chunk and append to accumulated
-        const chunk = decoder.decode(value, { stream: true });
-        accumulated += chunk;
+        // Decode the stream chunk
+        const chunkText = decoder.decode(value, { stream: true });
+        console.log('Received chunk:', chunkText);
         
-        try {
-          const jsonData = JSON.parse(chunk);
-          if (jsonData.usage) {
-            setTokenUsage(jsonData.usage);
+        // Try to parse each line as JSON
+        const lines = chunkText.split('\n').filter(line => line.trim() !== '');
+        
+        for (const line of lines) {
+          try {
+            const jsonData = JSON.parse(line);
+            console.log('Parsed JSON:', jsonData);
+            
+            // Handle different types of chunks
+            if (jsonData.usage) {
+              console.log('Setting token usage:', jsonData.usage);
+              setTokenUsage(jsonData.usage);
+            } else if (jsonData.content !== undefined) {
+              accumulated += jsonData.content;
+            } else if (jsonData.error) {
+              throw new Error(jsonData.error);
+            }
+          } catch (e) {
+            // If not valid JSON, treat as content
+            accumulated += line;
           }
-        } catch (e) {
-          // If not valid JSON, it's likely just a content chunk
         }
         
         // Update the message content
@@ -220,8 +234,11 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
     
     // Send to backend - use streaming when available, fallback to standard
     try {
+      // Log the message being sent
+      console.log('Sending message to agent:', values.message);
       await streamResponse(values.message);
     } catch (error) {
+      console.error('Streaming failed, falling back to standard request:', error);
       // Fallback to non-streaming if streaming fails
       sendMessageMutation.mutate(values);
     }
