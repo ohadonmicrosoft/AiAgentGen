@@ -287,21 +287,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           if (response.usage) {
             // Handle different response formats
-            if (typeof response.usage.promptTokens === 'number') {
+            if ('promptTokens' in response.usage && typeof response.usage.promptTokens === 'number') {
               tokenUsage.promptTokens = response.usage.promptTokens;
-            } else if (typeof response.usage.prompt_tokens === 'number') {
+            } else if ('prompt_tokens' in response.usage && typeof response.usage.prompt_tokens === 'number') {
               tokenUsage.promptTokens = response.usage.prompt_tokens;
             }
             
-            if (typeof response.usage.completionTokens === 'number') {
+            if ('completionTokens' in response.usage && typeof response.usage.completionTokens === 'number') {
               tokenUsage.completionTokens = response.usage.completionTokens;
-            } else if (typeof response.usage.completion_tokens === 'number') {
+            } else if ('completion_tokens' in response.usage && typeof response.usage.completion_tokens === 'number') {
               tokenUsage.completionTokens = response.usage.completion_tokens;
             }
             
-            if (typeof response.usage.totalTokens === 'number') {
+            if ('totalTokens' in response.usage && typeof response.usage.totalTokens === 'number') {
               tokenUsage.totalTokens = response.usage.totalTokens;
-            } else if (typeof response.usage.total_tokens === 'number') {
+            } else if ('total_tokens' in response.usage && typeof response.usage.total_tokens === 'number') {
               tokenUsage.totalTokens = response.usage.total_tokens;
             }
           }
