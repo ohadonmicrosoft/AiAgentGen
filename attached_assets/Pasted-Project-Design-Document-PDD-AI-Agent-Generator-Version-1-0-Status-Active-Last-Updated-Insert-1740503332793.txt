@@ -1,0 +1,550 @@
+Project Design Document (PDD) – AI Agent Generator
+Version: 1.0
+Status: Active
+Last Updated: [Insert Date]
+Author: [Your Name / Team Name]
+
+Table of Contents
+	1.	Project Overview
+1.1 Project Name
+1.2 Project Description
+1.3 Key Features & Functionalities
+1.4 Goals & Objectives
+1.5 Scope of the Project
+1.6 Target Audience & Users
+	2.	Technical Architecture
+2.1 Overview
+2.2 Tech Stack Selection
+2.3 System Architecture
+2.4 Data Models & Database Schema
+2.5 Deployment & Scaling Strategy
+	3.	API Design & Endpoints
+3.1 Overview
+3.2 API Structure
+3.3 API Endpoints
+3.4 Security & Rate Limiting
+	4.	Data Flow & System Interactions
+4.1 Overview
+4.2 Request Handling Lifecycle
+4.3 AI Processing Flow
+4.4 Data Flow Between Components
+4.5 Performance Optimization Strategies
+	5.	Future Roadmap & Expansion
+5.1 Overview
+5.2 Roadmap Phases
+5.3 Scalability & Performance Plan
+
+1. Project Overview
+
+1.1 Project Name
+
+AI Agent Generator
+
+1.2 Project Description
+
+The AI Agent Generator is a web-based AI configuration platform that enables users to create, manage, and deploy AI-powered agents through an intuitive step-by-step interface. The system offers real-time AI response previews, prompt engineering tools, and REST API integration for automation.
+
+Built with scalability, security, and high performance in mind, the platform serves individual users, enterprises, and developers looking for a seamless AI agent deployment and management experience.
+
+1.3 Key Features & Functionalities
+
+Feature	Description	Future Enhancements
+AI Agent Generator	Multi-step wizard for configuring AI agent logic and behavior.	Support for custom AI models in future updates.
+Live AI Response Preview	Real-time AI interaction based on user-defined parameters.	Extend preview to include multiple AI models.
+Prompt Engineering System	Tools for creating, managing, and optimizing AI prompts.	Advanced prompt versioning and analytics.
+Dashboard & Monitoring	View recent AI agent interactions, drafts, and saved configurations.	Usage tracking & error logs.
+Dark Mode & Adaptive UI	Fully responsive and accessible UI with dark mode support.	Custom theme options for better personalization.
+Authentication & RBAC	Secure login and role-based permissions.	Multi-tenant account support for enterprises.
+API Integration	REST API for executing AI agent commands and automation.	Expand webhooks & integrations (Zapier, Slack).
+
+1.4 Goals & Objectives
+
+1.4.1 Business Objectives
+	•	User-Friendly AI Configuration – Provide a no-code, guided approach for creating AI agents.
+	•	Scalable Architecture – Support multiple AI models and third-party service integrations.
+	•	Optimized AI Agent Management – Enable effortless refinement of AI behavior and prompt strategies.
+	•	High-Performance Execution – Deliver low-latency AI interactions for smooth real-time responses.
+
+1.4.2 Technical Objectives
+	•	Modular & Extensible Codebase – Maintain a scalable and maintainable architecture.
+	•	Security-First Development – Implement JWT authentication & RBAC to prevent unauthorized access.
+	•	Optimized API Performance – Efficiently handle AI requests through caching and rate limiting.
+	•	Developer-Focused API Design – Provide a structured and well-documented API for third-party automation.
+
+1.5 Scope of the Project
+
+1.5.1 In-Scope (Phase 1)
+
+The initial phase focuses on core AI agent creation, configuration, and testing.
+
+Frontend Development
+	•	Framework: Next.js 13+ (App Router) for a modern, scalable UI architecture.
+	•	Styling: TailwindCSS + ShadCN UI for consistency, accessibility, and responsiveness.
+	•	UI Features: Fully responsive design with dark mode support.
+
+Backend Development
+	•	Backend Framework: NestJS (Node.js) for a modular, scalable backend system.
+	•	Database: PostgreSQL for structured data storage and query optimization.
+	•	Authentication: NextAuth.js for secure user login and authentication (Google, GitHub, Email/Password).
+
+Core Functionalities
+	•	AI Agent Generator: Step-by-step configuration wizard for building AI agents.
+	•	Prompt Engineering System: Tools to save, test, and refine AI-generated prompts.
+	•	Live AI Response Preview: Real-time feedback from AI based on agent settings.
+	•	REST API for AI Agent Execution: Programmatic control over AI agent operations.
+
+1.5.2 Future Enhancements (Phase 2 & Beyond)
+
+AI Model Customization
+	•	Custom AI Model Training (user-defined models).
+	•	Multiple AI Model Selection (OpenAI, Anthropic, Custom Models).
+
+Enterprise Features
+	•	Multi-Tenant SaaS Support for organizations.
+	•	Advanced RBAC for granular access control.
+
+Analytics & Monitoring
+	•	Usage & Performance Tracking.
+	•	Error Logging & Debugging Tools.
+
+Integrations & Automation
+	•	Webhook & Third-Party Integrations (Slack, Zapier, CRM).
+	•	Agent Deployment via API to external platforms.
+
+1.6 Target Audience & Users
+
+User Type	Use Case	Permissions
+Regular Users	Create AI agents for business automation (chatbots, etc.).	Can create, modify, and delete AI agents.
+Administrators	Manage user accounts, set permissions, and monitor API usage.	Full access to system-wide settings and controls.
+Developers	Integrate AI agents via the API.	Access API keys, configure automations, connect external services.
+
+2. Technical Architecture
+
+2.1 Overview
+
+The AI Agent Generator employs a modular, scalable, and high-performance architecture. Key components include:
+	•	Frontend Layer (Next.js) for user interaction.
+	•	Backend Layer (NestJS) for API processing and agent management.
+	•	Database Layer (PostgreSQL) for structured data storage.
+	•	AI Processing Layer connecting to OpenAI or other AI models.
+	•	Authentication Layer using NextAuth.js (JWT, OAuth).
+	•	Hosting & Deployment on Vercel (frontend) and Railway (backend + database).
+
+2.2 Tech Stack Selection
+
+2.2.1 Frontend Technology Stack
+
+Component	Technology	Reason for Selection
+Framework	Next.js 13+ (App Router)	Modern, optimized SSR and SSG features.
+UI Styling	Tailwind CSS + ShadCN UI	Utility-first styling, rapid development, responsive design.
+State Mgmt	React Context + React Query	Efficient state handling, API caching, background updates.
+Animations	Framer Motion	Smooth UI transitions.
+Routing	Next.js App Router	File-based routing and server components for better performance.
+
+2.2.2 Backend Technology Stack
+
+Component	Technology	Reason for Selection
+Backend Framework	NestJS (Node.js)	Modular, scalable, TypeScript-first backend framework.
+Database	PostgreSQL	Reliable, relational DB optimized for structured data.
+ORM	Prisma ORM	Type-safe queries, easy migrations, and schema management.
+Authentication	NextAuth.js (JWT)	Secure authentication with OAuth support (Google, GitHub).
+AI Integration	OpenAI API / Custom LLMs	Provides robust AI responses and agent interactions.
+API Documentation	Swagger (OpenAPI)	Auto-generated API docs for developers.
+
+2.2.3 Infrastructure & Deployment
+
+Component	Technology	Reason for Selection
+Frontend Hosting	Vercel	Optimized for Next.js, fast global CDN.
+Backend Hosting	Railway	Scalable backend hosting with automated deployments.
+Database Hosting	Railway PostgreSQL	Managed DB service with backups and high availability.
+Caching	Redis (future)	Intended for caching AI responses and rate limiting.
+Logging & Monitoring	LogRocket + Prometheus	Tracks performance, API logs, and system errors.
+
+2.3 System Architecture
+
+2.3.1 High-Level Architecture Flow
+
+[Frontend (Next.js)]
+    ├── User Authentication (NextAuth.js + JWT)
+    ├── Fetch AI Responses (React Query → Backend API)
+    ├── Render UI (ShadCN UI, Tailwind)
+    |
+[Backend (NestJS)]
+    ├── API Gateway (REST API)
+    ├── AI Processing Layer (OpenAI API / Custom LLMs)
+    ├── Database (PostgreSQL)
+    ├── User & Agent Management
+    |
+[Database Layer]
+    ├── Users Table (Authentication, Profiles)
+    ├── AI Agents Table (Configurations, Behaviors)
+    ├── Prompts Table (Saved Prompts for AI)
+    ├── Activity Logs (User Actions, AI Interactions)
+
+2.3.2 Component Interactions
+
+Component	Interaction
+Frontend → Backend	Next.js interacts with NestJS via REST APIs for authentication, agent config, AI responses.
+Backend → Database	NestJS communicates with PostgreSQL to store and retrieve user profiles, agents, prompts.
+Backend → AI API	Requests processed by external AI services (OpenAI) or custom LLMs.
+Frontend → Auth	NextAuth.js handles OAuth (Google, GitHub) or JWT-based login.
+
+2.4 Data Models & Database Schema
+
+Relational data storage in PostgreSQL ensures robust query performance and data integrity.
+
+2.4.1 Users Table
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(100),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash TEXT,
+    role VARCHAR(50) CHECK (role IN ('user', 'admin')),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+2.4.2 AI Agents Table
+
+CREATE TABLE ai_agents (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    config JSONB NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+2.4.3 Prompts Table
+
+CREATE TABLE prompts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    prompt_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+2.4.4 Activity Logs Table
+
+CREATE TABLE activity_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    action VARCHAR(255),
+    details JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+2.5 Deployment & Scaling Strategy
+
+2.5.1 Deployment Pipeline
+
+Stage	Process
+Development	Local dev with Docker for DB; Vercel for preview deployments.
+Staging	Hosted on Railway, connected to staging DB, with test API keys.
+Production	Deployed via Vercel (Frontend) and Railway (Backend & DB).
+
+2.5.2 Scaling Considerations
+
+Component	Scaling Strategy
+Frontend	Auto-scaled by Vercel’s edge network.
+Backend	Horizontal scaling via multiple NestJS instances.
+Database	Read replicas for load balancing and backups.
+AI API	Caching with Redis (future) to reduce overhead.
+
+3. API Design & Endpoints
+
+3.1 Overview
+
+The AI Agent Generator provides a RESTful API for managing agents, authentication, prompts, and AI interactions. Design principles include:
+	•	Scalability: High-volume AI requests supported by caching and rate limiting.
+	•	Security: JWT-based authentication and RBAC.
+	•	Efficiency: Optimized database queries using Prisma.
+	•	Developer-Friendly: Swagger (OpenAPI) documentation.
+
+3.2 API Structure
+
+3.2.1 Base URL
+	•	Staging: https://api.staging.aiagentgen.com/v1
+	•	Production: https://api.aiagentgen.com/v1
+
+3.2.2 Authentication
+	•	JWT-based (Bearer token for protected routes).
+	•	OAuth support (Google, GitHub) via NextAuth.js.
+	•	RBAC to limit sensitive operations to admin roles.
+
+3.2.3 Request & Response Format
+	•	Content-Type: application/json
+	•	Response Format: Standardized JSON.
+	•	Error Handling: HTTP status codes (400, 401, 403, 404, 500) with detailed error messages.
+
+3.3 API Endpoints
+
+3.3.1 Authentication & User Management
+
+Method	Endpoint	Description	Authentication
+POST	/auth/register	Registers a new user.	Public
+POST	/auth/login	Authenticates user, returns JWT token.	Public
+GET	/auth/me	Fetches the current authenticated user.	JWT Required
+POST	/auth/logout	Logs out user, invalidates session.	JWT Required
+
+Example Request: User Login
+
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+
+Example Response
+
+{
+  "token": "eyJhbGciOiJIUzI1...",
+  "user": {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "name": "John Doe",
+    "email": "user@example.com",
+    "role": "user"
+  }
+}
+
+3.3.2 AI Agent Management
+
+Method	Endpoint	Description	Authentication
+POST	/agents	Creates a new AI agent.	JWT Required
+GET	/agents	Retrieves user’s AI agents.	JWT Required
+GET	/agents/{id}	Fetches details of a specific AI agent.	JWT Required
+PUT	/agents/{id}	Updates an AI agent’s configuration.	JWT Required
+DELETE	/agents/{id}	Deletes an AI agent.	JWT Required (Admin)
+
+Example Request: Create AI Agent
+
+{
+  "name": "Customer Support Bot",
+  "description": "Handles customer inquiries automatically",
+  "config": {
+    "temperature": 0.7,
+    "response_style": "formal"
+  }
+}
+
+Example Response
+
+{
+  "id": "b67c95fa-1d4a-4a89-9b8c-3a7b5a5b6e29",
+  "name": "Customer Support Bot",
+  "description": "Handles customer inquiries automatically",
+  "config": {
+    "temperature": 0.7,
+    "response_style": "formal"
+  },
+  "created_at": "2024-03-12T12:34:56Z"
+}
+
+3.3.3 AI Prompt Management
+
+Method	Endpoint	Description	Authentication
+POST	/prompts	Saves a new AI prompt.	JWT Required
+GET	/prompts	Retrieves list of saved AI prompts.	JWT Required
+GET	/prompts/{id}	Fetches details of a specific AI prompt.	JWT Required
+PUT	/prompts/{id}	Updates an AI prompt.	JWT Required
+DELETE	/prompts/{id}	Deletes an AI prompt.	JWT Required
+
+Example Request: Save Prompt
+
+{
+  "prompt_text": "Generate a professional email response to a client inquiry.",
+  "metadata": {
+    "category": "Business",
+    "tags": ["email", "client", "professional"]
+  }
+}
+
+Example Response
+
+{
+  "id": "5f2b3a99-4c2d-41f9-a9b5-09a9e5a1c4ef",
+  "prompt_text": "Generate a professional email response to a client inquiry.",
+  "metadata": {
+    "category": "Business",
+    "tags": ["email", "client", "professional"]
+  },
+  "created_at": "2024-03-12T12:34:56Z"
+}
+
+3.3.4 AI Execution & Testing
+
+Method	Endpoint	Description	Authentication
+POST	/ai/generate	Generates an AI response based on user input.	JWT Required
+POST	/ai/validate	Tests a prompt against AI models.	JWT Required
+
+Example Request: AI Response Generation
+
+{
+  "agent_id": "b67c95fa-1d4a-4a89-9b8c-3a7b5a5b6e29",
+  "input_text": "How can I reset my password?"
+}
+
+Example Response
+
+{
+  "response": "To reset your password, go to the settings page and select 'Reset Password'."
+}
+
+3.4 Security & Rate Limiting
+
+3.4.1 Authentication & Authorization
+	•	JWT Authentication: Required for all protected endpoints.
+	•	RBAC: Admin-only operations for sensitive tasks.
+	•	OAuth Support: (Google, GitHub) for easier login.
+
+3.4.2 Rate Limiting & Abuse Protection
+	•	API Rate Limiting:
+	•	Free Users: 50 requests/minute
+	•	Premium Users: 500 requests/minute
+	•	IP Blocking for repeated failed login attempts.
+	•	Request Validation to mitigate SQL injection/XSS attacks.
+
+4. Data Flow & System Interactions
+
+4.1 Overview
+
+This section details how data moves between the frontend, backend, database, and AI processing services. The flow is optimized for:
+	•	Efficient Request Handling: Validations, caching, and minimal overhead.
+	•	Seamless Data Interaction: Consistent communication between layers.
+	•	High Performance: Use of indexing, caching, and concurrency optimizations.
+
+4.2 Request Handling Lifecycle
+
+4.2.1 Standard API Request Flow
+
+Example: User requests an AI-generated response.
+	1.	Frontend: User submits a query (/ai/generate).
+	2.	Backend:
+	•	Validates request (JWT, required fields).
+	•	Fetches AI agent configuration from DB.
+	3.	Database: Retrieves agent settings and saved prompts.
+	4.	AI Processing: Sends request to OpenAI API or custom model.
+	5.	Backend: Receives response, applies formatting, optional caching.
+	6.	Frontend: Renders AI response to user.
+
+4.2.2 Component Interaction Diagram
+
+[Frontend (Next.js)]
+    ├── User submits AI request
+    ├── Fetches data from API
+    |
+[Backend (NestJS)]
+    ├── Validates & authenticates request
+    ├── Retrieves AI agent settings
+    ├── Calls OpenAI API for response
+    ├── Caches response (if needed)
+    |
+[Database (PostgreSQL)]
+    ├── Stores AI agent & prompt configurations
+    ├── Tracks user activity logs
+    |
+[AI Processing (OpenAI API)]
+    ├── Generates AI response based on query
+
+4.3 AI Processing Flow
+
+4.3.1 AI Request Lifecycle
+	1.	User submits input via UI.
+	2.	API validates request & retrieves agent settings.
+	3.	Agent settings & prompt structure processed.
+	4.	Query sent to AI model (OpenAI/Custom).
+	5.	AI model generates response.
+	6.	Response formatted & sent back to UI.
+
+4.3.2 Optimizations for AI Requests
+	•	Rate Limiting: Prevents abuse by limiting requests/user.
+	•	Caching: Stores previous responses to reduce duplicate calls.
+	•	Prompt Optimization: Structured prompt design for better output.
+
+4.4 Data Flow Between Components
+
+4.4.1 User Authentication Flow
+	1.	User logs in via Next.js UI.
+	2.	Frontend sends credentials to /auth/login.
+	3.	Backend verifies credentials, returns JWT.
+	4.	JWT stored on frontend for future protected requests.
+
+4.4.2 AI Agent Creation Flow
+	1.	User submits new AI agent form (/agents).
+	2.	Backend validates & saves agent config in DB.
+	3.	Frontend fetches updated agent list.
+
+4.4.3 AI Prompt Storage Flow
+	1.	User saves a prompt (/prompts).
+	2.	Backend stores prompt, returns success response.
+	3.	Prompt is available in user’s library.
+
+4.5 Performance Optimization Strategies
+
+Optimization	Implementation	Benefit
+Database Indexing	Index frequently queried columns	Improves query speed
+API Caching	Cache AI responses for repeated queries	Reduces API call costs, faster UX
+Rate Limiting	Restrict excessive requests per user	Prevents abuse, stabilizes system
+Lazy Loading	Load data only when needed	Reduces initial UI load times
+Pagination	Return limited records per request	Lowers server overhead
+
+5. Future Roadmap & Expansion
+
+5.1 Overview
+
+The AI Agent Generator is designed for ongoing enhancements. The roadmap spans multiple phases, ensuring continuous improvements in functionality, performance, and enterprise readiness.
+
+5.2 Roadmap Phases
+
+Phase 2: Enhancements & Optimizations (3–6 Months)
+
+Focus on refining user experience, optimizing AI interactions, and improving performance.
+
+Feature	Description	Benefit
+AI Response Caching	Implement Redis to store frequent AI responses.	Lower latency, reduced API costs.
+Prompt Versioning	Track changes and roll back AI prompts.	Easier prompt testing & optimization.
+Advanced Analytics	Real-time usage and error logging.	Better insights into user behavior & AI efficiency.
+API Rate Limiting	Fine-grained rate limits to prevent abuse.	Enhanced security & reliability.
+Enhanced UI/UX	Improved dashboard layout, dark mode, animations.	More intuitive user experience.
+Multi-Language	Support multiple languages in UI & AI responses.	Expands global user base.
+
+Phase 3: Enterprise & Multi-Tenant Support (6–12 Months)
+
+Expand to handle larger organizations with team collaboration features.
+
+Feature	Description	Benefit
+Multi-Tenant SaaS Support	Manage multiple user accounts & roles within one organization.	Enterprise-ready solution for large teams.
+Advanced RBAC	Fine-grained permissions for different user roles.	Secure, controlled access to AI agents.
+Webhook & Integrations	Slack, Zapier, CRM integration.	Automated AI workflows in external tools.
+Custom API Keys	Generate multiple keys for different integrations.	Easier management & tracking of third-party usage.
+Team Collaboration	Shared workspace for agent and prompt collaboration.	Faster, collaborative AI development.
+On-Premise Deployment	Self-hosted option for privacy-focused enterprises.	Appeals to industries with strict data policies.
+
+Phase 4: AI Customization & Model Expansion (12+ Months)
+
+Introduce advanced AI capabilities and customizable models.
+
+Feature	Description	Benefit
+Custom AI Model Support	Users can train and deploy custom AI models (e.g., Hugging Face).	Greater control over AI agent behavior.
+Multi-Model Selection	Select from GPT-4, Claude, custom LLMs, etc.	Flexibility in AI deployment.
+Memory & Context	Persist conversation history for advanced personalization.	More accurate, context-aware responses.
+Voice & Speech AI	Voice-based AI interactions.	Opens up new use cases beyond text-based.
+AI Agent Marketplace	Share and monetize AI agents publicly.	Encourages collaboration & knowledge sharing.
+
+5.3 Scalability & Performance Plan
+
+Scaling Area	Strategy	Implementation Plan
+Frontend Performance	SSR optimization, lazy loading, caching	Reduce initial page load times
+Backend Scalability	Horizontal scaling with multiple NestJS instances	Improve request-handling capacity
+Database Optimization	Query indexing, read replicas for PostgreSQL	Handle high-traffic loads effectively
+AI Query Optimization	Redis caching for frequently used prompts/responses	Lower latency and API cost
+Global Load Balancing	CDN for static assets, API gateway routing	Stable performance for international users
+
+Document Notes & Enhancement Suggestions
+	•	Last Updated: Keep this field current to track updates.
+	•	Author: Update with project lead or team name.
+	•	Versioning: Increment version numbers as major features or architecture changes are introduced.
+	•	Feedback Mechanism: Establish a process to collect user and developer feedback for continuous improvements.
+
+End of Document
