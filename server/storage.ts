@@ -3,7 +3,7 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
-type SessionStore = ReturnType<typeof createMemoryStore>;
+type SessionStore = ReturnType<typeof MemoryStore>;
 
 export interface IStorage {
   // User methods
@@ -31,7 +31,7 @@ export interface IStorage {
   deletePrompt(id: number): Promise<void>;
   
   // Session store
-  sessionStore: session.SessionStore;
+  sessionStore: SessionStore;
 }
 
 export class MemStorage implements IStorage {
@@ -43,7 +43,7 @@ export class MemStorage implements IStorage {
   userIdCounter: number;
   agentIdCounter: number;
   promptIdCounter: number;
-  sessionStore: session.SessionStore;
+  sessionStore: SessionStore;
 
   constructor() {
     this.usersMap = new Map();

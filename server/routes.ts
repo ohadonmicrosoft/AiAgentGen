@@ -218,6 +218,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: error.message || "Failed to test agent" });
     }
   });
+  
+  // User profile and settings
+  app.put("/api/user/profile", checkAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      console.log("[UserSettings] Updating user profile for user", userId);
+      
+      // Validate incoming data
+      const { username, email } = req.body;
+      if (!username) {
+        return res.status(400).json({ error: "Username is required" });
+      }
+      
+      // Update the user profile
+      const updatedUser = await storage.updateUser(userId, {
+        username,
+        email: email || null,
+      });
+      
+      // Return the updated user (without password)
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      console.error("[UserSettings] Profile update error:", error);
+      res.status(500).json({ error: error.message || "Failed to update profile" });
+    }
+  });
+  
+  // Password change
+  app.put("/api/user/password", checkAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      console.log("[UserSettings] Password change request for user", userId);
+      
+      const { currentPassword, newPassword } = req.body;
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: "Current password and new password are required" });
+      }
+      
+      // Get current user
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Check if current password matches
+      if (user.password !== currentPassword) { // In production, use proper password hashing
+        return res.status(401).json({ error: "Current password is incorrect" });
+      }
+      
+      // Update the password
+      await storage.updateUser(userId, {
+        password: newPassword,
+      });
+      
+      res.json({ message: "Password updated successfully" });
+    } catch (error: any) {
+      console.error("[UserSettings] Password change error:", error);
+      res.status(500).json({ error: error.message || "Failed to update password" });
+    }
+  });
+  
+  // API Key management
+  app.get("/api/user/apikey", checkAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      console.log("[UserSettings] Getting API key for user", userId);
+      
+      const apiKey = await storage.getApiKey(userId);
+      
+      // Instead of sending the actual key, just send a boolean indicating if it exists
+      res.json({ hasApiKey: !!apiKey });
+    } catch (error: any) {
+      console.error("[UserSettings] Get API key error:", error);
+      res.status(500).json({ error: error.message || "Failed to get API key status" });
+    }
+  });
+  
+  app.post("/api/user/apikey", checkAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      console.log("[UserSettings] Saving API key for user", userId);
+      
+      const { apiKey } = req.body;
+      if (!apiKey) {
+        return res.status(400).json({ error: "API Key is required" });
+      }
+      
+      await storage.saveApiKey(userId, apiKey);
+      res.json({ message: "API key saved successfully" });
+    } catch (error: any) {
+      console.error("[UserSettings] Save API key error:", error);
+      res.status(500).json({ error: error.message || "Failed to save API key" });
+    }
+  });
 
   // Create HTTP server
   const httpServer = createServer(app);

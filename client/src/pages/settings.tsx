@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainLayout from "@/layouts/MainLayout";
 import { useAuth } from "@/hooks/use-auth";
 import { useForm } from "react-hook-form";
@@ -58,14 +58,136 @@ export default function Settings() {
     },
   });
 
-  const onProfileSubmit = (values: ProfileFormValues) => {
-    console.log(values);
-    // Here you would send the data to your API
+  const [profileSubmitting, setProfileSubmitting] = useState(false);
+  const [passwordSubmitting, setPasswordSubmitting] = useState(false);
+  const [apiKeySubmitting, setApiKeySubmitting] = useState(false);
+  const [profileSuccess, setProfileSuccess] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [apiKeySuccess, setApiKeySuccess] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [apiKeyError, setApiKeyError] = useState<string | null>(null);
+
+  // Check if user has an API key
+  useEffect(() => {
+    async function checkApiKey() {
+      try {
+        const response = await fetch("/api/user/apikey", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.hasApiKey) {
+            // If they have a key, we'll put a placeholder
+            apiKeyForm.setValue("apiKey", "········");
+          }
+        }
+      } catch (error) {
+        console.error("Failed to check API key status:", error);
+      }
+    }
+    
+    if (user) {
+      checkApiKey();
+    }
+  }, [user]);
+
+  const onProfileSubmit = async (values: ProfileFormValues) => {
+    try {
+      setProfileSubmitting(true);
+      setProfileError(null);
+      setProfileSuccess(false);
+      
+      // If we're changing password, use the password endpoint
+      if (values.currentPassword && values.newPassword && values.newPassword === values.confirmPassword) {
+        setPasswordSubmitting(true);
+        
+        const passwordResponse = await fetch("/api/user/password", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            currentPassword: values.currentPassword,
+            newPassword: values.newPassword,
+          }),
+        });
+        
+        if (!passwordResponse.ok) {
+          const errorData = await passwordResponse.json();
+          throw new Error(errorData.error || "Failed to update password");
+        }
+        
+        setPasswordSuccess(true);
+        // Clear the password fields
+        profileForm.setValue("currentPassword", "");
+        profileForm.setValue("newPassword", "");
+        profileForm.setValue("confirmPassword", "");
+      }
+      
+      // Update profile information
+      const profileResponse = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          username: values.username,
+          email: values.email,
+        }),
+      });
+      
+      if (!profileResponse.ok) {
+        const errorData = await profileResponse.json();
+        throw new Error(errorData.error || "Failed to update profile");
+      }
+      
+      setProfileSuccess(true);
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      setProfileError(error.message || "An error occurred while updating your profile");
+    } finally {
+      setProfileSubmitting(false);
+      setPasswordSubmitting(false);
+    }
   };
 
-  const onApiKeySubmit = (values: ApiKeyFormValues) => {
-    console.log(values);
-    // Here you would send the data to your API
+  const onApiKeySubmit = async (values: ApiKeyFormValues) => {
+    try {
+      setApiKeySubmitting(true);
+      setApiKeyError(null);
+      setApiKeySuccess(false);
+      
+      const response = await fetch("/api/user/apikey", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          apiKey: values.apiKey,
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save API key");
+      }
+      
+      setApiKeySuccess(true);
+    } catch (error: any) {
+      console.error("Error saving API key:", error);
+      setApiKeyError(error.message || "An error occurred while saving your API key");
+    } finally {
+      setApiKeySubmitting(false);
+    }
   };
 
   return (
@@ -167,7 +289,27 @@ export default function Settings() {
                       </div>
                     </div>
 
-                    <Button type="submit">Save Changes</Button>
+                    {profileError && (
+                      <div className="text-sm text-destructive mt-2">
+                        Error: {profileError}
+                      </div>
+                    )}
+                    
+                    {profileSuccess && (
+                      <div className="text-sm text-green-600 dark:text-green-500 mt-2">
+                        Profile information updated successfully!
+                      </div>
+                    )}
+                    
+                    {passwordSuccess && (
+                      <div className="text-sm text-green-600 dark:text-green-500 mt-2">
+                        Password updated successfully!
+                      </div>
+                    )}
+                    
+                    <Button type="submit" disabled={profileSubmitting}>
+                      {profileSubmitting ? "Saving..." : "Save Changes"}
+                    </Button>
                   </form>
                 </Form>
               </CardContent>
@@ -302,7 +444,21 @@ export default function Settings() {
                       />
                     </div>
                     
-                    <Button type="submit">Save API Key</Button>
+                    {apiKeyError && (
+                      <div className="text-sm text-destructive mt-2">
+                        Error: {apiKeyError}
+                      </div>
+                    )}
+                    
+                    {apiKeySuccess && (
+                      <div className="text-sm text-green-600 dark:text-green-500 mt-2">
+                        API key saved successfully!
+                      </div>
+                    )}
+                    
+                    <Button type="submit" disabled={apiKeySubmitting}>
+                      {apiKeySubmitting ? "Saving..." : "Save API Key"}
+                    </Button>
                   </form>
                 </Form>
               </CardContent>
