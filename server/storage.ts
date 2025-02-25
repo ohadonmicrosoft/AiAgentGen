@@ -3,12 +3,18 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
+type SessionStore = ReturnType<typeof createMemoryStore>;
 
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, user: Partial<User>): Promise<User>;
+  
+  // User settings methods
+  saveApiKey(userId: number, apiKey: string): Promise<void>;
+  getApiKey(userId: number): Promise<string | null>;
   
   // Agent methods
   getAgent(id: number): Promise<Agent | undefined>;
@@ -32,6 +38,7 @@ export class MemStorage implements IStorage {
   private usersMap: Map<number, User>;
   private agentsMap: Map<number, Agent>;
   private promptsMap: Map<number, Prompt>;
+  private apiKeysMap: Map<number, string>;
   
   userIdCounter: number;
   agentIdCounter: number;
@@ -42,6 +49,7 @@ export class MemStorage implements IStorage {
     this.usersMap = new Map();
     this.agentsMap = new Map();
     this.promptsMap = new Map();
+    this.apiKeysMap = new Map();
     
     this.userIdCounter = 1;
     this.agentIdCounter = 1;
@@ -65,9 +73,33 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userIdCounter++;
-    const user: User = { ...insertUser, id };
+    // Fix for type safety
+    const user: User = { 
+      ...insertUser, 
+      id,
+      email: insertUser.email || null 
+    };
     this.usersMap.set(id, user);
     return user;
+  }
+  
+  async updateUser(id: number, updates: Partial<User>): Promise<User> {
+    const user = this.usersMap.get(id);
+    if (!user) {
+      throw new Error(`User with id ${id} not found`);
+    }
+    
+    const updatedUser = { ...user, ...updates };
+    this.usersMap.set(id, updatedUser);
+    return updatedUser;
+  }
+  
+  async saveApiKey(userId: number, apiKey: string): Promise<void> {
+    this.apiKeysMap.set(userId, apiKey);
+  }
+  
+  async getApiKey(userId: number): Promise<string | null> {
+    return this.apiKeysMap.get(userId) || null;
   }
 
   // Agent methods
@@ -83,7 +115,16 @@ export class MemStorage implements IStorage {
 
   async createAgent(insertAgent: InsertAgent): Promise<Agent> {
     const id = this.agentIdCounter++;
-    const agent: Agent = { ...insertAgent, id };
+    // Fix for type safety
+    const agent: Agent = { 
+      ...insertAgent, 
+      id,
+      description: insertAgent.description || null,
+      responseStyle: insertAgent.responseStyle || null,
+      systemPrompt: insertAgent.systemPrompt || null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
     this.agentsMap.set(id, agent);
     return agent;
   }
@@ -116,7 +157,15 @@ export class MemStorage implements IStorage {
 
   async createPrompt(insertPrompt: InsertPrompt): Promise<Prompt> {
     const id = this.promptIdCounter++;
-    const prompt: Prompt = { ...insertPrompt, id };
+    // Fix for type safety
+    const prompt: Prompt = { 
+      ...insertPrompt, 
+      id,
+      tags: insertPrompt.tags || null,
+      isFavorite: insertPrompt.isFavorite || false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
     this.promptsMap.set(id, prompt);
     return prompt;
   }
