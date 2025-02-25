@@ -486,11 +486,19 @@ export default function Prompts() {
                       <span>Updated {new Date(prompt.updatedAt).toLocaleDateString()}</span>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => handleEditPrompt(prompt)}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleEditPrompt(prompt)}
+                      >
                         <Edit className="h-4 w-4 mr-1" />
                         Edit
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeletePrompt(prompt)}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleDeletePrompt(prompt)}
+                      >
                         <Trash2 className="h-4 w-4 mr-1" />
                         Delete
                       </Button>
@@ -538,11 +546,19 @@ export default function Prompts() {
                       <span>Updated {new Date(prompt.updatedAt).toLocaleDateString()}</span>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => handleEditPrompt(prompt)}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleEditPrompt(prompt)}
+                      >
                         <Edit className="h-4 w-4 mr-1" />
                         Edit
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeletePrompt(prompt)}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleDeletePrompt(prompt)}
+                      >
                         <Trash2 className="h-4 w-4 mr-1" />
                         Delete
                       </Button>
