@@ -28,6 +28,13 @@ export default function TestAgentPage() {
     enabled: !!id,
   });
   
+  // Log agent data for debugging
+  useEffect(() => {
+    if (agent) {
+      console.log('Agent data loaded:', agent);
+    }
+  }, [agent]);
+  
   // If we don't have an ID, we'll use a temporary agent
   const tempAgent: Partial<Agent> = {
     name: 'Test Agent',
