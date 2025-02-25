@@ -665,7 +665,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("[Conversations] Fetching conversations for user", userId);
       
       // Check if user has permission to view all conversations
-      const canViewAllConversations = await storage.hasPermission(userId, PERMISSIONS.ADMIN);
+      const canViewAllConversations = await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_CONVERSATION);
       
       let conversations;
       if (canViewAllConversations) {
@@ -723,7 +723,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if user has permission to view this conversation
       if (conversation.userId !== userId && 
-          !await storage.hasPermission(userId, PERMISSIONS.ADMIN)) {
+          !await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_CONVERSATION)) {
         return res.status(403).json({ error: "You don't have permission to view this conversation" });
       }
       
@@ -766,8 +766,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const conversation = await storage.createConversation({
         userId,
         agentId,
-        title: title || `Conversation with ${agent.name}`,
-        createdAt: new Date()
+        title: title || `Conversation with ${agent.name}`
       });
       
       res.status(201).json(conversation);
@@ -796,7 +795,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (conversation.userId !== userId && 
-          !await storage.hasPermission(userId, PERMISSIONS.ADMIN)) {
+          !await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_CONVERSATION)) {
         return res.status(403).json({ error: "You don't have permission to access this conversation" });
       }
       
@@ -805,8 +804,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         conversationId,
         content,
         role,
-        tokenCount: tokenCount || 0,
-        createdAt: new Date()
+        tokenCount: tokenCount || 0
       });
       
       // Update conversation's lastUpdated timestamp
@@ -835,7 +833,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (conversation.userId !== userId && 
-          !await storage.hasPermission(userId, PERMISSIONS.ADMIN)) {
+          !await storage.hasPermission(userId, PERMISSIONS.MANAGE_CONVERSATIONS)) {
         return res.status(403).json({ error: "You don't have permission to delete this conversation" });
       }
       

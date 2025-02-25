@@ -31,7 +31,12 @@ export const PERMISSIONS = {
   VIEW_ANY_PROMPT: "view_any_prompt",
   
   MANAGE_USERS: "manage_users",
-  ASSIGN_ROLES: "assign_roles"
+  ASSIGN_ROLES: "assign_roles",
+  
+  // Conversation permissions
+  VIEW_CONVERSATIONS: "view_conversations",
+  VIEW_ANY_CONVERSATION: "view_any_conversation",
+  MANAGE_CONVERSATIONS: "manage_conversations"
 } as const;
 
 // Role-based permission mapping
