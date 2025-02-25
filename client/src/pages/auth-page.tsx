@@ -134,6 +134,39 @@ export default function AuthPage() {
                     </form>
                   </Form>
                 </CardContent>
+                <CardFooter className="flex flex-col gap-2">
+                  <div className="text-xs text-muted-foreground text-center w-full mb-1">
+                    Developer Quick Login
+                  </div>
+                  <div className="flex gap-2 w-full">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex-1 text-xs h-8"
+                      onClick={() => {
+                        loginForm.setValue("username", "developer");
+                        loginForm.setValue("password", "developer123");
+                        loginForm.handleSubmit(onLoginSubmit)();
+                      }}
+                    >
+                      Dev Login
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex-1 text-xs h-8"
+                      onClick={() => {
+                        registerForm.setValue("username", "developer" + Math.floor(Math.random() * 1000));
+                        const password = "developer123";
+                        registerForm.setValue("password", password);
+                        registerForm.setValue("confirmPassword", password);
+                        registerForm.handleSubmit(onRegisterSubmit)();
+                      }}
+                    >
+                      Create Dev Account
+                    </Button>
+                  </div>
+                </CardFooter>
               </Card>
             </TabsContent>
             
