@@ -235,8 +235,23 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
         credentials: 'include'
       });
       
+      if (response.status === 401) {
+        throw new Error('You need to be logged in to use this feature. Please log in and try again.');
+      }
+      
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        const errorText = await response.text();
+        let errorMessage = `Error: ${response.status}`;
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          // If not JSON, use text directly if available
+          if (errorText) errorMessage = errorText;
+        }
+        
+        throw new Error(errorMessage);
       }
       
       // Set up the event source

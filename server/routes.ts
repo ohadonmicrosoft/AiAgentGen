@@ -677,7 +677,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if user has permission to use this agent
       if (agent.userId !== userId && 
-          !await storage.hasPermission(userId, PERMISSIONS.USE_ANY_AGENT)) {
+          !await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT)) {
         return res.status(403).json({ error: "You don't have permission to use this agent" });
       }
       
