@@ -238,24 +238,153 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Test an agent with OpenAI
   app.post("/api/agents/test", checkAuthenticated, async (req, res) => {
     try {
-      const { agentConfig, userMessage } = req.body;
+      const userId = req.user!.id;
+      const { agentId, message, stream = false } = req.body;
       
-      if (!agentConfig || !userMessage) {
-        return res.status(400).json({ error: "Missing agent configuration or user message" });
+      if (!message) {
+        return res.status(400).json({ error: "Message is required" });
+      }
+      
+      // Get agent details if agentId is provided
+      let agent;
+      if (agentId) {
+        agent = await storage.getAgent(parseInt(String(agentId)));
+        
+        // Check if user can access this agent
+        if (agent && agent.userId !== userId && 
+            !await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT)) {
+          return res.status(403).json({ error: "You don't have permission to use this agent" });
+        }
+      } else {
+        // Use a temporary agent configuration from request body
+        agent = req.body;
+      }
+      
+      if (!agent || !agent.systemPrompt) {
+        return res.status(400).json({ error: "Invalid agent configuration" });
       }
       
       console.log("Testing agent with configuration:", {
-        model: agentConfig.model,
-        temperature: agentConfig.temperature,
-        maxTokens: agentConfig.maxTokens,
-        responseStyle: agentConfig.responseStyle,
+        model: agent.model,
+        temperature: agent.temperature,
+        maxTokens: agent.maxTokens,
       });
       
-      const response = await testAgentResponse(agentConfig, userMessage);
+      // Get user for Slack notifications if needed
+      const user = await storage.getUser(userId);
+      
+      // Use the enhanced OpenAI integration
+      const response = await testAgentResponse(agent, message, userId);
+      
+      // Send Slack notification for agent usage
+      if (agent.id && process.env.SLACK_BOT_TOKEN && process.env.SLACK_CHANNEL_ID) {
+        import('./slack').then(({ default: slackService }) => {
+          slackService.notifyAgentUsed({
+            id: typeof agent.id === 'string' ? parseInt(agent.id) : agent.id,
+            name: agent.name,
+            userId,
+            username: user?.username
+          }, message, response.usage);
+        });
+      }
+      
       res.json(response);
     } catch (error: any) {
       console.error("OpenAI test error:", error);
       res.status(500).json({ error: error.message || "Failed to test agent" });
+    }
+  });
+  
+  // Streaming API for real-time agent responses
+  app.post("/api/agents/test/stream", checkAuthenticated, async (req, res) => {
+    const userId = req.user!.id;
+    const { agentId, message } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ error: "Message is required" });
+    }
+    
+    try {
+      // Get agent details
+      let agent;
+      if (agentId) {
+        agent = await storage.getAgent(parseInt(String(agentId)));
+        
+        // Check if user can access this agent
+        if (agent && agent.userId !== userId && 
+            !await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT)) {
+          return res.status(403).json({ error: "You don't have permission to use this agent" });
+        }
+      } else {
+        // Use a temporary agent configuration from request body
+        agent = req.body;
+      }
+      
+      if (!agent || !agent.systemPrompt) {
+        return res.status(400).json({ error: "Invalid agent configuration" });
+      }
+      
+      // Set up Server-Sent Events
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      
+      // Import the streaming function dynamically
+      const { generateStreamingResponse, getTokenUsage } = await import('./openai');
+      
+      // Start the streaming response
+      const stream = generateStreamingResponse(
+        agent.systemPrompt,
+        message,
+        {
+          temperature: agent.temperature,
+          maxTokens: agent.maxTokens,
+          model: agent.model,
+          userId,
+          agentId: agent.id
+        }
+      );
+      
+      // Notify Slack about agent usage
+      if (agent.id && process.env.SLACK_BOT_TOKEN && process.env.SLACK_CHANNEL_ID) {
+        const user = await storage.getUser(userId);
+        import('./slack').then(({ default: slackService }) => {
+          slackService.notifyAgentUsed({
+            id: typeof agent.id === 'string' ? parseInt(agent.id) : agent.id,
+            name: agent.name,
+            userId,
+            username: user?.username
+          }, message);
+        });
+      }
+      
+      // Send chunks as they come
+      for await (const chunk of stream) {
+        res.write(JSON.stringify(chunk));
+        
+        // If this is the last chunk, include token usage
+        if (chunk.done) {
+          const usageEstimate = getTokenUsage({ userId });
+          res.write(JSON.stringify({ 
+            usage: {
+              promptTokens: usageEstimate.promptTokens,
+              completionTokens: usageEstimate.completionTokens,
+              totalTokens: usageEstimate.totalTokens
+            }
+          }));
+        }
+      }
+      
+      res.end();
+      
+    } catch (error: any) {
+      // If we've already started streaming, we can't send a proper error response
+      if (!res.headersSent) {
+        return res.status(500).json({ error: error.message });
+      }
+      // Otherwise, send the error as a stream chunk
+      res.write(JSON.stringify({ error: error.message, done: true }));
+      res.end();
     }
   });
   
