@@ -1,4 +1,4 @@
-import { users, agents, prompts, type User, type InsertUser, type Agent, type InsertAgent, type Prompt, type InsertPrompt } from "@shared/schema";
+import { users, agents, prompts, ROLES, PERMISSIONS, ROLE_PERMISSIONS, type User, type InsertUser, type Agent, type InsertAgent, type Prompt, type InsertPrompt, type Role, type Permission } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 

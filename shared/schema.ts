@@ -1,6 +1,54 @@
-import { pgTable, text, serial, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+// Available roles and their permissions
+export const ROLES = {
+  ADMIN: "admin",
+  MANAGER: "manager", 
+  CREATOR: "creator",
+  VIEWER: "viewer"
+} as const;
+
+// Permission levels for different operations
+export const PERMISSIONS = {
+  CREATE_AGENT: "create_agent",
+  EDIT_AGENT: "edit_agent",
+  DELETE_AGENT: "delete_agent",
+  VIEW_AGENT: "view_agent",
+  EDIT_ANY_AGENT: "edit_any_agent",
+  DELETE_ANY_AGENT: "delete_any_agent",
+  VIEW_ANY_AGENT: "view_any_agent",
+  
+  CREATE_PROMPT: "create_prompt",
+  EDIT_PROMPT: "edit_prompt",
+  DELETE_PROMPT: "delete_prompt",
+  VIEW_PROMPT: "view_prompt",
+  EDIT_ANY_PROMPT: "edit_any_prompt",
+  DELETE_ANY_PROMPT: "delete_any_prompt",
+  VIEW_ANY_PROMPT: "view_any_prompt",
+  
+  MANAGE_USERS: "manage_users",
+  ASSIGN_ROLES: "assign_roles"
+} as const;
+
+// Role-based permission mapping
+export const ROLE_PERMISSIONS = {
+  [ROLES.ADMIN]: Object.values(PERMISSIONS),
+  [ROLES.MANAGER]: [
+    PERMISSIONS.CREATE_AGENT, PERMISSIONS.EDIT_AGENT, PERMISSIONS.DELETE_AGENT, PERMISSIONS.VIEW_AGENT,
+    PERMISSIONS.VIEW_ANY_AGENT, PERMISSIONS.EDIT_ANY_AGENT,
+    PERMISSIONS.CREATE_PROMPT, PERMISSIONS.EDIT_PROMPT, PERMISSIONS.DELETE_PROMPT, PERMISSIONS.VIEW_PROMPT,
+    PERMISSIONS.VIEW_ANY_PROMPT, PERMISSIONS.EDIT_ANY_PROMPT
+  ],
+  [ROLES.CREATOR]: [
+    PERMISSIONS.CREATE_AGENT, PERMISSIONS.EDIT_AGENT, PERMISSIONS.DELETE_AGENT, PERMISSIONS.VIEW_AGENT,
+    PERMISSIONS.CREATE_PROMPT, PERMISSIONS.EDIT_PROMPT, PERMISSIONS.DELETE_PROMPT, PERMISSIONS.VIEW_PROMPT
+  ],
+  [ROLES.VIEWER]: [
+    PERMISSIONS.VIEW_AGENT, PERMISSIONS.VIEW_PROMPT
+  ]
+};
 
 // Users table
 export const users = pgTable("users", {
@@ -8,6 +56,8 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email"),
+  role: text("role").default(ROLES.CREATOR).notNull(),
+  customPermissions: json("custom_permissions").$type<string[]>(),
 });
 
 // Agents table
@@ -44,6 +94,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   email: true,
+  role: true,
+  customPermissions: true,
 });
 
 export const insertAgentSchema = createInsertSchema(agents).omit({
@@ -67,3 +119,22 @@ export type Agent = typeof agents.$inferSelect;
 
 export type InsertPrompt = z.infer<typeof insertPromptSchema>;
 export type Prompt = typeof prompts.$inferSelect;
+
+// Role and permission types
+export type Role = typeof ROLES[keyof typeof ROLES];
+export type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS];
+
+// Role validation schema
+export const roleSchema = z.enum([
+  ROLES.ADMIN, 
+  ROLES.MANAGER, 
+  ROLES.CREATOR, 
+  ROLES.VIEWER
+]);
+
+// User with role update schema
+export const userRoleUpdateSchema = z.object({
+  userId: z.number(),
+  role: roleSchema,
+  customPermissions: z.array(z.string()).optional()
+});
