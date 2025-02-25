@@ -12,14 +12,21 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User>;
+  getAllUsers(): Promise<User[]>;
   
   // User settings methods
   saveApiKey(userId: number, apiKey: string): Promise<void>;
   getApiKey(userId: number): Promise<string | null>;
   
+  // Role and permission methods
+  updateUserRole(userId: number, role: Role, customPermissions?: string[]): Promise<User>;
+  getUserPermissions(userId: number): Promise<Permission[]>;
+  hasPermission(userId: number, permission: Permission): Promise<boolean>;
+  
   // Agent methods
   getAgent(id: number): Promise<Agent | undefined>;
   getAgentsByUserId(userId: number): Promise<Agent[]>;
+  getAllAgents(): Promise<Agent[]>;
   createAgent(agent: InsertAgent): Promise<Agent>;
   updateAgent(id: number, agent: Partial<Agent>): Promise<Agent>;
   deleteAgent(id: number): Promise<void>;
@@ -27,6 +34,7 @@ export interface IStorage {
   // Prompt methods
   getPrompt(id: number): Promise<Prompt | undefined>;
   getPromptsByUserId(userId: number): Promise<Prompt[]>;
+  getAllPrompts(): Promise<Prompt[]>;
   createPrompt(prompt: InsertPrompt): Promise<Prompt>;
   updatePrompt(id: number, prompt: Partial<Prompt>): Promise<Prompt>;
   deletePrompt(id: number): Promise<void>;
@@ -74,11 +82,25 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userIdCounter++;
+    
+    // Process customPermissions to ensure it's an array of strings or null
+    let customPermissions: string[] | null = null;
+    if (insertUser.customPermissions) {
+      if (Array.isArray(insertUser.customPermissions)) {
+        customPermissions = insertUser.customPermissions;
+      } else {
+        // This handles potential type issues
+        customPermissions = null;
+      }
+    }
+    
     // Fix for type safety
     const user: User = { 
       ...insertUser, 
       id,
-      email: insertUser.email || null 
+      email: insertUser.email || null,
+      role: insertUser.role || ROLES.CREATOR, // Default to CREATOR role
+      customPermissions: customPermissions
     };
     this.usersMap.set(id, user);
     return user;
@@ -101,6 +123,62 @@ export class MemStorage implements IStorage {
   
   async getApiKey(userId: number): Promise<string | null> {
     return this.apiKeysMap.get(userId) || null;
+  }
+
+  // Role and permission methods
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.usersMap.values());
+  }
+
+  async updateUserRole(userId: number, role: Role, customPermissions?: string[]): Promise<User> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+
+    const updatedUser = await this.updateUser(userId, { 
+      role, 
+      customPermissions: customPermissions || null 
+    });
+
+    return updatedUser;
+  }
+
+  async getUserPermissions(userId: number): Promise<Permission[]> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+
+    // Get permissions based on role
+    const rolePermissions = ROLE_PERMISSIONS[user.role as Role] || [];
+    
+    // Add any custom permissions
+    const customPermissions = user.customPermissions || [];
+    
+    // Combine and deduplicate permissions
+    const allPermissions = [...rolePermissions, ...customPermissions];
+    return [...new Set(allPermissions)] as Permission[];
+  }
+
+  async hasPermission(userId: number, permission: Permission): Promise<boolean> {
+    try {
+      const permissions = await this.getUserPermissions(userId);
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error("Error checking permission:", error);
+      return false;
+    }
+  }
+
+  // Get all agents (for admins/managers)
+  async getAllAgents(): Promise<Agent[]> {
+    return Array.from(this.agentsMap.values());
+  }
+
+  // Get all prompts (for admins/managers)
+  async getAllPrompts(): Promise<Prompt[]> {
+    return Array.from(this.promptsMap.values());
   }
 
   // Agent methods

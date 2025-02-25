@@ -2,8 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { checkAuthenticated } from "./middleware";
+import { checkAuthenticated, checkAdmin, checkPermission, checkResourceOwnership } from "./middleware";
 import { testAgentResponse } from "./openai";
+import { PERMISSIONS, ROLES, userRoleUpdateSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
@@ -351,6 +352,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[UserSettings] Save API key error:", error);
       res.status(500).json({ error: error.message || "Failed to save API key" });
+    }
+  });
+
+  // Role-based access control (RBAC) endpoints
+  
+  // Get all available roles - admin only
+  app.get("/api/admin/roles", checkAdmin, async (req, res) => {
+    try {
+      res.json(Object.values(ROLES));
+    } catch (error: any) {
+      console.error("[RBAC] Get roles error:", error);
+      res.status(500).json({ error: error.message || "Failed to fetch roles" });
+    }
+  });
+  
+  // Get all permissions - admin only
+  app.get("/api/admin/permissions", checkAdmin, async (req, res) => {
+    try {
+      res.json(Object.values(PERMISSIONS));
+    } catch (error: any) {
+      console.error("[RBAC] Get permissions error:", error);
+      res.status(500).json({ error: error.message || "Failed to fetch permissions" });
+    }
+  });
+  
+  // Get all users - admin only
+  app.get("/api/admin/users", checkAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      
+      // Don't send passwords
+      const sanitizedUsers = users.map(user => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      
+      res.json(sanitizedUsers);
+    } catch (error: any) {
+      console.error("[RBAC] Get users error:", error);
+      res.status(500).json({ error: error.message || "Failed to fetch users" });
+    }
+  });
+  
+  // Update user role - admin only
+  app.put("/api/admin/users/:id/role", checkAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
+      // Validate request body using the schema
+      const validation = userRoleUpdateSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ error: "Invalid role update data", details: validation.error });
+      }
+      
+      const { role, customPermissions } = validation.data;
+      
+      // Don't allow changing one's own role (to prevent admin lockout)
+      if (userId === req.user!.id) {
+        return res.status(403).json({ 
+          error: "Forbidden", 
+          message: "You cannot change your own role" 
+        });
+      }
+      
+      // Update the user's role
+      const updatedUser = await storage.updateUserRole(userId, role, customPermissions);
+      
+      // Don't send password back
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      console.error("[RBAC] Update user role error:", error);
+      res.status(500).json({ error: error.message || "Failed to update user role" });
+    }
+  });
+  
+  // Get current user's permissions
+  app.get("/api/user/permissions", checkAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const permissions = await storage.getUserPermissions(userId);
+      res.json(permissions);
+    } catch (error: any) {
+      console.error("[RBAC] Get user permissions error:", error);
+      res.status(500).json({ error: error.message || "Failed to fetch user permissions" });
     }
   });
 
