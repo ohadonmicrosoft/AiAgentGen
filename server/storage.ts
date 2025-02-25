@@ -86,11 +86,21 @@ export class MemStorage implements IStorage {
     // Process customPermissions to ensure it's an array of strings or null
     let customPermissions: string[] | null = null;
     if (insertUser.customPermissions) {
+      // Create a safe string array to handle type issues
+      const safePermissions: string[] = [];
+      
       if (Array.isArray(insertUser.customPermissions)) {
-        customPermissions = insertUser.customPermissions;
-      } else {
-        // This handles potential type issues
-        customPermissions = null;
+        // Convert each item to string and filter out non-strings
+        for (let i = 0; i < insertUser.customPermissions.length; i++) {
+          const item = insertUser.customPermissions[i];
+          if (typeof item === 'string') {
+            safePermissions.push(item);
+          }
+        }
+        
+        if (safePermissions.length > 0) {
+          customPermissions = safePermissions;
+        }
       }
     }
     
@@ -136,9 +146,20 @@ export class MemStorage implements IStorage {
       throw new Error(`User with id ${userId} not found`);
     }
 
+    // Process customPermissions to ensure it's a valid string array or null
+    let safeCustomPermissions: string[] | null = null;
+    if (customPermissions && Array.isArray(customPermissions)) {
+      // Filter to only keep string values
+      const filteredPermissions = customPermissions.filter(p => typeof p === 'string');
+      
+      if (filteredPermissions.length > 0) {
+        safeCustomPermissions = filteredPermissions;
+      }
+    }
+
     const updatedUser = await this.updateUser(userId, { 
       role, 
-      customPermissions: customPermissions || null 
+      customPermissions: safeCustomPermissions 
     });
 
     return updatedUser;
@@ -153,12 +174,16 @@ export class MemStorage implements IStorage {
     // Get permissions based on role
     const rolePermissions = ROLE_PERMISSIONS[user.role as Role] || [];
     
-    // Add any custom permissions
-    const customPermissions = user.customPermissions || [];
+    // Add any custom permissions (ensure it's an array)
+    const customPermissions = Array.isArray(user.customPermissions) ? user.customPermissions : [];
     
-    // Combine and deduplicate permissions
+    // Combine permissions
     const allPermissions = [...rolePermissions, ...customPermissions];
-    return [...new Set(allPermissions)] as Permission[];
+    
+    // Deduplicate permissions
+    const uniquePermissions = Array.from(new Set(allPermissions));
+    
+    return uniquePermissions as Permission[];
   }
 
   async hasPermission(userId: number, permission: Permission): Promise<boolean> {

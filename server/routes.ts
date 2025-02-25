@@ -32,9 +32,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/agents", checkAuthenticated, async (req, res) => {
     try {
       const userId = req.user!.id;
-      const agents = await storage.getAgentsByUserId(userId);
+      
+      // Check if user has permission to view all agents
+      const canViewAllAgents = await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT);
+      
+      let agents;
+      if (canViewAllAgents) {
+        console.log(`[Agents] User ${userId} has permission to view all agents`);
+        agents = await storage.getAllAgents();
+      } else {
+        agents = await storage.getAgentsByUserId(userId);
+      }
+      
       res.json(agents);
     } catch (error) {
+      console.error("[Agents] Error fetching agents:", error);
       res.status(500).json({ error: "Failed to fetch agents" });
     }
   });
@@ -42,6 +54,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/agents", checkAuthenticated, async (req, res) => {
     try {
       const userId = req.user!.id;
+      
+      // Check if user has permission to create agents
+      const canCreateAgents = await storage.hasPermission(userId, PERMISSIONS.CREATE_AGENT);
+      
+      if (!canCreateAgents) {
+        return res.status(403).json({ 
+          error: "Forbidden", 
+          message: "You do not have permission to create agents" 
+        });
+      }
+      
       const agent = await storage.createAgent({
         ...req.body,
         userId,
@@ -49,40 +72,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updatedAt: new Date().toISOString(),
         status: req.body.status || "draft"
       });
+      
       res.status(201).json(agent);
     } catch (error) {
+      console.error("[Agents] Error creating agent:", error);
       res.status(500).json({ error: "Failed to create agent" });
     }
   });
 
-  app.get("/api/agents/:id", checkAuthenticated, async (req, res) => {
+  app.get("/api/agents/:id", checkAuthenticated, checkResourceOwnership('agent', PERMISSIONS.VIEW_ANY_AGENT), async (req, res) => {
     try {
       const agent = await storage.getAgent(parseInt(req.params.id));
       if (!agent) {
         return res.status(404).json({ error: "Agent not found" });
       }
       
-      if (agent.userId !== req.user!.id) {
-        return res.status(403).json({ error: "Unauthorized" });
-      }
-      
       res.json(agent);
     } catch (error) {
+      console.error("[Agents] Error fetching agent:", error);
       res.status(500).json({ error: "Failed to fetch agent" });
     }
   });
 
-  app.put("/api/agents/:id", checkAuthenticated, async (req, res) => {
+  app.put("/api/agents/:id", checkAuthenticated, checkResourceOwnership('agent', PERMISSIONS.EDIT_ANY_AGENT), async (req, res) => {
     try {
       const agentId = parseInt(req.params.id);
       const agent = await storage.getAgent(agentId);
       
       if (!agent) {
         return res.status(404).json({ error: "Agent not found" });
-      }
-      
-      if (agent.userId !== req.user!.id) {
-        return res.status(403).json({ error: "Unauthorized" });
       }
       
       const updatedAgent = await storage.updateAgent(agentId, {
@@ -92,11 +110,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(updatedAgent);
     } catch (error) {
+      console.error("[Agents] Error updating agent:", error);
       res.status(500).json({ error: "Failed to update agent" });
     }
   });
 
-  app.delete("/api/agents/:id", checkAuthenticated, async (req, res) => {
+  app.delete("/api/agents/:id", checkAuthenticated, checkResourceOwnership('agent', PERMISSIONS.DELETE_ANY_AGENT), async (req, res) => {
     try {
       const agentId = parseInt(req.params.id);
       const agent = await storage.getAgent(agentId);
@@ -105,13 +124,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Agent not found" });
       }
       
-      if (agent.userId !== req.user!.id) {
-        return res.status(403).json({ error: "Unauthorized" });
-      }
-      
       await storage.deleteAgent(agentId);
       res.sendStatus(204);
     } catch (error) {
+      console.error("[Agents] Error deleting agent:", error);
       res.status(500).json({ error: "Failed to delete agent" });
     }
   });
@@ -120,9 +136,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/prompts", checkAuthenticated, async (req, res) => {
     try {
       const userId = req.user!.id;
-      const prompts = await storage.getPromptsByUserId(userId);
+      
+      // Check if user has permission to view all prompts
+      const canViewAllPrompts = await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_PROMPT);
+      
+      let prompts;
+      if (canViewAllPrompts) {
+        console.log(`[Prompts] User ${userId} has permission to view all prompts`);
+        prompts = await storage.getAllPrompts();
+      } else {
+        prompts = await storage.getPromptsByUserId(userId);
+      }
+      
       res.json(prompts);
     } catch (error) {
+      console.error("[Prompts] Error fetching prompts:", error);
       res.status(500).json({ error: "Failed to fetch prompts" });
     }
   });
@@ -130,46 +158,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/prompts", checkAuthenticated, async (req, res) => {
     try {
       const userId = req.user!.id;
+      
+      // Check if user has permission to create prompts
+      const canCreatePrompts = await storage.hasPermission(userId, PERMISSIONS.CREATE_PROMPT);
+      
+      if (!canCreatePrompts) {
+        return res.status(403).json({ 
+          error: "Forbidden", 
+          message: "You do not have permission to create prompts" 
+        });
+      }
+      
       const prompt = await storage.createPrompt({
         ...req.body,
         userId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
+      
       res.status(201).json(prompt);
     } catch (error) {
+      console.error("[Prompts] Error creating prompt:", error);
       res.status(500).json({ error: "Failed to create prompt" });
     }
   });
 
-  app.get("/api/prompts/:id", checkAuthenticated, async (req, res) => {
+  app.get("/api/prompts/:id", checkAuthenticated, checkResourceOwnership('prompt', PERMISSIONS.VIEW_ANY_PROMPT), async (req, res) => {
     try {
       const prompt = await storage.getPrompt(parseInt(req.params.id));
       if (!prompt) {
         return res.status(404).json({ error: "Prompt not found" });
       }
       
-      if (prompt.userId !== req.user!.id) {
-        return res.status(403).json({ error: "Unauthorized" });
-      }
-      
       res.json(prompt);
     } catch (error) {
+      console.error("[Prompts] Error fetching prompt:", error);
       res.status(500).json({ error: "Failed to fetch prompt" });
     }
   });
 
-  app.put("/api/prompts/:id", checkAuthenticated, async (req, res) => {
+  app.put("/api/prompts/:id", checkAuthenticated, checkResourceOwnership('prompt', PERMISSIONS.EDIT_ANY_PROMPT), async (req, res) => {
     try {
       const promptId = parseInt(req.params.id);
       const prompt = await storage.getPrompt(promptId);
       
       if (!prompt) {
         return res.status(404).json({ error: "Prompt not found" });
-      }
-      
-      if (prompt.userId !== req.user!.id) {
-        return res.status(403).json({ error: "Unauthorized" });
       }
       
       const updatedPrompt = await storage.updatePrompt(promptId, {
@@ -179,11 +213,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(updatedPrompt);
     } catch (error) {
+      console.error("[Prompts] Error updating prompt:", error);
       res.status(500).json({ error: "Failed to update prompt" });
     }
   });
 
-  app.delete("/api/prompts/:id", checkAuthenticated, async (req, res) => {
+  app.delete("/api/prompts/:id", checkAuthenticated, checkResourceOwnership('prompt', PERMISSIONS.DELETE_ANY_PROMPT), async (req, res) => {
     try {
       const promptId = parseInt(req.params.id);
       const prompt = await storage.getPrompt(promptId);
@@ -192,13 +227,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Prompt not found" });
       }
       
-      if (prompt.userId !== req.user!.id) {
-        return res.status(403).json({ error: "Unauthorized" });
-      }
-      
       await storage.deletePrompt(promptId);
       res.sendStatus(204);
     } catch (error) {
+      console.error("[Prompts] Error deleting prompt:", error);
       res.status(500).json({ error: "Failed to delete prompt" });
     }
   });
