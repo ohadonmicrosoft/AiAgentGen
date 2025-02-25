@@ -656,6 +656,199 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Conversation History Management
+  
+  // Get user's conversations
+  app.get("/api/conversations", checkAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      console.log("[Conversations] Fetching conversations for user", userId);
+      
+      // Check if user has permission to view all conversations
+      const canViewAllConversations = await storage.hasPermission(userId, PERMISSIONS.ADMIN);
+      
+      let conversations;
+      if (canViewAllConversations) {
+        // Admin can see all conversations
+        conversations = await storage.getAllConversations();
+      } else {
+        conversations = await storage.getConversationsByUserId(userId);
+      }
+      
+      res.json(conversations);
+    } catch (error: any) {
+      console.error("[Conversations] Error fetching conversations:", error);
+      res.status(500).json({ error: error.message || "Failed to fetch conversations" });
+    }
+  });
+
+  // Get conversations for a specific agent
+  app.get("/api/agents/:id/conversations", checkAuthenticated, async (req, res) => {
+    try {
+      const agentId = parseInt(req.params.id);
+      const userId = req.user!.id;
+      console.log("[Conversations] Fetching conversations for agent", agentId);
+      
+      // Check if user has permission to view this agent
+      const agent = await storage.getAgent(agentId);
+      if (!agent) {
+        return res.status(404).json({ error: "Agent not found" });
+      }
+      
+      if (agent.userId !== userId && 
+          !await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT)) {
+        return res.status(403).json({ error: "You don't have permission to view this agent's conversations" });
+      }
+      
+      const conversations = await storage.getConversationsByAgentId(agentId);
+      res.json(conversations);
+    } catch (error: any) {
+      console.error("[Conversations] Error fetching agent conversations:", error);
+      res.status(500).json({ error: error.message || "Failed to fetch conversations" });
+    }
+  });
+
+  // Get a specific conversation with its messages
+  app.get("/api/conversations/:id", checkAuthenticated, async (req, res) => {
+    try {
+      const conversationId = parseInt(req.params.id);
+      const userId = req.user!.id;
+      console.log("[Conversations] Fetching conversation", conversationId);
+      
+      const conversation = await storage.getConversation(conversationId);
+      
+      if (!conversation) {
+        return res.status(404).json({ error: "Conversation not found" });
+      }
+      
+      // Check if user has permission to view this conversation
+      if (conversation.userId !== userId && 
+          !await storage.hasPermission(userId, PERMISSIONS.ADMIN)) {
+        return res.status(403).json({ error: "You don't have permission to view this conversation" });
+      }
+      
+      // Get messages for this conversation
+      const messages = await storage.getMessagesByConversationId(conversationId);
+      
+      res.json({
+        conversation,
+        messages
+      });
+    } catch (error: any) {
+      console.error("[Conversations] Error fetching conversation:", error);
+      res.status(500).json({ error: error.message || "Failed to fetch conversation" });
+    }
+  });
+
+  // Create a new conversation
+  app.post("/api/conversations", checkAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const { agentId, title } = req.body;
+      console.log("[Conversations] Creating new conversation with agent", agentId);
+      
+      if (!agentId) {
+        return res.status(400).json({ error: "Agent ID is required" });
+      }
+      
+      // Check if agent exists and user has access to it
+      const agent = await storage.getAgent(agentId);
+      if (!agent) {
+        return res.status(404).json({ error: "Agent not found" });
+      }
+      
+      if (agent.userId !== userId && 
+          !await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT)) {
+        return res.status(403).json({ error: "You don't have permission to use this agent" });
+      }
+      
+      // Create conversation
+      const conversation = await storage.createConversation({
+        userId,
+        agentId,
+        title: title || `Conversation with ${agent.name}`,
+        createdAt: new Date()
+      });
+      
+      res.status(201).json(conversation);
+    } catch (error: any) {
+      console.error("[Conversations] Error creating conversation:", error);
+      res.status(500).json({ error: error.message || "Failed to create conversation" });
+    }
+  });
+
+  // Add a message to a conversation
+  app.post("/api/conversations/:id/messages", checkAuthenticated, async (req, res) => {
+    try {
+      const conversationId = parseInt(req.params.id);
+      const userId = req.user!.id;
+      const { content, role, tokenCount } = req.body;
+      console.log("[Conversations] Adding message to conversation", conversationId);
+      
+      if (!content || !role) {
+        return res.status(400).json({ error: "Content and role are required" });
+      }
+      
+      // Check if conversation exists and user has access to it
+      const conversation = await storage.getConversation(conversationId);
+      if (!conversation) {
+        return res.status(404).json({ error: "Conversation not found" });
+      }
+      
+      if (conversation.userId !== userId && 
+          !await storage.hasPermission(userId, PERMISSIONS.ADMIN)) {
+        return res.status(403).json({ error: "You don't have permission to access this conversation" });
+      }
+      
+      // Create message
+      const message = await storage.createMessage({
+        conversationId,
+        content,
+        role,
+        tokenCount: tokenCount || 0,
+        createdAt: new Date()
+      });
+      
+      // Update conversation's lastUpdated timestamp
+      await storage.updateConversation(conversationId, { 
+        lastUpdated: new Date() 
+      });
+      
+      res.status(201).json(message);
+    } catch (error: any) {
+      console.error("[Conversations] Error adding message:", error);
+      res.status(500).json({ error: error.message || "Failed to add message" });
+    }
+  });
+
+  // Delete a conversation
+  app.delete("/api/conversations/:id", checkAuthenticated, async (req, res) => {
+    try {
+      const conversationId = parseInt(req.params.id);
+      const userId = req.user!.id;
+      console.log("[Conversations] Deleting conversation", conversationId);
+      
+      // Check if conversation exists and user has access to it
+      const conversation = await storage.getConversation(conversationId);
+      if (!conversation) {
+        return res.status(404).json({ error: "Conversation not found" });
+      }
+      
+      if (conversation.userId !== userId && 
+          !await storage.hasPermission(userId, PERMISSIONS.ADMIN)) {
+        return res.status(403).json({ error: "You don't have permission to delete this conversation" });
+      }
+      
+      // Delete conversation (this should cascade delete all messages)
+      await storage.deleteConversation(conversationId);
+      
+      res.sendStatus(204);
+    } catch (error: any) {
+      console.error("[Conversations] Error deleting conversation:", error);
+      res.status(500).json({ error: error.message || "Failed to delete conversation" });
+    }
+  });
+
   // Create HTTP server
   const httpServer = createServer(app);
 

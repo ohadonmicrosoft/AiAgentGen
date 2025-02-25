@@ -356,16 +356,22 @@ export class PostgresStorage implements IStorage {
     return results[0];
   }
   
+  async getAllConversations(): Promise<Conversation[]> {
+    return await this.db.select().from(conversations).orderBy(conversations.updatedAt);
+  }
+  
   async getConversationsByUserId(userId: number): Promise<Conversation[]> {
     return await this.db.select()
       .from(conversations)
-      .where(eq(conversations.userId, userId));
+      .where(eq(conversations.userId, userId))
+      .orderBy(conversations.updatedAt);
   }
   
   async getConversationsByAgentId(agentId: number): Promise<Conversation[]> {
     return await this.db.select()
       .from(conversations)
-      .where(eq(conversations.agentId, agentId));
+      .where(eq(conversations.agentId, agentId))
+      .orderBy(conversations.updatedAt);
   }
   
   async createConversation(insertConversation: InsertConversation): Promise<Conversation> {
@@ -704,16 +710,21 @@ export class MemStorage implements IStorage {
     return this.conversationsMap.get(id);
   }
   
+  async getAllConversations(): Promise<Conversation[]> {
+    return Array.from(this.conversationsMap.values())
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  }
+  
   async getConversationsByUserId(userId: number): Promise<Conversation[]> {
-    return Array.from(this.conversationsMap.values()).filter(
-      (conversation) => conversation.userId === userId,
-    );
+    return Array.from(this.conversationsMap.values())
+      .filter((conversation) => conversation.userId === userId)
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   }
   
   async getConversationsByAgentId(agentId: number): Promise<Conversation[]> {
-    return Array.from(this.conversationsMap.values()).filter(
-      (conversation) => conversation.agentId === agentId,
-    );
+    return Array.from(this.conversationsMap.values())
+      .filter((conversation) => conversation.agentId === agentId)
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   }
   
   async createConversation(insertConversation: InsertConversation): Promise<Conversation> {
