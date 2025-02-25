@@ -1,6 +1,8 @@
-import { pgTable, text, serial, integer, boolean, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, json, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+// Added timestamp for better date handling
 
 // Available roles and their permissions
 export const ROLES = {
@@ -73,8 +75,8 @@ export const agents = pgTable("agents", {
   responseStyle: text("response_style"),
   systemPrompt: text("system_prompt"),
   status: text("status").notNull(),
-  createdAt: text("created_at").notNull(),
-  updatedAt: text("updated_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Prompts table
@@ -85,8 +87,8 @@ export const prompts = pgTable("prompts", {
   content: text("content").notNull(),
   tags: text("tags").array(),
   isFavorite: boolean("is_favorite").default(false),
-  createdAt: text("created_at").notNull(),
-  updatedAt: text("updated_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Insert schemas

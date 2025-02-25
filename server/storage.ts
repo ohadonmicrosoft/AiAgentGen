@@ -1,10 +1,24 @@
 import { users, agents, prompts, ROLES, PERMISSIONS, ROLE_PERMISSIONS, type User, type InsertUser, type Agent, type InsertAgent, type Prompt, type InsertPrompt, type Role, type Permission } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
+import { eq, and } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import connectPg from "connect-pg-simple";
 
 const MemoryStore = createMemoryStore(session);
 // Create a simpler type definition that avoids complications
 type SessionStore = any;
+
+// Create a separate table for API keys
+// We'll define this inside storage.ts since it's internal implementation detail
+import { pgTable, text, integer, serial } from "drizzle-orm/pg-core";
+export const apiKeys = pgTable("api_keys", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  apiKey: text("api_key").notNull()
+});
 
 export interface IStorage {
   // User methods
@@ -43,6 +57,285 @@ export interface IStorage {
   sessionStore: SessionStore;
 }
 
+// PostgreSQL Database Storage Implementation
+export class PostgresStorage implements IStorage {
+  db: PostgresJsDatabase;
+  sessionStore: SessionStore;
+  
+  constructor() {
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL environment variable is required");
+    }
+    
+    // Create connection pool
+    const connectionString = process.env.DATABASE_URL;
+    const client = postgres(connectionString);
+    this.db = drizzle(client);
+    
+    // Set up session store
+    const PostgresSessionStore = connectPg(session);
+    this.sessionStore = new PostgresSessionStore({
+      conObject: {
+        connectionString,
+        ssl: process.env.NODE_ENV === 'production'
+      },
+      createTableIfMissing: true
+    });
+  }
+  
+  // User methods
+  async getUser(id: number): Promise<User | undefined> {
+    const results = await this.db.select().from(users).where(eq(users.id, id));
+    return results[0];
+  }
+  
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const results = await this.db.select().from(users).where(eq(users.username, username));
+    return results[0];
+  }
+  
+  async createUser(insertUser: InsertUser): Promise<User> {
+    // Process customPermissions to ensure it's an array of strings or null
+    let customPermissions: string[] | null = null;
+    if (insertUser.customPermissions) {
+      const safePermissions: string[] = [];
+      
+      if (Array.isArray(insertUser.customPermissions)) {
+        for (let i = 0; i < insertUser.customPermissions.length; i++) {
+          const item = insertUser.customPermissions[i];
+          if (typeof item === 'string') {
+            safePermissions.push(item);
+          }
+        }
+        
+        if (safePermissions.length > 0) {
+          customPermissions = safePermissions;
+        }
+      }
+    }
+    
+    const user = {
+      ...insertUser,
+      email: insertUser.email || null,
+      role: insertUser.role || ROLES.CREATOR,
+      customPermissions: customPermissions
+    };
+    
+    const result = await this.db.insert(users).values(user).returning();
+    return result[0];
+  }
+  
+  async updateUser(id: number, updates: Partial<User>): Promise<User> {
+    const result = await this.db.update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+      
+    if (result.length === 0) {
+      throw new Error(`User with id ${id} not found`);
+    }
+    
+    return result[0];
+  }
+  
+  async getAllUsers(): Promise<User[]> {
+    return await this.db.select().from(users);
+  }
+  
+  async saveApiKey(userId: number, apiKey: string): Promise<void> {
+    // Check if key already exists
+    const existing = await this.db.select()
+      .from(apiKeys)
+      .where(eq(apiKeys.userId, userId));
+    
+    if (existing.length > 0) {
+      // Update existing key
+      await this.db.update(apiKeys)
+        .set({ apiKey })
+        .where(eq(apiKeys.userId, userId));
+    } else {
+      // For serial ID columns, we don't need to specify the ID as it's auto-generated
+      const query = this.db.insert(apiKeys).values({
+        userId,
+        apiKey
+      });
+      
+      // Execute the query
+      await query;
+    }
+  }
+  
+  async getApiKey(userId: number): Promise<string | null> {
+    const results = await this.db.select()
+      .from(apiKeys)
+      .where(eq(apiKeys.userId, userId));
+    
+    return results.length > 0 ? results[0].apiKey : null;
+  }
+  
+  // Role and permission methods
+  async updateUserRole(userId: number, role: Role, customPermissions?: string[]): Promise<User> {
+    // Process customPermissions to ensure it's a valid string array or null
+    let safeCustomPermissions: string[] | null = null;
+    if (customPermissions && Array.isArray(customPermissions)) {
+      const filteredPermissions = customPermissions.filter(p => typeof p === 'string');
+      
+      if (filteredPermissions.length > 0) {
+        safeCustomPermissions = filteredPermissions;
+      }
+    }
+    
+    const result = await this.db.update(users)
+      .set({ 
+        role, 
+        customPermissions: safeCustomPermissions 
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+    
+    return result[0];
+  }
+  
+  async getUserPermissions(userId: number): Promise<Permission[]> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+    
+    // Get permissions based on role
+    const rolePermissions = ROLE_PERMISSIONS[user.role as Role] || [];
+    
+    // Add any custom permissions (ensure it's an array)
+    const customPermissions = Array.isArray(user.customPermissions) ? user.customPermissions : [];
+    
+    // Combine permissions
+    const allPermissions = [...rolePermissions, ...customPermissions];
+    
+    // Deduplicate permissions
+    const uniquePermissions = Array.from(new Set(allPermissions));
+    
+    return uniquePermissions as Permission[];
+  }
+  
+  async hasPermission(userId: number, permission: Permission): Promise<boolean> {
+    try {
+      const permissions = await this.getUserPermissions(userId);
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error("Error checking permission:", error);
+      return false;
+    }
+  }
+  
+  // Agent methods
+  async getAgent(id: number): Promise<Agent | undefined> {
+    const results = await this.db.select().from(agents).where(eq(agents.id, id));
+    return results[0];
+  }
+  
+  async getAgentsByUserId(userId: number): Promise<Agent[]> {
+    return await this.db.select()
+      .from(agents)
+      .where(eq(agents.userId, userId));
+  }
+  
+  async getAllAgents(): Promise<Agent[]> {
+    return await this.db.select().from(agents);
+  }
+  
+  async createAgent(insertAgent: InsertAgent): Promise<Agent> {
+    const agent = {
+      ...insertAgent,
+      description: insertAgent.description || null,
+      responseStyle: insertAgent.responseStyle || null,
+      systemPrompt: insertAgent.systemPrompt || null,
+      // createdAt and updatedAt will be set by the database defaultNow()
+    };
+    
+    const result = await this.db.insert(agents).values(agent).returning();
+    return result[0];
+  }
+  
+  async updateAgent(id: number, updates: Partial<Agent>): Promise<Agent> {
+    // Remove any timestamps from updates as they're handled by the database
+    const { createdAt, updatedAt, ...safeUpdates } = updates;
+    
+    const result = await this.db.update(agents)
+      .set({
+        ...safeUpdates,
+        updatedAt: new Date() // PostgreSQL will handle the timestamp conversion
+      })
+      .where(eq(agents.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error(`Agent with id ${id} not found`);
+    }
+    
+    return result[0];
+  }
+  
+  async deleteAgent(id: number): Promise<void> {
+    await this.db.delete(agents).where(eq(agents.id, id));
+  }
+  
+  // Prompt methods
+  async getPrompt(id: number): Promise<Prompt | undefined> {
+    const results = await this.db.select().from(prompts).where(eq(prompts.id, id));
+    return results[0];
+  }
+  
+  async getPromptsByUserId(userId: number): Promise<Prompt[]> {
+    return await this.db.select()
+      .from(prompts)
+      .where(eq(prompts.userId, userId));
+  }
+  
+  async getAllPrompts(): Promise<Prompt[]> {
+    return await this.db.select().from(prompts);
+  }
+  
+  async createPrompt(insertPrompt: InsertPrompt): Promise<Prompt> {
+    const prompt = {
+      ...insertPrompt,
+      tags: insertPrompt.tags || null,
+      isFavorite: insertPrompt.isFavorite || false,
+      // createdAt and updatedAt will be set by the database defaultNow()
+    };
+    
+    const result = await this.db.insert(prompts).values(prompt).returning();
+    return result[0];
+  }
+  
+  async updatePrompt(id: number, updates: Partial<Prompt>): Promise<Prompt> {
+    // Remove any timestamps from updates as they're handled by the database
+    const { createdAt, updatedAt, ...safeUpdates } = updates;
+    
+    const result = await this.db.update(prompts)
+      .set({
+        ...safeUpdates,
+        updatedAt: new Date() // PostgreSQL will handle the timestamp conversion
+      })
+      .where(eq(prompts.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error(`Prompt with id ${id} not found`);
+    }
+    
+    return result[0];
+  }
+  
+  async deletePrompt(id: number): Promise<void> {
+    await this.db.delete(prompts).where(eq(prompts.id, id));
+  }
+}
+
+// In-memory storage implementation for development and testing
 export class MemStorage implements IStorage {
   private usersMap: Map<number, User>;
   private agentsMap: Map<number, Agent>;
@@ -127,6 +420,10 @@ export class MemStorage implements IStorage {
     return updatedUser;
   }
   
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.usersMap.values());
+  }
+  
   async saveApiKey(userId: number, apiKey: string): Promise<void> {
     this.apiKeysMap.set(userId, apiKey);
   }
@@ -136,10 +433,6 @@ export class MemStorage implements IStorage {
   }
 
   // Role and permission methods
-  async getAllUsers(): Promise<User[]> {
-    return Array.from(this.usersMap.values());
-  }
-
   async updateUserRole(userId: number, role: Role, customPermissions?: string[]): Promise<User> {
     const user = await this.getUser(userId);
     if (!user) {
@@ -219,6 +512,8 @@ export class MemStorage implements IStorage {
 
   async createAgent(insertAgent: InsertAgent): Promise<Agent> {
     const id = this.agentIdCounter++;
+    const now = new Date();
+    
     // Fix for type safety
     const agent: Agent = { 
       ...insertAgent, 
@@ -226,8 +521,8 @@ export class MemStorage implements IStorage {
       description: insertAgent.description || null,
       responseStyle: insertAgent.responseStyle || null,
       systemPrompt: insertAgent.systemPrompt || null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: now,
+      updatedAt: now
     };
     this.agentsMap.set(id, agent);
     return agent;
@@ -239,7 +534,12 @@ export class MemStorage implements IStorage {
       throw new Error(`Agent with id ${id} not found`);
     }
     
-    const updatedAgent = { ...agent, ...updates };
+    const updatesWithTimestamp = {
+      ...updates,
+      updatedAt: new Date()
+    };
+    
+    const updatedAgent = { ...agent, ...updatesWithTimestamp };
     this.agentsMap.set(id, updatedAgent);
     return updatedAgent;
   }
@@ -261,14 +561,16 @@ export class MemStorage implements IStorage {
 
   async createPrompt(insertPrompt: InsertPrompt): Promise<Prompt> {
     const id = this.promptIdCounter++;
+    const now = new Date();
+    
     // Fix for type safety
     const prompt: Prompt = { 
       ...insertPrompt, 
       id,
       tags: insertPrompt.tags || null,
       isFavorite: insertPrompt.isFavorite || false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: now,
+      updatedAt: now
     };
     this.promptsMap.set(id, prompt);
     return prompt;
@@ -280,7 +582,12 @@ export class MemStorage implements IStorage {
       throw new Error(`Prompt with id ${id} not found`);
     }
     
-    const updatedPrompt = { ...prompt, ...updates };
+    const updatesWithTimestamp = {
+      ...updates,
+      updatedAt: new Date()
+    };
+    
+    const updatedPrompt = { ...prompt, ...updatesWithTimestamp };
     this.promptsMap.set(id, updatedPrompt);
     return updatedPrompt;
   }
@@ -290,4 +597,9 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Choose which storage implementation to use based on environment
+const usePostgres = process.env.DATABASE_URL && process.env.USE_POSTGRES !== 'false';
+
+export const storage = usePostgres 
+  ? new PostgresStorage() 
+  : new MemStorage();

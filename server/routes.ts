@@ -68,8 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const agent = await storage.createAgent({
         ...req.body,
         userId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        // createdAt and updatedAt will be automatically set by PostgreSQL
         status: req.body.status || "draft"
       });
       
@@ -104,8 +103,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const updatedAgent = await storage.updateAgent(agentId, {
-        ...req.body,
-        updatedAt: new Date().toISOString()
+        ...req.body
+        // updatedAt will be automatically set by PostgreSQL
       });
       
       res.json(updatedAgent);
@@ -171,9 +170,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const prompt = await storage.createPrompt({
         ...req.body,
-        userId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        userId
+        // createdAt and updatedAt will be automatically set by PostgreSQL
       });
       
       res.status(201).json(prompt);
@@ -207,8 +205,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const updatedPrompt = await storage.updatePrompt(promptId, {
-        ...req.body,
-        updatedAt: new Date().toISOString()
+        ...req.body
+        // updatedAt will be automatically set by PostgreSQL
       });
       
       res.json(updatedPrompt);

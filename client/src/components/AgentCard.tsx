@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Edit, Play, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useLocation } from "wouter";
 
 interface Agent {
   id: string;
@@ -15,10 +16,20 @@ interface Agent {
 interface AgentCardProps {
   agent: Agent;
   onEdit: () => void;
-  onTest: () => void;
+  onTest?: () => void; // Make onTest optional
 }
 
 export default function AgentCard({ agent, onEdit, onTest }: AgentCardProps) {
+  const [, navigate] = useLocation();
+  
+  // Default test handler if none provided
+  const handleTest = () => {
+    if (onTest) {
+      onTest();
+    } else {
+      navigate(`/test-agent/${agent.id}`);
+    }
+  };
   return (
     <Card className="overflow-hidden">
       <CardContent className="p-5">
@@ -34,7 +45,7 @@ export default function AgentCard({ agent, onEdit, onTest }: AgentCardProps) {
             <Edit className="mr-1.5 h-3.5 w-3.5" />
             Edit
           </Button>
-          <Button variant="outline" size="sm" onClick={onTest}>
+          <Button variant="outline" size="sm" onClick={handleTest}>
             <Play className="mr-1.5 h-3.5 w-3.5" />
             Test
           </Button>
