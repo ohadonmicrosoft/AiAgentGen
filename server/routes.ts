@@ -807,9 +807,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tokenCount: tokenCount || 0
       });
       
-      // Update conversation's lastUpdated timestamp
+      // Update conversation's updatedAt timestamp
       await storage.updateConversation(conversationId, { 
-        lastUpdated: new Date() 
+        updatedAt: new Date() 
       });
       
       res.status(201).json(message);

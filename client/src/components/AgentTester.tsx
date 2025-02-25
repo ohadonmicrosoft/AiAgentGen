@@ -1,18 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, getQueryFn } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Send, RotateCcw, Bot, User } from "lucide-react";
+import { Loader2, Send, RotateCcw, Bot, User, Clock, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Agent } from "@shared/schema";
+import { Agent, Conversation, Message as DBMessage } from "@shared/schema";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "date-fns";
 
 // Form schema
 const formSchema = z.object({
@@ -44,8 +45,98 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
+  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [showConversations, setShowConversations] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // Fetch user's conversations with this agent
+  const { data: conversations, isLoading: loadingConversations } = useQuery<Conversation[]>({
+    queryKey: ['/api/conversations', agent.id],
+    queryFn: getQueryFn({ on401: 'throw' }),
+    enabled: !!agent.id && showConversations,
+  });
+  
+  // Fetch messages for the active conversation
+  const { data: conversationMessages, isLoading: loadingMessages } = useQuery<{
+    conversation: Conversation;
+    messages: DBMessage[];
+  }>({
+    queryKey: ['/api/conversations', activeConversation?.id, 'messages'],
+    queryFn: getQueryFn({ on401: 'throw' }),
+    enabled: !!activeConversation?.id,
+  });
+  
+  // Update messages when conversation data changes
+  useEffect(() => {
+    if (conversationMessages) {
+      // Convert DB messages to UI messages
+      const uiMessages: Message[] = conversationMessages.messages.map(msg => ({
+        id: `${msg.role}-${msg.id}`,
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content,
+        timestamp: new Date(msg.createdAt as unknown as string),
+      }));
+      setMessages(uiMessages);
+    }
+  }, [conversationMessages]);
+  
+  // Create a new conversation
+  const createConversationMutation = useMutation({
+    mutationFn: async (title: string) => {
+      const res = await apiRequest(
+        "POST",
+        "/api/conversations",
+        {
+          agentId: agent.id,
+          title
+        }
+      );
+      return await res.json();
+    },
+    onSuccess: (data: Conversation) => {
+      setActiveConversation(data);
+      setMessages([]);
+      queryClient.invalidateQueries({ queryKey: ['/api/conversations', agent.id] });
+      setShowConversations(false);
+      toast({
+        title: "Conversation created",
+        description: "New conversation started.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error creating conversation",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Save a message to the conversation
+  const saveMessageMutation = useMutation({
+    mutationFn: async ({ content, role, tokenCount }: { content: string; role: string; tokenCount?: number }) => {
+      if (!activeConversation?.id) throw new Error("No active conversation");
+      
+      const res = await apiRequest(
+        "POST",
+        `/api/conversations/${activeConversation.id}/messages`,
+        {
+          content,
+          role,
+          tokenCount
+        }
+      );
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/conversations', activeConversation?.id, 'messages'] });
+    },
+    onError: (error: Error) => {
+      console.error("Failed to save message:", error);
+    }
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -234,6 +325,50 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
     }
   };
 
+  // Create a new conversation
+  const startNewConversation = () => {
+    const title = `Conversation ${new Date().toLocaleString()}`;
+    createConversationMutation.mutate(title);
+  };
+
+  // Load a conversation history
+  const loadConversation = (conversation: Conversation) => {
+    setActiveConversation(conversation);
+    setShowConversations(false);
+  };
+  
+  // Delete a conversation
+  const deleteConversationMutation = useMutation({
+    mutationFn: async (conversationId: number) => {
+      const res = await apiRequest(
+        "DELETE",
+        `/api/conversations/${conversationId}`,
+        {}
+      );
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/conversations', agent.id] });
+      toast({
+        title: "Conversation deleted",
+        description: "The conversation has been deleted.",
+      });
+      
+      // If this was the active conversation, clear it
+      if (activeConversation && conversations?.find(c => c.id === activeConversation.id) === undefined) {
+        setActiveConversation(null);
+        setMessages([]);
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error deleting conversation",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
   // Handle form submission
   const onSubmit = async (values: FormValues) => {
     // Add user message
@@ -246,15 +381,50 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
     
     setMessages((prev) => [...prev, userMsg]);
     
+    // If in a conversation, save the user message
+    if (activeConversation?.id) {
+      saveMessageMutation.mutate({
+        role: 'user',
+        content: values.message
+      });
+    }
+    
     // Send to backend - use streaming when available, fallback to standard
     try {
       // Log the message being sent
       console.log('Sending message to agent:', values.message);
       await streamResponse(values.message);
+      
+      // If in a conversation, save the assistant message
+      if (activeConversation?.id) {
+        // Find the most recent assistant message
+        const lastMessage = [...messages].reverse().find(m => m.role === 'assistant' && !m.isStreaming);
+        if (lastMessage) {
+          saveMessageMutation.mutate({
+            role: 'assistant',
+            content: lastMessage.content,
+            tokenCount: tokenUsage?.totalTokens
+          });
+        }
+      }
+      
     } catch (error) {
       console.error('Streaming failed, falling back to standard request:', error);
       // Fallback to non-streaming if streaming fails
       sendMessageMutation.mutate(values);
+      
+      if (activeConversation?.id) {
+        // Handle saving message for non-streaming case in the onSuccess callback
+        sendMessageMutation.mutate(values, {
+          onSuccess: (data) => {
+            saveMessageMutation.mutate({
+              role: 'assistant',
+              content: data.content,
+              tokenCount: data.usage?.totalTokens
+            });
+          }
+        });
+      }
     }
   };
 
