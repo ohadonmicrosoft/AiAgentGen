@@ -285,9 +285,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             userId,
             username: user?.username
           }, message, {
-            promptTokens: response.usage ? Number(response.usage.prompt_tokens) : 0,
-            completionTokens: response.usage ? Number(response.usage.completion_tokens) : 0,
-            totalTokens: response.usage ? Number(response.usage.total_tokens) : 0
+            promptTokens: response.usage ? Number(response.usage.promptTokens || response.usage.prompt_tokens) : 0,
+            completionTokens: response.usage ? Number(response.usage.completionTokens || response.usage.completion_tokens) : 0,
+            totalTokens: response.usage ? Number(response.usage.totalTokens || response.usage.total_tokens) : 0
           });
         });
       }

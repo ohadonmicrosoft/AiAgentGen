@@ -35,7 +35,7 @@ export default function TestAgentPage() {
     systemPrompt: 'You are a helpful, creative, clever, and friendly AI assistant. Your purpose is to engage in natural, helpful conversations. You have a cheerful, optimistic, and supportive personality. You help users with their questions and problems to the best of your ability. You respond to questions conversationally.',
     model: 'gpt-4o',
     temperature: '0.7',
-    maxTokens: '1000',
+    maxTokens: 1000,
     status: 'draft'
   };
   
