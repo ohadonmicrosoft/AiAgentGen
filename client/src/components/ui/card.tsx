@@ -9,7 +9,10 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-soft transition-all duration-300 hover:shadow-md card-hover card",
+      "rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-md relative group card-hover card",
+      "after:absolute after:inset-0 after:rounded-lg after:content-[''] after:bg-gradient-to-b after:from-white/[0.03] after:to-transparent after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-300",
+      "before:absolute before:inset-0 before:rounded-lg before:content-[''] before:bg-gradient-to-t before:from-black/[0.01] before:via-transparent before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300",
+      "hover:translate-y-[-2px] hover:border-black/10 dark:hover:border-white/10",
       className
     )}
     {...props}
@@ -37,6 +40,7 @@ const CardTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "text-2xl font-bold leading-none tracking-tight transition-all duration-300",
+      "group-hover:translate-x-[2px] group-hover:text-black dark:group-hover:text-white",
       className
     )}
     {...props}
@@ -50,7 +54,11 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground transition-colors duration-300", className)}
+    className={cn(
+      "text-sm text-muted-foreground transition-all duration-300",
+      "group-hover:text-foreground/80 group-hover:translate-x-[1px]",
+      className
+    )}
     {...props}
   />
 ))
