@@ -90,9 +90,9 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
       if (isMobile) return 'h-[calc(100vh-190px)]';
       return 'h-[calc(100vh-230px)]';
     }
-    if (isMobile) return 'h-[300px]';
-    if (isTablet) return 'h-[400px]';
-    return 'h-[450px]';
+    if (isMobile) return 'h-[350px]';
+    if (isTablet) return 'h-[420px]';
+    return 'h-[480px]';
   };
   
   // Format timestamp for message display
