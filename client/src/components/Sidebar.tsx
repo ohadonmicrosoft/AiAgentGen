@@ -63,23 +63,31 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-30 flex flex-col w-64 max-h-screen overflow-hidden bg-background border-r shadow-lg lg:shadow-none",
-        "transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static",
-        !mounted ? "duration-0" : "", // No transition on first render
-        open ? "translate-x-0" : "-translate-x-full"
+        "fixed inset-y-0 left-0 z-30 flex flex-col w-64 md:w-72 max-h-screen overflow-hidden bg-background border-r",
+        "transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:shadow-none",
+        open ? "translate-x-0 shadow-xl" : "-translate-x-full shadow-none",
+        !mounted ? "duration-0" : ""  // No transition on first render
       )}
     >
-      <div className="flex items-center justify-between flex-shrink-0 p-4">
-        <Link href="/" className="flex items-center space-x-2" onClick={handleLinkClick}>
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10">
-            <Bot className="text-xl text-primary" />
-          </div>
-          <span className="text-lg font-bold">AI Agent Generator</span>
-        </Link>
+      <div className="flex items-center justify-between flex-shrink-0 p-4 border-b">
+        <div className="flex items-center space-x-2" onClick={handleLinkClick}>
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10">
+              <Bot className="h-5 w-5 text-primary" />
+            </div>
+            <span className="text-lg font-bold">AI Agent Generator</span>
+          </Link>
+        </div>
         
         {isMobile && (
-          <Button variant="ghost" size="icon" onClick={onClose} className="lg:hidden">
-            <X className="w-5 h-5" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose} 
+            className="lg:hidden h-8 w-8 rounded-full hover:bg-muted"
+            aria-label="Close sidebar"
+          >
+            <X className="w-4 h-4" />
           </Button>
         )}
       </div>
@@ -139,24 +147,32 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         </ul>
       </nav>
 
-      <div className="flex-shrink-0 p-4 border-t">
+      <div className="flex-shrink-0 p-3 sm:p-4 border-t bg-muted/50">
         <div className="flex items-center">
-          <Avatar className="relative flex-shrink-0 w-9 h-9 border">
-            <AvatarImage src={`https://avatar.vercel.sh/${user?.username || 'user'}`} alt={user?.username || "User"} />
+          <Avatar className="relative flex-shrink-0 w-8 h-8 md:w-9 md:h-9 border">
+            <AvatarImage 
+              src={`https://avatar.vercel.sh/${user?.username || 'user'}`} 
+              alt={user?.username || "User"} 
+            />
             <AvatarFallback>{user?.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
           </Avatar>
           
           <div className="ml-3 overflow-hidden">
-            <p className="text-sm font-medium truncate">{user?.username || "User"}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.email || "user@example.com"}</p>
+            <p className="text-sm font-medium truncate">
+              {user?.username || "User"}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : "User"}
+            </p>
           </div>
           
           <Button 
             variant="ghost" 
             size="icon" 
-            className="p-1.5 ml-auto rounded-full hover:bg-red-500/10 hover:text-red-500" 
+            className="ml-auto h-8 w-8 rounded-full hover:bg-red-500/10 hover:text-red-500" 
             onClick={handleLogout}
             title="Log out"
+            aria-label="Log out"
           >
             <LogOut className="w-4 h-4" />
           </Button>
