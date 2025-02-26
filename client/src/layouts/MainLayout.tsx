@@ -54,43 +54,60 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
 
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Improved backdrop with blur effect */}
+      {/* Improved backdrop with blur effect for mobile */}
       <Backdrop 
         show={isMobile && sidebarOpen}
         onClick={() => setSidebarOpen(false)}
-        className="z-20 backdrop-blur-sm bg-background/60"
+        className="z-30 backdrop-blur-md bg-background/70"
       />
       
-      {/* Sidebar with smooth transitions */}
+      {/* Enhanced Sidebar with smooth transitions */}
       <Sidebar 
         open={sidebarOpen} 
         onClose={() => setSidebarOpen(false)} 
       />
 
+      {/* Main content area with responsive adjustments */}
       <div className={cn(
-        "flex flex-col flex-grow min-h-screen transition-all duration-300",
+        "flex flex-col flex-grow min-h-screen transition-all duration-300 ease-in-out",
         isMobile ? "w-full" : "lg:ml-64"
       )}>
+        {/* Top navigation with improved styling */}
         <TopNav title={title} onMenuClick={toggleSidebar} />
 
+        {/* Main content with enhanced spacing and transitions */}
         <main className={cn(
-          "flex-grow transition-all duration-300",
-          isMobile ? "px-3 py-4" : "px-6 md:px-8 py-6"
+          "flex-grow transition-all duration-300 ease-in-out",
+          isMobile ? "px-4 py-5" : "px-6 md:px-8 py-6"
         )}>
-          {children}
+          {/* Page container with max width and auto centering */}
+          <div className="mx-auto w-full max-w-7xl">
+            {/* Animated page entry */}
+            <div className="animate-in fade-in duration-500">
+              {children}
+            </div>
+          </div>
         </main>
 
+        {/* Enhanced footer with better responsive styling */}
         <footer className={cn(
-          "py-3 md:py-4 mt-auto border-t bg-muted/30",
-          isMobile ? "px-3" : "px-6"
+          "py-4 md:py-5 mt-auto border-t shadow-soft",
+          isMobile ? "px-4" : "px-6",
+          "bg-glass"
         )}>
-          <div className="flex justify-between items-center">
-            <p className="text-xs md:text-sm text-muted-foreground">
-              © {new Date().getFullYear()} AI Agent Generator
-            </p>
-            <div className="flex gap-3 text-xs md:text-sm text-muted-foreground">
-              <a href="#" className="hover:text-primary transition-colors">Terms</a>
-              <a href="#" className="hover:text-primary transition-colors">Privacy</a>
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+              <div className="flex items-center">
+                <p className="text-sm text-muted-foreground">
+                  © {new Date().getFullYear()} AI Agent Generator
+                </p>
+              </div>
+              
+              <div className="flex gap-6 text-sm text-muted-foreground">
+                <a href="#" className="hover:text-primary transition-colors hover:underline">Terms</a>
+                <a href="#" className="hover:text-primary transition-colors hover:underline">Privacy</a>
+                <a href="#" className="hover:text-primary transition-colors hover:underline">Support</a>
+              </div>
             </div>
           </div>
         </footer>
