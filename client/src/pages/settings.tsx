@@ -89,13 +89,22 @@ export default function Settings() {
         }
       } catch (error) {
         console.error("Failed to check API key status:", error);
+        // Still allow the form to work even if the check fails
+        apiKeyForm.setValue("apiKey", "");
       }
     }
     
+    // Update the profile form with user data when available
     if (user) {
-      checkApiKey();
+      // Update username from auth context
+      profileForm.setValue("username", user.username || "");
+      
+      // Attempt to check API key, but don't block rendering if it fails
+      checkApiKey().catch(err => {
+        console.error("API key check failed but continuing", err);
+      });
     }
-  }, [user]);
+  }, [user, profileForm, apiKeyForm]);
 
   const onProfileSubmit = async (values: ProfileFormValues) => {
     try {
