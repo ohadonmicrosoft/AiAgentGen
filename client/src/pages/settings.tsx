@@ -57,7 +57,7 @@ export default function Settings() {
   const apiKeyForm = useForm<ApiKeyFormValues>({
     resolver: zodResolver(apiKeySchema),
     defaultValues: {
-      apiKey: process.env.OPENAI_API_KEY || "",
+      apiKey: "", // We'll populate this from the API
     },
   });
 
