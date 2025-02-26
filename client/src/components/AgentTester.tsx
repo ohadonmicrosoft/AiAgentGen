@@ -9,11 +9,17 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Send, RotateCcw, Bot, User, Clock, Save } from "lucide-react";
+import { 
+  Loader2, Send, RotateCcw, Bot, User, Clock, Save,
+  Maximize2, Minimize2, X, ChevronDown, ChevronUp, 
+  Download, Info, MessageSquare  
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Agent, Conversation, Message as DBMessage } from "@shared/schema";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
+import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 // Form schema
 const formSchema = z.object({
@@ -47,9 +53,49 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
   const [showConversations, setShowConversations] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showTokens, setShowTokens] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  
+  // Used for the initial render to prevent transition flickering
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // Close fullscreen when escape is pressed
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
+  
+  // Toggle fullscreen mode
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+  
+  // Determine chat container height based on screen size and fullscreen state
+  const getChatHeight = () => {
+    if (isFullscreen) return 'h-[calc(100vh-230px)]';
+    if (isMobile) return 'h-[350px]';
+    if (isTablet) return 'h-[400px]';
+    return 'h-[450px]';
+  };
+  
+  // Format timestamp for message display
+  const formatMessageTime = (date: Date): string => {
+    return format(date, 'h:mm a');
+  };
   
   // Fetch user's conversations with this agent
   const { data: conversations, isLoading: loadingConversations } = useQuery<Conversation[]>({
@@ -501,216 +547,329 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
   };
 
   return (
-    <Card className="w-full h-full flex flex-col">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-center">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-primary" />
-              Test: {agent.name || "Agent"}
-              {activeConversation && (
-                <Badge variant="outline" className="ml-2">
-                  {activeConversation.title}
-                </Badge>
-              )}
-            </CardTitle>
-            <CardDescription>
-              Test your agent in real-time before deploying
-            </CardDescription>
-          </div>
-          <div className="flex gap-2">
-            {agent.id && ( // Only show conversation options if this is a real agent
-              <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setShowConversations(!showConversations)}
-                  className="flex items-center gap-1"
-                >
-                  <Clock className="h-4 w-4" />
-                  History
-                </Button>
-                
-                {messages.length > 0 && !activeConversation && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={startNewConversation}
-                    className="flex items-center gap-1"
-                  >
-                    <Save className="h-4 w-4" />
-                    Save Chat
-                  </Button>
+    <div className={cn(
+      "transition-all duration-300 ease-in-out",
+      isFullscreen ? "fixed inset-0 z-50 bg-background/95 flex items-center justify-center p-4" : ""
+    )}>
+      <Card className={cn(
+        "border rounded-lg shadow-lg w-full transition-all duration-300 overflow-hidden",
+        isFullscreen ? "max-w-5xl h-[calc(100vh-40px)]" : "max-w-3xl"
+      )}>
+        <CardHeader className={cn(
+          "pb-3 border-b",
+          isFullscreen ? "lg:pb-4" : "",
+          isMobile ? "px-3 py-3" : ""
+        )}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                <Bot className="h-5 w-5 text-primary" />
+                <span className="truncate">{agent.name || "Agent"}</span>
+                {activeConversation && (
+                  <Badge variant="outline" className="ml-1">
+                    {activeConversation.title}
+                  </Badge>
                 )}
-              </>
-            )}
-            <Badge>{agent.model || "gpt-4o"}</Badge>
-          </div>
-        </div>
-        
-        {/* Conversation History Panel */}
-        {showConversations && (
-          <div className="mt-4 p-3 border rounded-md bg-muted/50">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-sm font-medium">Conversation History</h3>
-              <Button variant="default" size="sm" onClick={startNewConversation}>
-                New Conversation
-              </Button>
+              </CardTitle>
+              {!isMobile && (
+                <CardDescription className="mt-1">
+                  Test your agent in real-time before deploying
+                </CardDescription>
+              )}
             </div>
             
-            {loadingConversations ? (
-              <div className="flex justify-center py-4">
-                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-              </div>
-            ) : conversations && conversations.length > 0 ? (
-              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
-                {conversations.map((conversation) => (
-                  <div 
-                    key={conversation.id} 
-                    className={`flex justify-between items-center p-2 rounded-md hover:bg-muted cursor-pointer ${
-                      activeConversation?.id === conversation.id ? 'bg-muted border-primary' : ''
-                    }`}
-                    onClick={() => loadConversation(conversation)}
+            <div className="flex flex-wrap gap-1 sm:gap-2 justify-end">
+              {agent.id && ( // Only show conversation options if this is a real agent
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => setShowConversations(!showConversations)}
+                    className="h-8 w-8 sm:h-9 sm:w-9"
+                    title="Conversation History"
                   >
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{conversation.title}</span>
+                    <Clock className="h-4 w-4" />
+                    <span className="sr-only">History</span>
+                  </Button>
+                  
+                  {messages.length > 0 && !activeConversation && (
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={startNewConversation}
+                      className="h-8 w-8 sm:h-9 sm:w-9"
+                      title="Save Conversation"
+                    >
+                      <Save className="h-4 w-4" />
+                      <span className="sr-only">Save</span>
+                    </Button>
+                  )}
+                </>
+              )}
+              
+              {messages.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="icon" 
+                  onClick={clearChat}
+                  className="h-8 w-8 sm:h-9 sm:w-9"
+                  title="Clear Chat"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  <span className="sr-only">Clear</span>
+                </Button>
+              )}
+              
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleFullscreen}
+                className="h-8 w-8 sm:h-9 sm:w-9"
+                title={isFullscreen ? "Exit Fullscreen" : "Fullscreen Mode"}
+              >
+                {isFullscreen ? (
+                  <Minimize2 className="h-4 w-4" />
+                ) : (
+                  <Maximize2 className="h-4 w-4" />
+                )}
+                <span className="sr-only">
+                  {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                </span>
+              </Button>
+              
+              {onClose && !isFullscreen && (
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={onClose}
+                  className="h-8 w-8 sm:h-9 sm:w-9"
+                  title="Close"
+                >
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Close</span>
+                </Button>
+              )}
+              
+              <Badge className="h-8 px-2 flex items-center justify-center">
+                {agent.model || "gpt-4o"}
+              </Badge>
+            </div>
+          </div>
+          
+          {/* Conversation History Panel */}
+          {showConversations && (
+            <div className="mt-4 p-3 border rounded-md bg-muted/50">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-medium">Conversation History</h3>
+                <Button variant="default" size="sm" onClick={startNewConversation}>
+                  New Conversation
+                </Button>
+              </div>
+              
+              {loadingConversations ? (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
+              ) : conversations && conversations.length > 0 ? (
+                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
+                  {conversations.map((conversation) => (
+                    <div 
+                      key={conversation.id} 
+                      className={`flex justify-between items-center p-2 rounded-md hover:bg-muted cursor-pointer ${
+                        activeConversation?.id === conversation.id ? 'bg-muted border-primary' : ''
+                      }`}
+                      onClick={() => loadConversation(conversation)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{conversation.title}</span>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteConversationMutation.mutate(conversation.id);
+                          }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-destructive">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                          </svg>
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 w-7 p-0"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteConversationMutation.mutate(conversation.id);
-                        }}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-destructive">
-                          <path d="M3 6h18"></path>
-                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                        </svg>
-                      </Button>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-4 text-center text-sm text-muted-foreground">
+                  No saved conversations. Start a new one to save your chat history.
+                </div>
+              )}
+            </div>
+          )}
+        </CardHeader>
+        
+        <CardContent className={cn(
+          "flex-grow overflow-hidden p-0",
+          isMobile ? "px-3" : ""
+        )}>
+          <ScrollArea className={cn(
+            "pr-4 px-3 py-2",
+            getChatHeight(),
+            mounted ? "transition-all duration-300" : ""
+          )}>
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                <Bot className="h-12 w-12 mb-4 opacity-20" />
+                <p className="text-center">Start a conversation with your agent</p>
+                <p className="text-sm text-center max-w-[280px] mx-auto mt-2">
+                  {agent.name ? agent.name : "This agent"} will respond based on your configuration
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${
+                      message.role === "user" ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={cn(
+                        "relative max-w-[90%] sm:max-w-[80%] rounded-lg px-3 py-2",
+                        message.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      )}
+                    >
+                      <div className="flex items-center gap-1 mb-1 text-xs font-medium">
+                        {message.role === "user" ? (
+                          <>
+                            <span>You</span>
+                            <User className="h-3 w-3" />
+                            <span className="ml-auto text-[10px] opacity-70">
+                              {formatMessageTime(message.timestamp)}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <Bot className="h-3 w-3" />
+                            <span>{agent.name || "Agent"}</span>
+                            <span className="ml-auto text-[10px] opacity-70">
+                              {formatMessageTime(message.timestamp)}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      <div className="whitespace-pre-wrap text-[15px]">
+                        {(() => {
+                          try {
+                            // Check if the content looks like JSON but only render as normal text
+                            if (message.content?.startsWith("{") && message.content?.includes("content")) {
+                              // Parse the JSON-like structure and extract content
+                              const formattedContent = message.content
+                                .split(/(?<=})\s*(?={)/) // Split by JSON objects
+                                .map(chunk => {
+                                  try {
+                                    const parsed = JSON.parse(chunk);
+                                    return parsed.content || "";
+                                  } catch (e) {
+                                    return chunk;
+                                  }
+                                })
+                                .join("");
+                              return formattedContent;
+                            }
+                            // Not JSON, just return the content
+                            return message.content;
+                          } catch (e) {
+                            // If any error, return the original content
+                            return message.content;
+                          }
+                        })()}
+                        {message.isStreaming && (
+                          <span className="animate-pulse">▊</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
-              </div>
-            ) : (
-              <div className="py-4 text-center text-sm text-muted-foreground">
-                No saved conversations. Start a new one to save your chat history.
+                <div ref={messagesEndRef} />
               </div>
             )}
-          </div>
-        )}
-      </CardHeader>
-      
-      <CardContent className="flex-grow">
-        <ScrollArea className="h-[400px] pr-4">
-          {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-              <Bot className="h-12 w-12 mb-2 opacity-20" />
-              <p>Start a conversation with your agent</p>
-              <p className="text-sm">Your agent will respond based on your configuration</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-1 text-xs font-medium">
-                      {message.role === "user" ? (
-                        <>
-                          <span>You</span>
-                          <User className="h-3 w-3" />
-                        </>
-                      ) : (
-                        <>
-                          <Bot className="h-3 w-3" />
-                          <span>{agent.name || "Agent"}</span>
-                        </>
-                      )}
-                    </div>
-                    <div className="whitespace-pre-wrap">
-                      {(() => {
-                        try {
-                          // Check if the content looks like JSON but only render as normal text
-                          if (message.content?.startsWith("{") && message.content?.includes("content")) {
-                            // Parse the JSON-like structure and extract content
-                            const formattedContent = message.content
-                              .split(/(?<=})\s*(?={)/) // Split by JSON objects
-                              .map(chunk => {
-                                try {
-                                  const parsed = JSON.parse(chunk);
-                                  return parsed.content || "";
-                                } catch (e) {
-                                  return chunk;
-                                }
-                              })
-                              .join("");
-                            return formattedContent;
-                          }
-                          // Not JSON, just return the content
-                          return message.content;
-                        } catch (e) {
-                          // If any error, return the original content
-                          return message.content;
-                        }
-                      })()}
-                      {message.isStreaming && (
-                        <span className="animate-pulse">▊</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
+          </ScrollArea>
+          
+          {tokenUsage && showTokens && (
+            <div className="px-4 mt-2 flex flex-wrap justify-between text-xs text-muted-foreground border-t pt-2">
+              <span>Total: {tokenUsage.totalTokens}</span>
+              <span>Prompt: {tokenUsage.promptTokens}</span>
+              <span>Completion: {tokenUsage.completionTokens}</span>
             </div>
           )}
-        </ScrollArea>
+        </CardContent>
         
-        {tokenUsage && (
-          <div className="mt-2 flex justify-between text-xs text-muted-foreground border-t pt-2">
-            <span>Tokens: {tokenUsage.totalTokens}</span>
-            <span>Prompt: {tokenUsage.promptTokens}</span>
-            <span>Completion: {tokenUsage.completionTokens}</span>
-          </div>
-        )}
-      </CardContent>
-      
-      <CardFooter className="pt-0">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 w-full">
-            <FormField
-              control={form.control}
-              name="message"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="flex space-x-2">
-                      <Textarea
-                        placeholder="Type your message here..."
-                        className="flex-grow resize-none"
-                        {...field}
-                        disabled={isStreaming || sendMessageMutation.isPending}
-                      />
-                      <div className="flex flex-col space-y-2">
+        <CardFooter className={cn(
+          "pt-2 border-t", 
+          isMobile ? "px-3 py-3" : ""
+        )}>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex gap-2">
+                        {tokenUsage && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => setShowTokens(!showTokens)}
+                            title="Toggle Token Usage"
+                          >
+                            <Info className="h-3.5 w-3.5" />
+                            <span className="sr-only">Tokens</span>
+                          </Button>
+                        )}
+                      </div>
+                      <div className="flex gap-1">
+                        {!isFullscreen && messages.length > 0 && (
+                          <Button 
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={clearChat}
+                            title="Clear Chat"
+                          >
+                            <RotateCcw className="h-3.5 w-3.5" />
+                            <span className="sr-only">Clear</span>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <FormControl>
+                      <div className="flex space-x-2">
+                        <Textarea
+                          placeholder="Type your message here..."
+                          className="flex-grow resize-none min-h-[70px]"
+                          {...field}
+                          disabled={isStreaming || sendMessageMutation.isPending}
+                        />
                         <Button
                           type="submit"
-                          size="sm"
-                          className="flex-grow"
-                          disabled={isStreaming || sendMessageMutation.isPending}
+                          size="icon"
+                          className="self-end h-9 w-9"
+                          disabled={isStreaming || sendMessageMutation.isPending || !field.value}
                         >
                           {isStreaming || sendMessageMutation.isPending ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -718,26 +877,16 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                             <Send className="h-4 w-4" />
                           )}
                         </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="flex-grow"
-                          onClick={clearChat}
-                          disabled={messages.length === 0}
-                        >
-                          <RotateCcw className="h-4 w-4" />
-                        </Button>
                       </div>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
-      </CardFooter>
-    </Card>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }

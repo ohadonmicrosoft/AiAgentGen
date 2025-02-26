@@ -70,7 +70,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       )}
     >
       <div className="flex items-center justify-between flex-shrink-0 p-4">
-        <Link href="/" className="flex items-center space-x-2">
+        <Link href="/" className="flex items-center space-x-2" onClick={handleLinkClick}>
           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10">
             <Bot className="text-xl text-primary" />
           </div>
@@ -88,20 +88,19 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         <ul className="p-3 space-y-1.5">
           {navItems.map((item) => (
             <li key={item.path}>
-              <Link href={item.path}>
-                <a
-                  onClick={handleLinkClick}
-                  className={cn(
-                    "flex items-center px-3 py-2.5 text-sm font-medium rounded-md",
-                    "transition-all duration-200 ease-in-out",
-                    location === item.path 
-                      ? "bg-primary/10 text-primary font-semibold" 
-                      : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-                  )}
-                >
-                  {item.icon}
-                  {item.label}
-                </a>
+              <Link 
+                href={item.path}
+                onClick={handleLinkClick}
+                className={cn(
+                  "flex items-center px-3 py-2.5 text-sm font-medium rounded-md",
+                  "transition-all duration-200 ease-in-out",
+                  location === item.path 
+                    ? "bg-primary/10 text-primary font-semibold" 
+                    : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                )}
+              >
+                {item.icon}
+                {item.label}
               </Link>
             </li>
           ))}
@@ -119,20 +118,19 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               </li>
               {adminItems.map((item) => (
                 <li key={item.path}>
-                  <Link href={item.path}>
-                    <a
-                      onClick={handleLinkClick}
-                      className={cn(
-                        "flex items-center px-3 py-2.5 text-sm font-medium rounded-md",
-                        "transition-all duration-200 ease-in-out",
-                        location === item.path 
-                          ? "bg-primary/10 text-primary font-semibold" 
-                          : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-                      )}
-                    >
-                      {item.icon}
-                      {item.label}
-                    </a>
+                  <Link 
+                    href={item.path}
+                    onClick={handleLinkClick}
+                    className={cn(
+                      "flex items-center px-3 py-2.5 text-sm font-medium rounded-md",
+                      "transition-all duration-200 ease-in-out",
+                      location === item.path 
+                        ? "bg-primary/10 text-primary font-semibold" 
+                        : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                    )}
+                  >
+                    {item.icon}
+                    {item.label}
                   </Link>
                 </li>
               ))}
