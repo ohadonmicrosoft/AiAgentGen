@@ -277,20 +277,49 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
         
         for (const line of lines) {
           try {
-            const jsonData = JSON.parse(line);
-            console.log('Parsed JSON:', jsonData);
+            console.log('Processing line:', line);
             
-            // Handle different types of chunks
-            if (jsonData.usage) {
-              console.log('Setting token usage:', jsonData.usage);
-              setTokenUsage(jsonData.usage);
-            } else if (jsonData.content !== undefined) {
-              // Just append the content directly, don't keep the JSON structure
-              accumulated += jsonData.content;
-            } else if (jsonData.error) {
-              throw new Error(jsonData.error);
+            // Handle multiple JSON objects in one line (sometimes the API sends multiple chunks)
+            if (line.includes('}{')) {
+              const jsonObjects = line.match(/\{[^{}]*\}/g) || [];
+              
+              for (const jsonStr of jsonObjects) {
+                try {
+                  const jsonData = JSON.parse(jsonStr);
+                  console.log('Parsed JSON object:', jsonData);
+                  
+                  // Handle different types of chunks
+                  if (jsonData.usage) {
+                    console.log('Setting token usage:', jsonData.usage);
+                    setTokenUsage(jsonData.usage);
+                  } else if (jsonData.content !== undefined) {
+                    // Just append the content directly
+                    accumulated += jsonData.content;
+                  } else if (jsonData.error) {
+                    throw new Error(jsonData.error);
+                  }
+                } catch (innerError) {
+                  console.error('Error parsing JSON object:', innerError);
+                }
+              }
+            } else {
+              // Simple case: just one JSON object per line
+              const jsonData = JSON.parse(line);
+              console.log('Parsed JSON:', jsonData);
+              
+              // Handle different types of chunks
+              if (jsonData.usage) {
+                console.log('Setting token usage:', jsonData.usage);
+                setTokenUsage(jsonData.usage);
+              } else if (jsonData.content !== undefined) {
+                // Just append the content directly
+                accumulated += jsonData.content;
+              } else if (jsonData.error) {
+                throw new Error(jsonData.error);
+              }
             }
           } catch (e) {
+            console.error('Error parsing line:', e);
             // If not valid JSON, treat as content
             accumulated += line;
           }
