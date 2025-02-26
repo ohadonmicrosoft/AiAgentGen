@@ -29,21 +29,45 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+  // Define more robust session settings
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "ai-agent-generator-secret",
-    resave: true,
-    saveUninitialized: true,
+    resave: false,             // Don't save session if unmodified
+    saveUninitialized: false,  // Don't create session until something stored
+    rolling: true,             // Reset cookie expiration on each response
     cookie: { 
-      secure: false, // Set to true in production with HTTPS
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      secure: process.env.NODE_ENV === 'production', // Only use secure in production
+      httpOnly: true,          // Prevents client-side JS from reading cookie
+      maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+      sameSite: 'lax'          // Helps against CSRF attacks
     },
     store: storage.sessionStore,
+    name: 'aiagent.sid',       // Custom session name instead of default
   };
 
+  // Properly handle proxy headers when behind a reverse proxy
   app.set("trust proxy", 1);
+  
+  // Set up session middleware
   app.use(session(sessionSettings));
+  
+  // Initialize passport for authentication
   app.use(passport.initialize());
   app.use(passport.session());
+  
+  // Log session events for diagnostics
+  console.log("[Auth] Session store initialized");
+  
+  // Monitor session store health
+  if (storage.sessionStore && typeof storage.sessionStore.on === 'function') {
+    try {
+      storage.sessionStore.on('error', (error) => {
+        console.error('[Auth] Session store error:', error);
+      });
+    } catch (err) {
+      console.warn('[Auth] Session store does not support event listeners');
+    }
+  }
 
   passport.use(
     new LocalStrategy(async (username, password, done) => {

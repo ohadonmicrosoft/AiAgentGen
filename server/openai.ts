@@ -225,7 +225,8 @@ export async function generateResponse(
 }
 
 /**
- * Generate a streaming response for real-time feedback
+ * Generate a streaming response for real-time feedback with improved error handling
+ * and connection management
  */
 export async function* generateStreamingResponse(
   systemPrompt: string,
@@ -236,26 +237,30 @@ export async function* generateStreamingResponse(
     maxTokens?: string | number;
     userId?: number;
     agentId?: number;
+    conversationId?: number;
   } = {}
 ) {
   const {
-    model = 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    model = 'gpt-4o', // Default to the most capable model
     temperature = 0.7,
     maxTokens = 1000,
     userId,
-    agentId
+    agentId,
+    conversationId
   } = options;
   
   // Get user-specific API key if a userId is provided
   let apiKey: string | null = null;
-  if (userId) {
-    apiKey = await storage.getApiKey(userId);
-  }
-  
-  // Create OpenAI client with the appropriate API key
-  const openai = createOpenAIClient(apiKey || undefined);
+  let startTime = Date.now();
   
   try {
+    if (userId) {
+      apiKey = await storage.getApiKey(userId);
+    }
+    
+    // Create OpenAI client with the appropriate API key
+    const openai = createOpenAIClient(apiKey || undefined);
+    
     // Process and validate prompts
     const { systemPrompt: processedSystemPrompt, userPrompt: processedUserPrompt } = 
       processPrompts(systemPrompt, userPrompt);
@@ -263,6 +268,19 @@ export async function* generateStreamingResponse(
     // Use the numeric temperature and maxTokens values
     const numericTemperature = typeof temperature === 'string' ? parseFloat(temperature) : temperature;
     const numericMaxTokens = typeof maxTokens === 'string' ? parseInt(maxTokens) : maxTokens;
+    
+    // Add request timeout - break streaming after 45 seconds as a safeguard
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => {
+      abortController.abort();
+      console.error('[openai] Streaming request timed out after 45 seconds');
+    }, 45000);
+    
+    // Options for the API request
+    const requestOptions = {
+      timeout: 30000, // 30 second timeout for the initial connection
+      signal: abortController.signal
+    };
     
     // Call OpenAI API with streaming
     const stream = await openai.chat.completions.create({
@@ -273,45 +291,100 @@ export async function* generateStreamingResponse(
       ],
       temperature: numericTemperature,
       max_tokens: numericMaxTokens,
-      stream: true,
-    });
+      stream: true
+    }, requestOptions);
     
     let fullContent = '';
     let promptTokensEstimate = processedSystemPrompt.length / 4 + processedUserPrompt.length / 4;
     let completionTokensEstimate = 0;
+    let streamStart = Date.now();
+    let lastChunkTime = streamStart;
+    let chunkCount = 0;
     
-    // Stream the response
-    for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content || '';
-      fullContent += content;
-      completionTokensEstimate += content.length / 4;
+    try {
+      // Stream the response
+      for await (const chunk of stream) {
+        // Clear timeout since we're getting data
+        if (timeoutId) clearTimeout(timeoutId);
+        
+        // Get content from the chunk
+        const content = chunk.choices[0]?.delta?.content || '';
+        fullContent += content;
+        completionTokensEstimate += content.length / 4;
+        
+        // Update timings for logging
+        const now = Date.now();
+        const timeSinceLastChunk = now - lastChunkTime;
+        lastChunkTime = now;
+        chunkCount++;
+        
+        // Log slow chunks (useful for debugging latency issues)
+        if (timeSinceLastChunk > 1000) {
+          console.log(`[openai] Slow chunk #${chunkCount}: ${timeSinceLastChunk}ms since last chunk`);
+        }
+        
+        // Yield the chunk to the client
+        yield {
+          content,
+          done: false
+        };
+      }
       
+      // Log total streaming performance
+      const totalStreamTime = Date.now() - streamStart;
+      console.log(`[openai] Streaming complete: ${totalStreamTime}ms, ${chunkCount} chunks`);
+      
+      // Estimate token usage
+      const totalTokensEstimate = promptTokensEstimate + completionTokensEstimate;
+      
+      // Track token usage
+      trackTokenUsage({
+        promptTokens: Math.round(promptTokensEstimate),
+        completionTokens: Math.round(completionTokensEstimate),
+        totalTokens: Math.round(totalTokensEstimate),
+        timestamp: new Date(),
+        userId,
+        agentId
+      });
+      
+      // Save to conversation history if we have IDs
+      if (userId && agentId && conversationId) {
+        try {
+          await storage.createMessage({
+            conversationId,
+            role: 'assistant',
+            content: fullContent,
+            tokenCount: Math.round(completionTokensEstimate)
+          });
+        } catch (err) {
+          console.error('[openai] Error saving message to conversation:', err);
+        }
+      }
+      
+      // Signal that streaming is complete
       yield {
-        content,
-        done: false
+        content: '',
+        done: true,
+        timing: {
+          total: Date.now() - startTime,
+          streaming: Date.now() - streamStart
+        }
       };
+    } finally {
+      // Always clear the timeout to prevent memory leaks
+      if (timeoutId) clearTimeout(timeoutId);
     }
+  } catch (error: any) {
+    console.error('[openai] Streaming error:', error);
     
-    // Estimate token usage
-    const totalTokensEstimate = promptTokensEstimate + completionTokensEstimate;
-    
-    // Track token usage
-    trackTokenUsage({
-      promptTokens: Math.round(promptTokensEstimate),
-      completionTokens: Math.round(completionTokensEstimate),
-      totalTokens: Math.round(totalTokensEstimate),
-      timestamp: new Date(),
-      userId,
-      agentId
-    });
-    
-    // Signal that streaming is complete
+    // Let the client know there was an error
     yield {
       content: '',
+      error: error.message || 'An error occurred during streaming',
       done: true
     };
-  } catch (error: any) {
-    // Enhanced error handling
+    
+    // Use enhanced error handling
     handleOpenAIError(error);
   }
 }

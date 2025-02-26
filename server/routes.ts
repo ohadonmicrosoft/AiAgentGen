@@ -333,57 +333,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Streaming API for real-time agent responses
+  // Streaming API for real-time agent responses with enhanced error handling and performance
   app.post("/api/agents/test/stream", checkAuthenticated, async (req, res) => {
     const userId = req.user!.id;
-    const { agentId, message, systemPrompt, model, temperature, maxTokens } = req.body;
+    const { 
+      agentId, message, systemPrompt, model, temperature, maxTokens, 
+      conversationId: rawConversationId 
+    } = req.body;
     
-    console.log('Stream request body:', {
-      agentId, message, systemPrompt, model, temperature, maxTokens
+    // Save request start time for performance logging
+    const requestStartTime = Date.now();
+    
+    // Parse the conversation ID if it exists
+    let conversationId: number | undefined = undefined;
+    if (rawConversationId && !isNaN(parseInt(String(rawConversationId)))) {
+      conversationId = parseInt(String(rawConversationId));
+    }
+    
+    console.log(`[Stream] Request from user ${userId}:`, {
+      agentId, message: message?.slice(0, 50) + (message?.length > 50 ? '...' : ''),
+      model, conversationId 
     });
     
+    // Bail early for empty messages
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
     }
     
+    // Set up connection timeout in case of hanging connections
+    let connectionTimeout = setTimeout(() => {
+      console.error('[Stream] Request timed out after 60s');
+      if (!res.headersSent) {
+        res.status(504).json({ error: "Request timed out" });
+      } else {
+        res.write(JSON.stringify({ error: "Request timed out", done: true }));
+        res.end();
+      }
+    }, 60000); // 60-second timeout
+    
     try {
       // Get agent details
       let agent;
+      let agentIdNumber: number | undefined = undefined;
+      
       if (agentId && !isNaN(parseInt(String(agentId)))) {
-        agent = await storage.getAgent(parseInt(String(agentId)));
-        console.log('Found agent by ID:', agent);
+        agentIdNumber = parseInt(String(agentId));
+        agent = await storage.getAgent(agentIdNumber);
         
-        // Check if user can access this agent
-        if (agent && agent.userId !== userId && 
-            !await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT)) {
-          return res.status(403).json({ error: "You don't have permission to use this agent" });
+        if (agent) {
+          console.log(`[Stream] Using agent: "${agent.name}" (ID: ${agent.id})`);
+          
+          // Check if user can access this agent
+          if (agent.userId !== userId && 
+              !await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT)) {
+            clearTimeout(connectionTimeout);
+            return res.status(403).json({ error: "You don't have permission to use this agent" });
+          }
+        } else {
+          console.warn(`[Stream] Agent not found: ${agentId}`);
         }
-      } else {
-        // Use a temporary agent configuration from request body
-        agent = {
-          systemPrompt,
-          model,
-          temperature,
-          maxTokens,
-          ...req.body
-        };
-        console.log('Using temporary agent:', agent);
       }
       
+      // If no agent was found but we have system prompt, create a temporary agent config
+      if (!agent && systemPrompt) {
+        agent = {
+          systemPrompt,
+          model: model || 'gpt-4o',
+          temperature: temperature !== undefined ? temperature : 0.7,
+          maxTokens: maxTokens !== undefined ? maxTokens : 1000,
+        };
+        console.log('[Stream] Using temporary agent with custom system prompt');
+      }
+      
+      // Validate agent configuration
       if (!agent || !agent.systemPrompt) {
-        console.log('Invalid agent configuration:', agent);
+        clearTimeout(connectionTimeout);
+        console.error('[Stream] Invalid agent configuration:', agent);
         return res.status(400).json({ error: "Invalid agent configuration" });
       }
       
-      // Set up Server-Sent Events
+      // Create a conversation record if we don't have one but have an agent ID
+      if (!conversationId && agentIdNumber) {
+        try {
+          const conversation = await storage.createConversation({
+            userId,
+            agentId: agentIdNumber,
+            title: message.slice(0, 50) // Use the start of the message as the title
+          });
+          conversationId = conversation.id;
+          console.log(`[Stream] Created new conversation: ${conversationId}`);
+          
+          // Save the user message to the conversation
+          await storage.createMessage({
+            conversationId,
+            role: 'user',
+            content: message
+          });
+        } catch (err) {
+          console.error('[Stream] Error creating conversation:', err);
+          // Continue even if conversation creation fails
+        }
+      }
+      
+      // Set up HTTP stream headers for real-time updates
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no'); // Prevents proxy buffering
       
-      // Import the streaming function dynamically
+      // Import the streaming function dynamically 
       const { generateStreamingResponse, getTokenUsage } = await import('./openai');
       
-      // Start the streaming response
+      // Start streaming the AI response
       const stream = generateStreamingResponse(
         agent.systemPrompt,
         message,
@@ -392,50 +453,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
           maxTokens: agent.maxTokens,
           model: agent.model,
           userId,
-          agentId: agent.id
+          agentId: agentIdNumber,
+          conversationId
         }
       );
       
-      // Notify Slack about agent usage
-      if (agent.id && process.env.SLACK_BOT_TOKEN && process.env.SLACK_CHANNEL_ID) {
+      // Send Slack notification about agent usage (if configured)
+      if (agentIdNumber && process.env.SLACK_BOT_TOKEN && process.env.SLACK_CHANNEL_ID) {
         const user = await storage.getUser(userId);
-        import('./slack').then(({ default: slackService }) => {
-          slackService.notifyAgentUsed({
-            id: typeof agent.id === 'string' ? parseInt(agent.id) : agent.id,
-            name: agent.name,
+        try {
+          const { notifyAgentUsed } = await import('./slack');
+          notifyAgentUsed({
+            id: agentIdNumber,
+            name: agent.name || 'Unnamed Agent',
             userId,
-            username: user?.username
+            username: user?.username || 'Unknown User'
           }, message);
-        });
-      }
-      
-      // Send chunks as they come
-      for await (const chunk of stream) {
-        res.write(JSON.stringify(chunk));
-        
-        // If this is the last chunk, include token usage
-        if (chunk.done) {
-          const usageEstimate = getTokenUsage({ userId });
-          res.write(JSON.stringify({ 
-            usage: {
-              promptTokens: usageEstimate.promptTokens,
-              completionTokens: usageEstimate.completionTokens,
-              totalTokens: usageEstimate.totalTokens
-            }
-          }));
+        } catch (err) {
+          console.error('[Stream] Error sending Slack notification:', err);
+          // Continue even if Slack notification fails
         }
       }
       
+      // Stream the response chunks to the client
+      for await (const chunk of stream) {
+        // Clear the timeout since we're actively streaming
+        clearTimeout(connectionTimeout);
+        
+        // Write the chunk to the response
+        res.write(JSON.stringify(chunk));
+        
+        // If this is the last chunk, include token usage stats
+        if (chunk.done) {
+          try {
+            const usageEstimate = getTokenUsage({ userId });
+            res.write(JSON.stringify({ 
+              usage: {
+                promptTokens: usageEstimate.promptTokens,
+                completionTokens: usageEstimate.completionTokens,
+                totalTokens: usageEstimate.totalTokens
+              },
+              timing: {
+                total: Date.now() - requestStartTime
+              }
+            }));
+          } catch (err) {
+            console.error('[Stream] Error getting token usage:', err);
+          }
+        }
+        
+        // Set a new timeout for the next chunk
+        connectionTimeout = setTimeout(() => {
+          console.error('[Stream] Response streaming timed out after 30s');
+          res.write(JSON.stringify({ error: "Streaming timed out", done: true }));
+          res.end();
+        }, 30000); // 30-second timeout between chunks
+      }
+      
+      // End the response
       res.end();
+      console.log(`[Stream] Request completed in ${Date.now() - requestStartTime}ms`);
       
     } catch (error: any) {
-      // If we've already started streaming, we can't send a proper error response
-      if (!res.headersSent) {
-        return res.status(500).json({ error: error.message });
+      console.error('[Stream] Error processing request:', error);
+      
+      // If we've already started streaming, send the error as a chunk
+      if (res.headersSent) {
+        res.write(JSON.stringify({ 
+          error: error.message || "An error occurred during streaming",
+          done: true 
+        }));
+        res.end();
+      } else {
+        // Otherwise, send a proper error response
+        res.status(500).json({ 
+          error: error.message || "An error occurred during streaming"
+        });
       }
-      // Otherwise, send the error as a stream chunk
-      res.write(JSON.stringify({ error: error.message, done: true }));
-      res.end();
+    } finally {
+      // Always clear the timeout to prevent memory leaks
+      clearTimeout(connectionTimeout);
     }
   });
   
