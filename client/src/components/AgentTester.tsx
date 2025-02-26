@@ -86,8 +86,11 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
   
   // Determine chat container height based on screen size and fullscreen state
   const getChatHeight = () => {
-    if (isFullscreen) return 'h-[calc(100vh-230px)]';
-    if (isMobile) return 'h-[350px]';
+    if (isFullscreen) {
+      if (isMobile) return 'h-[calc(100vh-190px)]';
+      return 'h-[calc(100vh-230px)]';
+    }
+    if (isMobile) return 'h-[300px]';
     if (isTablet) return 'h-[400px]';
     return 'h-[450px]';
   };
@@ -548,31 +551,45 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
 
   return (
     <div className={cn(
-      "transition-all duration-300 ease-in-out",
-      isFullscreen ? "fixed inset-0 z-50 bg-background/95 flex items-center justify-center p-4" : ""
+      "relative transition-all duration-300 ease-in-out",
+      isFullscreen ? "fixed inset-0 z-50 bg-background flex items-center justify-center p-0 md:p-4" : ""
     )}>
       <Card className={cn(
-        "border rounded-lg shadow-lg w-full transition-all duration-300 overflow-hidden",
-        isFullscreen ? "max-w-5xl h-[calc(100vh-40px)]" : "max-w-3xl"
+        "border shadow-lg w-full transition-all duration-300 overflow-hidden",
+        isFullscreen 
+          ? "rounded-none max-w-full h-full md:rounded-lg md:max-w-5xl md:h-[calc(100vh-40px)]" 
+          : "rounded-lg max-w-3xl"
       )}>
         <CardHeader className={cn(
-          "pb-3 border-b",
-          isFullscreen ? "lg:pb-4" : "",
-          isMobile ? "px-3 py-3" : ""
+          "border-b transition-all",
+          isFullscreen 
+            ? "px-3 py-2 md:px-4 md:py-3" 
+            : isMobile ? "px-3 py-3" : "px-6 py-4 pb-3",
         )}>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div>
-              <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
-                <Bot className="h-5 w-5 text-primary" />
+          <div className={cn(
+            "flex gap-2 transition-all",
+            isFullscreen || isMobile
+              ? "flex-row items-center justify-between"
+              : "flex-col sm:flex-row sm:items-center sm:justify-between"
+          )}>
+            <div className="flex-1 min-w-0">
+              <CardTitle className={cn(
+                "flex items-center gap-2",
+                isFullscreen || isMobile ? "text-base" : "text-lg md:text-xl"
+              )}>
+                <Bot className="h-5 w-5 text-primary flex-shrink-0" />
                 <span className="truncate">{agent.name || "Agent"}</span>
                 {activeConversation && (
-                  <Badge variant="outline" className="ml-1">
+                  <Badge variant="outline" className="ml-1 text-xs">
                     {activeConversation.title}
                   </Badge>
                 )}
               </CardTitle>
-              {!isMobile && (
-                <CardDescription className="mt-1">
+              {(!isMobile || isFullscreen) && (
+                <CardDescription className={cn(
+                  "transition-all",
+                  isFullscreen ? "hidden md:block mt-1 text-xs" : "mt-1"
+                )}>
                   Test your agent in real-time before deploying
                 </CardDescription>
               )}
@@ -658,43 +675,72 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
           
           {/* Conversation History Panel */}
           {showConversations && (
-            <div className="mt-4 p-3 border rounded-md bg-muted/50">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-medium">Conversation History</h3>
-                <Button variant="default" size="sm" onClick={startNewConversation}>
+            <div className={cn(
+              "mt-3 border rounded-md bg-muted/50 transition-all",
+              isFullscreen 
+                ? "p-3 md:p-4 mx-0 md:mx-0" 
+                : "p-3 mx-0"
+            )}>
+              <div className={cn(
+                "flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2 xs:gap-0 mb-3",
+                isFullscreen ? "pb-1" : ""
+              )}>
+                <h3 className={cn(
+                  "font-medium",
+                  isFullscreen ? "text-base" : "text-sm"
+                )}>
+                  Conversation History
+                </h3>
+                <Button 
+                  variant="default" 
+                  size={isFullscreen && !isMobile ? "default" : "sm"} 
+                  onClick={startNewConversation}
+                  className="w-full xs:w-auto"
+                >
+                  <MessageSquare className="h-3.5 w-3.5 mr-1.5" /> 
                   New Conversation
                 </Button>
               </div>
               
               {loadingConversations ? (
-                <div className="flex justify-center py-4">
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                <div className="flex justify-center py-6">
+                  <Loader2 className={cn(
+                    "animate-spin text-muted-foreground",
+                    isFullscreen ? "h-6 w-6" : "h-5 w-5"
+                  )} />
                 </div>
               ) : conversations && conversations.length > 0 ? (
-                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
+                <div className={cn(
+                  "space-y-2 overflow-y-auto pr-2",
+                  isFullscreen ? "max-h-[250px]" : "max-h-[200px]"
+                )}>
                   {conversations.map((conversation) => (
                     <div 
                       key={conversation.id} 
-                      className={`flex justify-between items-center p-2 rounded-md hover:bg-muted cursor-pointer ${
-                        activeConversation?.id === conversation.id ? 'bg-muted border-primary' : ''
-                      }`}
+                      className={cn(
+                        "flex justify-between items-center p-2 rounded-md hover:bg-muted cursor-pointer transition-colors",
+                        activeConversation?.id === conversation.id 
+                          ? 'bg-muted border border-primary/30' 
+                          : 'border border-transparent'
+                      )}
                       onClick={() => loadConversation(conversation)}
                     >
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{conversation.title}</span>
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-sm truncate">{conversation.title}</span>
                       </div>
-                      <div className="flex gap-1">
+                      <div className="flex-shrink-0">
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 w-7 p-0"
+                          className="h-7 w-7 p-0 rounded-full hover:bg-destructive/10 hover:text-destructive"
                           onClick={(e) => {
                             e.stopPropagation();
                             deleteConversationMutation.mutate(conversation.id);
                           }}
+                          title="Delete conversation"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-destructive">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-destructive">
                             <path d="M3 6h18"></path>
                             <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                             <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
@@ -705,8 +751,12 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                   ))}
                 </div>
               ) : (
-                <div className="py-4 text-center text-sm text-muted-foreground">
-                  No saved conversations. Start a new one to save your chat history.
+                <div className={cn(
+                  "py-6 text-center text-muted-foreground",
+                  isFullscreen ? "text-base" : "text-sm"
+                )}>
+                  <MessageSquare className="h-10 w-10 mx-auto mb-3 opacity-20" />
+                  No saved conversations.<br/>Start a new one to save your chat history.
                 </div>
               )}
             </div>
@@ -715,18 +765,32 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
         
         <CardContent className={cn(
           "flex-grow overflow-hidden p-0",
-          isMobile ? "px-3" : ""
+          isFullscreen 
+            ? "px-0 md:px-0" 
+            : isMobile ? "px-2" : ""
         )}>
           <ScrollArea className={cn(
-            "pr-4 px-3 py-2",
             getChatHeight(),
+            "px-2 py-3 md:px-4",
+            isFullscreen ? "px-3 md:px-6" : "",
             mounted ? "transition-all duration-300" : ""
           )}>
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                <Bot className="h-12 w-12 mb-4 opacity-20" />
-                <p className="text-center">Start a conversation with your agent</p>
-                <p className="text-sm text-center max-w-[280px] mx-auto mt-2">
+                <Bot className={cn(
+                  "mb-4 opacity-20 transition-all", 
+                  isFullscreen ? "h-16 w-16" : "h-12 w-12"
+                )} />
+                <p className={cn(
+                  "text-center",
+                  isFullscreen && !isMobile ? "text-lg" : ""
+                )}>
+                  Start a conversation with your agent
+                </p>
+                <p className={cn(
+                  "text-sm text-center max-w-[280px] mx-auto mt-2",
+                  isFullscreen && !isMobile ? "text-base max-w-[340px]" : ""
+                )}>
                   {agent.name ? agent.name : "This agent"} will respond based on your configuration
                 </p>
               </div>
@@ -741,13 +805,17 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                   >
                     <div
                       className={cn(
-                        "relative max-w-[90%] sm:max-w-[80%] rounded-lg px-3 py-2",
+                        "relative rounded-lg",
                         message.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
+                          ? "bg-primary text-primary-foreground max-w-[85%] md:max-w-[75%] px-3 py-2"
+                          : "bg-muted max-w-[90%] md:max-w-[80%] px-3 py-2.5"
                       )}
                     >
-                      <div className="flex items-center gap-1 mb-1 text-xs font-medium">
+                      <div className={cn(
+                        "flex items-center gap-1 mb-1",
+                        isFullscreen ? "mb-1.5" : "",
+                        "text-xs font-medium"
+                      )}>
                         {message.role === "user" ? (
                           <>
                             <span>You</span>
@@ -759,14 +827,17 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                         ) : (
                           <>
                             <Bot className="h-3 w-3" />
-                            <span>{agent.name || "Agent"}</span>
+                            <span className="truncate max-w-[100px] md:max-w-[160px]">{agent.name || "Agent"}</span>
                             <span className="ml-auto text-[10px] opacity-70">
                               {formatMessageTime(message.timestamp)}
                             </span>
                           </>
                         )}
                       </div>
-                      <div className="whitespace-pre-wrap text-[15px]">
+                      <div className={cn(
+                        "whitespace-pre-wrap",
+                        isFullscreen || !isMobile ? "text-sm leading-relaxed" : "text-[14px] leading-snug"
+                      )}>
                         {(() => {
                           try {
                             // Check if the content looks like JSON but only render as normal text
@@ -805,7 +876,10 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
           </ScrollArea>
           
           {tokenUsage && showTokens && (
-            <div className="px-4 mt-2 flex flex-wrap justify-between text-xs text-muted-foreground border-t pt-2">
+            <div className={cn(
+              "mt-1 flex flex-wrap justify-between text-xs text-muted-foreground border-t pt-2",
+              isFullscreen || isMobile ? "px-3" : "px-4"
+            )}>
               <span>Total: {tokenUsage.totalTokens}</span>
               <span>Prompt: {tokenUsage.promptTokens}</span>
               <span>Completion: {tokenUsage.completionTokens}</span>
@@ -814,8 +888,10 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
         </CardContent>
         
         <CardFooter className={cn(
-          "pt-2 border-t", 
-          isMobile ? "px-3 py-3" : ""
+          "border-t transition-all", 
+          isFullscreen
+            ? "px-3 py-3 md:px-6 md:py-4"
+            : isMobile ? "px-3 py-3" : "px-6 py-4"
         )}>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
@@ -824,33 +900,42 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                 name="message"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <div className="flex items-center justify-between mb-1">
+                    <div className={cn(
+                      "flex items-center justify-between",
+                      isFullscreen ? "mb-2" : "mb-1"
+                    )}>
                       <div className="flex gap-2">
                         {tokenUsage && (
                           <Button
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7"
+                            className={cn(
+                              "transition-all",
+                              isFullscreen ? "h-8 w-8" : "h-7 w-7"
+                            )}
                             onClick={() => setShowTokens(!showTokens)}
                             title="Toggle Token Usage"
                           >
-                            <Info className="h-3.5 w-3.5" />
+                            <Info className={isFullscreen ? "h-4 w-4" : "h-3.5 w-3.5"} />
                             <span className="sr-only">Tokens</span>
                           </Button>
                         )}
                       </div>
                       <div className="flex gap-1">
-                        {!isFullscreen && messages.length > 0 && (
+                        {messages.length > 0 && (
                           <Button 
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7"
+                            className={cn(
+                              "transition-all",
+                              isFullscreen ? "h-8 w-8" : "h-7 w-7"
+                            )}
                             onClick={clearChat}
                             title="Clear Chat"
                           >
-                            <RotateCcw className="h-3.5 w-3.5" />
+                            <RotateCcw className={isFullscreen ? "h-4 w-4" : "h-3.5 w-3.5"} />
                             <span className="sr-only">Clear</span>
                           </Button>
                         )}
@@ -861,20 +946,33 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                       <div className="flex space-x-2">
                         <Textarea
                           placeholder="Type your message here..."
-                          className="flex-grow resize-none min-h-[70px]"
+                          className={cn(
+                            "flex-grow resize-none",
+                            isFullscreen 
+                              ? "min-h-[80px] md:min-h-[100px] text-base" 
+                              : "min-h-[70px] text-sm"
+                          )}
                           {...field}
                           disabled={isStreaming || sendMessageMutation.isPending}
                         />
                         <Button
                           type="submit"
                           size="icon"
-                          className="self-end h-9 w-9"
+                          className={cn(
+                            "self-end transition-all",
+                            isFullscreen 
+                              ? "h-10 w-10 md:h-12 md:w-12" 
+                              : "h-9 w-9"
+                          )}
                           disabled={isStreaming || sendMessageMutation.isPending || !field.value}
                         >
                           {isStreaming || sendMessageMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Loader2 className={cn(
+                              "animate-spin",
+                              isFullscreen ? "h-5 w-5" : "h-4 w-4"
+                            )} />
                           ) : (
-                            <Send className="h-4 w-4" />
+                            <Send className={isFullscreen ? "h-5 w-5" : "h-4 w-4"} />
                           )}
                         </Button>
                       </div>
