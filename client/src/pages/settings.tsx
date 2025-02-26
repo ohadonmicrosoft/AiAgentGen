@@ -346,11 +346,20 @@ export default function Settings() {
                         variant={theme === "light" ? "default" : "outline"}
                         className="w-full justify-start"
                         onClick={() => {
-                          setTheme("light");
-                          toast({
-                            title: "Theme changed",
-                            description: "Light theme applied successfully",
-                          });
+                          try {
+                            setTheme("light");
+                            toast({
+                              title: "Theme changed",
+                              description: "Light theme applied successfully",
+                            });
+                          } catch (error) {
+                            console.error("Failed to set light theme:", error);
+                            toast({
+                              title: "Theme change failed",
+                              description: "There was an error applying the theme",
+                              variant: "destructive",
+                            });
+                          }
                         }}
                       >
                         <Sun className="mr-2 h-4 w-4" />
@@ -361,11 +370,20 @@ export default function Settings() {
                         variant={theme === "dark" ? "default" : "outline"}
                         className="w-full justify-start"
                         onClick={() => {
-                          setTheme("dark");
-                          toast({
-                            title: "Theme changed",
-                            description: "Dark theme applied successfully",
-                          });
+                          try {
+                            setTheme("dark");
+                            toast({
+                              title: "Theme changed",
+                              description: "Dark theme applied successfully",
+                            });
+                          } catch (error) {
+                            console.error("Failed to set dark theme:", error);
+                            toast({
+                              title: "Theme change failed",
+                              description: "There was an error applying the theme",
+                              variant: "destructive",
+                            });
+                          }
                         }}
                       >
                         <Moon className="mr-2 h-4 w-4" />
@@ -376,11 +394,20 @@ export default function Settings() {
                         variant={theme === "system" ? "default" : "outline"}
                         className="w-full justify-start"
                         onClick={() => {
-                          setTheme("system");
-                          toast({
-                            title: "Theme changed",
-                            description: "System theme preference applied",
-                          });
+                          try {
+                            setTheme("system");
+                            toast({
+                              title: "Theme changed",
+                              description: "System preference applied",
+                            });
+                          } catch (error) {
+                            console.error("Failed to set system theme:", error);
+                            toast({
+                              title: "Theme change failed",
+                              description: "There was an error applying the theme",
+                              variant: "destructive",
+                            });
+                          }
                         }}
                       >
                         <Laptop className="mr-2 h-4 w-4" />
