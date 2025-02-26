@@ -11,7 +11,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/providers/ThemeProvider";
-import { Moon, Sun, Info } from "lucide-react";
+import { Moon, Sun, Info, Loader2, Laptop } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const profileFormSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -34,6 +35,8 @@ type ApiKeyFormValues = z.infer<typeof apiKeySchema>;
 export default function Settings() {
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [notifications, setNotifications] = useState({
     email: true,
     platform: true,
@@ -337,12 +340,18 @@ export default function Settings() {
                 <div>
                   <h3 className="text-lg font-medium mb-4">Theme</h3>
                   <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                       <Button
                         type="button"
                         variant={theme === "light" ? "default" : "outline"}
                         className="w-full justify-start"
-                        onClick={() => setTheme("light")}
+                        onClick={() => {
+                          setTheme("light");
+                          toast({
+                            title: "Theme changed",
+                            description: "Light theme applied successfully",
+                          });
+                        }}
                       >
                         <Sun className="mr-2 h-4 w-4" />
                         Light
@@ -351,10 +360,31 @@ export default function Settings() {
                         type="button"
                         variant={theme === "dark" ? "default" : "outline"}
                         className="w-full justify-start"
-                        onClick={() => setTheme("dark")}
+                        onClick={() => {
+                          setTheme("dark");
+                          toast({
+                            title: "Theme changed",
+                            description: "Dark theme applied successfully",
+                          });
+                        }}
                       >
                         <Moon className="mr-2 h-4 w-4" />
                         Dark
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={theme === "system" ? "default" : "outline"}
+                        className="w-full justify-start"
+                        onClick={() => {
+                          setTheme("system");
+                          toast({
+                            title: "Theme changed",
+                            description: "System theme preference applied",
+                          });
+                        }}
+                      >
+                        <Laptop className="mr-2 h-4 w-4" />
+                        System
                       </Button>
                     </div>
                   </div>
