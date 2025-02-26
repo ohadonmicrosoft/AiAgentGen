@@ -285,6 +285,7 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
               console.log('Setting token usage:', jsonData.usage);
               setTokenUsage(jsonData.usage);
             } else if (jsonData.content !== undefined) {
+              // Just append the content directly, don't keep the JSON structure
               accumulated += jsonData.content;
             } else if (jsonData.error) {
               throw new Error(jsonData.error);
@@ -613,7 +614,31 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                       )}
                     </div>
                     <div className="whitespace-pre-wrap">
-                      {message.content}
+                      {(() => {
+                        try {
+                          // Check if the content looks like JSON but only render as normal text
+                          if (message.content?.startsWith("{") && message.content?.includes("content")) {
+                            // Parse the JSON-like structure and extract content
+                            const formattedContent = message.content
+                              .split(/(?<=})\s*(?={)/) // Split by JSON objects
+                              .map(chunk => {
+                                try {
+                                  const parsed = JSON.parse(chunk);
+                                  return parsed.content || "";
+                                } catch (e) {
+                                  return chunk;
+                                }
+                              })
+                              .join("");
+                            return formattedContent;
+                          }
+                          // Not JSON, just return the content
+                          return message.content;
+                        } catch (e) {
+                          // If any error, return the original content
+                          return message.content;
+                        }
+                      })()}
                       {message.isStreaming && (
                         <span className="animate-pulse">▊</span>
                       )}
