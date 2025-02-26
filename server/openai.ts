@@ -2,11 +2,26 @@ import OpenAI from 'openai';
 import { log } from './vite';
 import { storage } from './storage';
 
-// Initialize OpenAI client
+// Initialize OpenAI client with better error handling
 const createOpenAIClient = (apiKey?: string) => {
-  return new OpenAI({
-    apiKey: apiKey || process.env.OPENAI_API_KEY
-  });
+  try {
+    const key = apiKey || process.env.OPENAI_API_KEY;
+    if (!key) {
+      console.warn('[openai] No API key provided - API calls will likely fail');
+    }
+    
+    return new OpenAI({
+      apiKey: key,
+      maxRetries: 2,
+      defaultHeaders: { 'OpenAI-Beta': 'assistants=v1' } // Use the latest API features
+    });
+  } catch (error) {
+    console.error('[openai] Error creating OpenAI client:', error);
+    // Still return a client so the app doesn't crash completely
+    return new OpenAI({ 
+      apiKey: process.env.OPENAI_API_KEY || 'invalid-key'
+    });
+  }
 };
 
 // Store token usage for analytics and rate limiting
@@ -276,10 +291,9 @@ export async function* generateStreamingResponse(
       console.error('[openai] Streaming request timed out after 45 seconds');
     }, 45000);
     
-    // Options for the API request
+    // OpenAI request options with timeout for streaming
     const requestOptions = {
-      timeout: 30000, // 30 second timeout for the initial connection
-      signal: abortController.signal
+      timeout: 30000 as unknown as number // 30 second timeout for the initial connection
     };
     
     // Call OpenAI API with streaming

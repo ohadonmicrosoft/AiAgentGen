@@ -58,12 +58,16 @@ export function setupAuth(app: Express) {
   // Log session events for diagnostics
   console.log("[Auth] Session store initialized");
   
-  // Monitor session store health
+  // Monitor session store health (with type safety)
   if (storage.sessionStore && typeof storage.sessionStore.on === 'function') {
     try {
-      storage.sessionStore.on('error', (error) => {
+      // Use explicit type annotation to avoid TypeScript error
+      type ErrorCallback = (error: Error) => void;
+      const errorHandler: ErrorCallback = (error) => {
         console.error('[Auth] Session store error:', error);
-      });
+      };
+      
+      storage.sessionStore.on('error', errorHandler);
     } catch (err) {
       console.warn('[Auth] Session store does not support event listeners');
     }
