@@ -1,10 +1,9 @@
-import { Moon, Sun, Menu, Search, MoreHorizontal } from "lucide-react";
+import { Moon, Sun, Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
 
 interface TopNavProps {
   title: string;

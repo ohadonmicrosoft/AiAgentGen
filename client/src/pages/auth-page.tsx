@@ -126,7 +126,7 @@ export default function AuthPage() {
                       
                       <Button 
                         type="submit" 
-                        className="w-full mt-2" 
+                        className="w-full" 
                         disabled={loginMutation.isPending}
                       >
                         {loginMutation.isPending ? "Logging in..." : "Login"}
@@ -138,17 +138,15 @@ export default function AuthPage() {
                   <div className="text-xs text-muted-foreground text-center w-full mb-1">
                     Developer Quick Login
                   </div>
-                  <div className="flex flex-wrap gap-2 w-full">
+                  <div className="flex gap-2 w-full">
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="flex-1 text-xs h-9"
+                      className="flex-1 text-xs h-8"
                       onClick={() => {
                         loginForm.setValue("username", "developer");
                         loginForm.setValue("password", "developer123");
-                        setTimeout(() => {
-                          loginForm.handleSubmit(onLoginSubmit)();
-                        }, 100);
+                        loginForm.handleSubmit(onLoginSubmit)();
                       }}
                     >
                       Dev Login
@@ -156,16 +154,13 @@ export default function AuthPage() {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="flex-1 text-xs h-9"
+                      className="flex-1 text-xs h-8"
                       onClick={() => {
-                        const username = "developer" + Math.floor(Math.random() * 1000);
+                        registerForm.setValue("username", "developer" + Math.floor(Math.random() * 1000));
                         const password = "developer123";
-                        registerForm.setValue("username", username);
                         registerForm.setValue("password", password);
                         registerForm.setValue("confirmPassword", password);
-                        setTimeout(() => {
-                          registerForm.handleSubmit(onRegisterSubmit)();
-                        }, 100);
+                        registerForm.handleSubmit(onRegisterSubmit)();
                       }}
                     >
                       Create Dev Account
@@ -173,7 +168,7 @@ export default function AuthPage() {
                     <Button 
                       variant="secondary" 
                       size="sm"
-                      className="flex-1 text-xs h-9"
+                      className="flex-1 text-xs h-8"
                       onClick={async () => {
                         try {
                           const response = await fetch("/api/devlogin", {
@@ -254,7 +249,7 @@ export default function AuthPage() {
                       
                       <Button 
                         type="submit" 
-                        className="w-full mt-2" 
+                        className="w-full" 
                         disabled={registerMutation.isPending}
                       >
                         {registerMutation.isPending ? "Creating account..." : "Register"}
