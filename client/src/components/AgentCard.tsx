@@ -4,6 +4,7 @@ import { Edit, Play, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLocation } from "wouter";
+import { cn } from "@/lib/utils";
 
 interface Agent {
   id: string;
@@ -35,7 +36,10 @@ export default function AgentCard({ agent, onEdit, onTest }: AgentCardProps) {
       <CardContent className="p-5">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-foreground">{agent.name}</h3>
-          <Badge variant={agent.status === "active" ? "success" : "secondary"} className="capitalize transition-all duration-200 hover:opacity-80">
+          <Badge variant={agent.status === "active" ? "default" : "secondary"} className={cn(
+            "capitalize transition-all duration-200 hover:opacity-80",
+            agent.status === "active" ? "bg-green-500/10 text-green-600 hover:bg-green-500/20" : ""
+          )}>
             {agent.status}
           </Badge>
         </div>

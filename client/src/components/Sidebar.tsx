@@ -66,7 +66,8 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         "fixed inset-y-0 left-0 z-30 flex flex-col w-64 md:w-72 max-h-screen overflow-hidden bg-background border-r",
         "transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:shadow-none",
         open ? "translate-x-0 shadow-xl" : "-translate-x-full shadow-none",
-        !mounted ? "duration-0" : ""  // No transition on first render
+        !mounted ? "duration-0" : "",  // No transition on first render
+        "backdrop-blur-sm bg-background/95"  // Adding glass effect
       )}
     >
       <div className="flex items-center justify-between flex-shrink-0 p-4 border-b">
@@ -101,14 +102,19 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                 onClick={handleLinkClick}
                 className={cn(
                   "flex items-center px-3 py-2.5 text-sm font-medium rounded-md",
-                  "transition-all duration-200 ease-in-out",
+                  "transition-all duration-200 ease-in-out relative overflow-hidden",
                   location === item.path 
                     ? "bg-primary/10 text-primary font-semibold" 
-                    : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                    : "text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:translate-x-1"
                 )}
               >
-                {item.icon}
-                {item.label}
+                <span className={cn(
+                  "mr-3 h-5 w-5 transition-transform duration-200",
+                  location === item.path ? "text-primary" : "group-hover:scale-110"
+                )}>
+                  {item.icon}
+                </span>
+                <span>{item.label}</span>
               </Link>
             </li>
           ))}
@@ -131,14 +137,19 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                     onClick={handleLinkClick}
                     className={cn(
                       "flex items-center px-3 py-2.5 text-sm font-medium rounded-md",
-                      "transition-all duration-200 ease-in-out",
+                      "transition-all duration-200 ease-in-out relative overflow-hidden",
                       location === item.path 
                         ? "bg-primary/10 text-primary font-semibold" 
-                        : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                        : "text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:translate-x-1"
                     )}
                   >
-                    {item.icon}
-                    {item.label}
+                    <span className={cn(
+                      "mr-3 h-5 w-5 transition-transform duration-200",
+                      location === item.path ? "text-primary" : "group-hover:scale-110"
+                    )}>
+                      {item.icon}
+                    </span>
+                    <span>{item.label}</span>
                   </Link>
                 </li>
               ))}
