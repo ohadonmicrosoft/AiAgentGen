@@ -132,12 +132,12 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             {/* Admin section - only shown to users with admin privileges */}
             {isAdmin && (
               <>
-                <li className="pt-4 pb-1">
-                  <div className="px-4 py-2">
-                    <h2 className="text-xs font-semibold tracking-wider text-black/50 dark:text-white/50 uppercase">
-                      Admin Tools
+                <li className="pt-2">
+                  <div className="px-3 py-2">
+                    <h2 className="mb-1 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                      Admin
                     </h2>
-                    <div className="h-px mt-1 bg-black/10 dark:bg-white/10" />
+                    <div className="h-px bg-border" />
                   </div>
                 </li>
                 {adminItems.map((item) => (
@@ -170,21 +170,21 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           </ul>
         </nav>
 
-        <div className="flex-shrink-0 p-4 border-t border-black/10 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.02]">
+        <div className="flex-shrink-0 p-3 border-t">
           <div className="flex items-center">
-            <Avatar className="flex-shrink-0 w-9 h-9 border border-black/10 dark:border-white/10 shadow-sm bg-black/5 dark:bg-white/5">
+            <Avatar className="flex-shrink-0 w-8 h-8 border">
               <AvatarImage 
                 src={`https://avatar.vercel.sh/${user?.username || 'user'}`} 
                 alt={user?.username || "User"} 
               />
-              <AvatarFallback className="font-medium">{user?.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+              <AvatarFallback>{user?.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
             </Avatar>
             
             <div className="ml-3 overflow-hidden">
-              <p className="text-sm font-medium truncate text-black dark:text-white">
+              <p className="text-sm font-medium truncate">
                 {user?.username || "User"}
               </p>
-              <p className="text-xs text-black/60 dark:text-white/60 truncate">
+              <p className="text-xs text-muted-foreground truncate">
                 {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : "User"}
               </p>
             </div>
@@ -192,7 +192,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="ml-auto h-8 w-8 hover:bg-black/5 dark:hover:bg-white/5 rounded-full" 
+              className="ml-auto h-8 w-8" 
               onClick={handleLogout}
               title="Log out"
               aria-label="Log out"

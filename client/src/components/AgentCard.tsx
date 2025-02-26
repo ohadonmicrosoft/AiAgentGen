@@ -32,10 +32,10 @@ export default function AgentCard({ agent, onEdit, onTest }: AgentCardProps) {
     }
   };
   return (
-    <Card className="overflow-hidden transition-all duration-150 hover:shadow-md group border">
+    <Card className="overflow-hidden border">
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-medium text-foreground">{agent.name}</h3>
+          <h3 className="text-lg font-medium">{agent.name}</h3>
           <Badge variant={agent.status === "active" ? "default" : "secondary"} className="capitalize">
             {agent.status}
           </Badge>
@@ -48,7 +48,7 @@ export default function AgentCard({ agent, onEdit, onTest }: AgentCardProps) {
             onClick={onEdit}
           >
             <Edit className="mr-1.5 h-3.5 w-3.5" />
-            <span>Edit</span>
+            Edit
           </Button>
           <Button 
             variant="outline" 
@@ -56,7 +56,7 @@ export default function AgentCard({ agent, onEdit, onTest }: AgentCardProps) {
             onClick={handleTest}
           >
             <Play className="mr-1.5 h-3.5 w-3.5" />
-            <span>Test</span>
+            Test
           </Button>
           <div className="ml-auto">
             <DropdownMenu>
@@ -70,17 +70,17 @@ export default function AgentCard({ agent, onEdit, onTest }: AgentCardProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem className="cursor-pointer">Duplicate</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">Share</DropdownMenuItem>
-                <DropdownMenuItem className="text-destructive cursor-pointer">Delete</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {}}>Duplicate</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {}}>Share</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {}} className="text-destructive">Delete</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
       </CardContent>
-      <CardFooter className="px-4 py-2 bg-muted/10 border-t">
-        <div className="flex items-center text-xs text-muted-foreground">
-          <span>{agent.lastUpdated}</span>
+      <CardFooter className="px-4 py-2 bg-muted/50 border-t">
+        <div className="text-xs text-muted-foreground">
+          {agent.lastUpdated}
         </div>
       </CardFooter>
     </Card>
