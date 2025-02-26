@@ -76,14 +76,15 @@ export default function TopNav({ title, onMenuClick }: TopNavProps) {
           <div className="flex items-center gap-2">
             {/* Search Bar - On tablets and up */}
             {!isMobile && (
-              <div className="relative max-w-xs mr-1 group">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none z-10 transition-all duration-200 group-focus-within:text-primary">
+              <div className="relative max-w-xs mr-1">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <Search className="w-3.5 h-3.5 text-muted-foreground" />
                 </div>
-                <Input
+                <input 
                   type="search" 
                   placeholder="Search..." 
-                  className="w-full py-1.5 pl-9 pr-4 text-sm h-9 bg-muted/40 dark:bg-muted/20 border-input/60"
+                  className="w-full py-1.5 pl-9 pr-4 text-sm h-9 bg-muted/50 border border-input rounded-md 
+                            focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 />
               </div>
             )}

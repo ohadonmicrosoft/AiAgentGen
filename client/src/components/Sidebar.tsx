@@ -65,28 +65,26 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       {/* Backdrop overlay - shown only on mobile when sidebar is open */}
       {isMobile && open && (
         <div 
-          className="fixed inset-0 z-20 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
+          className="fixed inset-0 z-20 bg-black/50"
           onClick={onClose}
         />
       )}
       
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 flex flex-col w-72 max-h-screen overflow-hidden bg-background/95 backdrop-blur-sm border-r",
-          "transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static",
-          open ? "translate-x-0 shadow-xl" : "-translate-x-full",
+          "fixed inset-y-0 left-0 z-30 flex flex-col w-64 max-h-screen overflow-hidden bg-background border-r",
+          "transform transition-all duration-150 lg:translate-x-0 lg:static",
+          open ? "translate-x-0" : "-translate-x-full",
           !mounted ? "duration-0" : "" // No transition on first render
         )}
       >
-        <div className="flex items-center justify-between flex-shrink-0 px-5 py-4 border-b">
+        <div className="flex items-center justify-between flex-shrink-0 p-4 border-b">
           <div className="flex items-center" onClick={handleLinkClick}>
-            <Link href="/" className="flex items-center space-x-3 group">
-              <div className="flex items-center justify-center w-9 h-9 rounded-md bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 transition-all duration-300 group-hover:border-black/20 dark:group-hover:border-white/20 shadow-sm">
-                <Bot className="h-4 w-4 transition-all duration-300 group-hover:scale-110" />
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="flex items-center justify-center w-8 h-8 rounded-md border">
+                <Bot className="h-4 w-4" />
               </div>
-              <span className="text-base font-semibold tracking-tight bg-gradient-to-r from-black to-black/80 dark:from-white dark:to-white/80 bg-clip-text text-transparent group-hover:to-black dark:group-hover:to-white transition-all duration-300">
-                AI Agent Generator
-              </span>
+              <span className="text-base font-medium">AI Agent Generator</span>
             </Link>
           </div>
           
@@ -95,7 +93,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               variant="ghost" 
               size="icon" 
               onClick={onClose} 
-              className="lg:hidden h-8 w-8 hover:bg-black/5 dark:hover:bg-white/5 rounded-full"
+              className="lg:hidden h-8 w-8"
               aria-label="Close sidebar"
             >
               <X className="w-4 h-4" />
@@ -111,25 +109,22 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                   href={item.path}
                   onClick={handleLinkClick}
                   className={cn(
-                    "relative flex items-center px-4 py-2.5 text-sm font-medium rounded-md group",
-                    "transition-all duration-300 overflow-hidden",
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-md",
+                    "transition-colors",
                     location === item.path 
-                      ? "bg-black/[0.03] dark:bg-white/[0.03] text-black dark:text-white shadow-sm" 
-                      : "text-black/70 dark:text-white/70 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] hover:text-black dark:hover:text-white",
-                    "before:absolute before:content-[''] before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-8 before:w-[3px] before:rounded-r-full before:scale-y-0 before:transition-transform before:duration-300 before:origin-center",
-                    location === item.path && "before:bg-primary before:scale-y-100"
+                      ? "bg-muted text-foreground" 
+                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   )}
                 >
-                  <div className={cn(
-                    "mr-3 h-5 w-5 transition-all duration-300",
-                    location === item.path ? "text-primary" : "text-black/50 dark:text-white/50 group-hover:text-black dark:group-hover:text-white/80"
-                  )}>
-                    {item.icon}
-                  </div>
-                  <span className="transition-all duration-300">{item.label}</span>
+                  {/* Left accent bar for active item */}
+                  {location === item.path && (
+                    <span className="absolute left-0 top-1/2 h-1/2 w-0.5 -translate-y-1/2 bg-foreground" />
+                  )}
                   
-                  {/* Subtle hover effect */}
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="mr-3 h-5 w-5">
+                    {item.icon}
+                  </span>
+                  {item.label}
                 </Link>
               </li>
             ))}
@@ -151,25 +146,22 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                       href={item.path}
                       onClick={handleLinkClick}
                       className={cn(
-                        "relative flex items-center px-4 py-2.5 text-sm font-medium rounded-md group",
-                        "transition-all duration-300 overflow-hidden",
+                        "flex items-center px-3 py-2 text-sm font-medium rounded-md",
+                        "transition-colors",
                         location === item.path 
-                          ? "bg-black/[0.03] dark:bg-white/[0.03] text-black dark:text-white shadow-sm" 
-                          : "text-black/70 dark:text-white/70 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] hover:text-black dark:hover:text-white",
-                        "before:absolute before:content-[''] before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-8 before:w-[3px] before:rounded-r-full before:scale-y-0 before:transition-transform before:duration-300 before:origin-center",
-                        location === item.path && "before:bg-primary before:scale-y-100"
+                          ? "bg-muted text-foreground" 
+                          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                       )}
                     >
-                      <div className={cn(
-                        "mr-3 h-5 w-5 transition-all duration-300",
-                        location === item.path ? "text-primary" : "text-black/50 dark:text-white/50 group-hover:text-black dark:group-hover:text-white/80"
-                      )}>
-                        {item.icon}
-                      </div>
-                      <span className="transition-all duration-300">{item.label}</span>
+                      {/* Left accent bar for active item */}
+                      {location === item.path && (
+                        <span className="absolute left-0 top-1/2 h-1/2 w-0.5 -translate-y-1/2 bg-foreground" />
+                      )}
                       
-                      {/* Subtle hover effect */}
-                      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <span className="mr-3 h-5 w-5">
+                        {item.icon}
+                      </span>
+                      {item.label}
                     </Link>
                   </li>
                 ))}
