@@ -79,3 +79,15 @@ vite.config.ts.*
 
 # Generated files
 /generated
+
+# Backup and temporary files
+*.bak
+*.new
+*.old
+*.tmp
+*.temp
+
+# Replit specific files
+.replit
+replit.nix
+.config/
