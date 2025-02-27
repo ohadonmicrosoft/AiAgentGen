@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, Loader2 } from "lucide-react";
 import { Agent as AgentSchema } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
+import { motion } from "framer-motion";
+import { useScrollAnimation } from "@/hooks/animations";
 
 // Define the UIAgent type to match the AgentCard component props
 interface UIAgent {
@@ -44,6 +46,28 @@ export default function Agents() {
   const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
+  const { ref, controls } = useScrollAnimation();
+  
+  // Animation variants for staggered animations
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.5 }
+    }
+  };
   
   // Fetch agents from the API
   const { data: agents, isLoading, error } = useQuery<AgentSchema[]>({
@@ -61,9 +85,20 @@ export default function Agents() {
 
   return (
     <MainLayout title="Agents">
-      <div className="py-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div className="relative w-full sm:w-64">
+      <motion.div 
+        className="py-6"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
+        <motion.div 
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"
+          variants={containerVariants}
+        >
+          <motion.div 
+            className="relative w-full sm:w-64"
+            variants={itemVariants}
+          >
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -73,111 +108,163 @@ export default function Agents() {
               onChange={(e) => setSearchQuery(e.target.value)}
               disabled={isLoading}
             />
-          </div>
+          </motion.div>
           
-          <Button onClick={() => navigate("/create-agent")}>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Agent
-          </Button>
-        </div>
+          <motion.div variants={itemVariants}>
+            <Button onClick={() => navigate("/create-agent")}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Agent
+            </Button>
+          </motion.div>
+        </motion.div>
 
         {/* Loading state */}
         {isLoading && (
-          <div className="flex justify-center items-center py-12">
+          <motion.div 
+            className="flex justify-center items-center py-12"
+            variants={itemVariants}
+          >
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+          </motion.div>
         )}
 
         {/* Error state */}
         {error && (
-          <div className="py-8 text-center">
+          <motion.div 
+            className="py-8 text-center"
+            variants={itemVariants}
+          >
             <p className="text-destructive">Error loading agents. Please try again later.</p>
-          </div>
+          </motion.div>
         )}
 
         {/* Content when data is loaded */}
         {!isLoading && !error && agents && (
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">All Agents ({filteredAgents?.length || 0})</TabsTrigger>
-              <TabsTrigger value="active">Active ({activeAgents?.length || 0})</TabsTrigger>
-              <TabsTrigger value="draft">Draft ({draftAgents?.length || 0})</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="all">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {filteredAgents?.map(agent => (
-                  <AgentCard
-                    key={agent.id}
-                    agent={{
-                      id: agent.id.toString(),
-                      name: agent.name,
-                      description: agent.description || "",
-                      status: agent.status as "active" | "draft",
-                      lastUpdated: formatLastUpdated(agent.updatedAt)
-                    }}
-                    onEdit={() => navigate(`/agents/${agent.id}`)}
-                    onTest={() => navigate(`/test-agent/${agent.id}`)}
-                  />
-                ))}
-                {filteredAgents?.length === 0 && (
-                  <div className="col-span-full py-8 text-center">
-                    <p className="text-muted-foreground">No agents found. Try a different search term or create a new agent.</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="active">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {activeAgents?.map(agent => (
-                  <AgentCard
-                    key={agent.id}
-                    agent={{
-                      id: agent.id.toString(),
-                      name: agent.name,
-                      description: agent.description || "",
-                      status: agent.status as "active" | "draft",
-                      lastUpdated: formatLastUpdated(agent.updatedAt)
-                    }}
-                    onEdit={() => navigate(`/agents/${agent.id}`)}
-                    onTest={() => navigate(`/test-agent/${agent.id}`)}
-                  />
-                ))}
-                {activeAgents?.length === 0 && (
-                  <div className="col-span-full py-8 text-center">
-                    <p className="text-muted-foreground">No active agents found. Try a different search term or activate a draft agent.</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="draft">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {draftAgents?.map(agent => (
-                  <AgentCard
-                    key={agent.id}
-                    agent={{
-                      id: agent.id.toString(),
-                      name: agent.name,
-                      description: agent.description || "",
-                      status: agent.status as "active" | "draft",
-                      lastUpdated: formatLastUpdated(agent.updatedAt)
-                    }}
-                    onEdit={() => navigate(`/agents/${agent.id}`)}
-                    onTest={() => navigate(`/test-agent/${agent.id}`)}
-                  />
-                ))}
-                {draftAgents?.length === 0 && (
-                  <div className="col-span-full py-8 text-center">
-                    <p className="text-muted-foreground">No draft agents found. Try a different search term.</p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-          </Tabs>
+          <motion.div
+            variants={containerVariants}
+            ref={ref}
+            animate={controls}
+          >
+            <Tabs defaultValue="all" className="w-full">
+              <motion.div variants={itemVariants}>
+                <TabsList className="mb-4">
+                  <TabsTrigger value="all">All Agents ({filteredAgents?.length || 0})</TabsTrigger>
+                  <TabsTrigger value="active">Active ({activeAgents?.length || 0})</TabsTrigger>
+                  <TabsTrigger value="draft">Draft ({draftAgents?.length || 0})</TabsTrigger>
+                </TabsList>
+              </motion.div>
+              
+              <TabsContent value="all">
+                <motion.div 
+                  className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+                  variants={containerVariants}
+                >
+                  {filteredAgents?.map((agent, index) => (
+                    <motion.div 
+                      key={agent.id}
+                      variants={itemVariants}
+                      custom={index}
+                    >
+                      <AgentCard
+                        agent={{
+                          id: agent.id.toString(),
+                          name: agent.name,
+                          description: agent.description || "",
+                          status: agent.status as "active" | "draft",
+                          lastUpdated: formatLastUpdated(agent.updatedAt)
+                        }}
+                        onEdit={() => navigate(`/agents/${agent.id}`)}
+                        onTest={() => navigate(`/test-agent/${agent.id}`)}
+                        animationDelay={0.1 * (index + 1)}
+                      />
+                    </motion.div>
+                  ))}
+                  {filteredAgents?.length === 0 && (
+                    <motion.div 
+                      className="col-span-full py-8 text-center"
+                      variants={itemVariants}
+                    >
+                      <p className="text-muted-foreground">No agents found. Try a different search term or create a new agent.</p>
+                    </motion.div>
+                  )}
+                </motion.div>
+              </TabsContent>
+              
+              <TabsContent value="active">
+                <motion.div 
+                  className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+                  variants={containerVariants}
+                >
+                  {activeAgents?.map((agent, index) => (
+                    <motion.div 
+                      key={agent.id}
+                      variants={itemVariants}
+                      custom={index}
+                    >
+                      <AgentCard
+                        agent={{
+                          id: agent.id.toString(),
+                          name: agent.name,
+                          description: agent.description || "",
+                          status: agent.status as "active" | "draft",
+                          lastUpdated: formatLastUpdated(agent.updatedAt)
+                        }}
+                        onEdit={() => navigate(`/agents/${agent.id}`)}
+                        onTest={() => navigate(`/test-agent/${agent.id}`)}
+                        animationDelay={0.1 * (index + 1)}
+                      />
+                    </motion.div>
+                  ))}
+                  {activeAgents?.length === 0 && (
+                    <motion.div 
+                      className="col-span-full py-8 text-center"
+                      variants={itemVariants}
+                    >
+                      <p className="text-muted-foreground">No active agents found. Try a different search term or activate a draft agent.</p>
+                    </motion.div>
+                  )}
+                </motion.div>
+              </TabsContent>
+              
+              <TabsContent value="draft">
+                <motion.div 
+                  className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+                  variants={containerVariants}
+                >
+                  {draftAgents?.map((agent, index) => (
+                    <motion.div 
+                      key={agent.id}
+                      variants={itemVariants}
+                      custom={index}
+                    >
+                      <AgentCard
+                        agent={{
+                          id: agent.id.toString(),
+                          name: agent.name,
+                          description: agent.description || "",
+                          status: agent.status as "active" | "draft",
+                          lastUpdated: formatLastUpdated(agent.updatedAt)
+                        }}
+                        onEdit={() => navigate(`/agents/${agent.id}`)}
+                        onTest={() => navigate(`/test-agent/${agent.id}`)}
+                        animationDelay={0.1 * (index + 1)}
+                      />
+                    </motion.div>
+                  ))}
+                  {draftAgents?.length === 0 && (
+                    <motion.div 
+                      className="col-span-full py-8 text-center"
+                      variants={itemVariants}
+                    >
+                      <p className="text-muted-foreground">No draft agents found. Try a different search term.</p>
+                    </motion.div>
+                  )}
+                </motion.div>
+              </TabsContent>
+            </Tabs>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
     </MainLayout>
   );
 }

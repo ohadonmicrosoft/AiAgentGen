@@ -1,9 +1,13 @@
-import { Moon, Sun, Menu, Search } from "lucide-react";
+import { Moon, Sun, Menu, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/providers/ThemeProvider";
+import { useTheme } from "@/hooks/use-theme";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useSidebarState } from "@/hooks/use-sidebar-state";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 interface TopNavProps {
   title: string;
@@ -11,10 +15,12 @@ interface TopNavProps {
 }
 
 export default function TopNav({ title, onMenuClick }: TopNavProps) {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const { isCollapsed, toggleCollapsed } = useSidebarState();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   // Used for the initial render to prevent transition flickering
   useEffect(() => {
@@ -34,16 +40,12 @@ export default function TopNav({ title, onMenuClick }: TopNavProps) {
     };
   }, []);
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
-
   return (
     <header 
       className={cn(
         "sticky top-0 z-20 w-full bg-background",
         "transition-all duration-150",
-        isScrolled ? "border-b" : "",
+        isScrolled ? "border-b shadow-sm" : "",
         !mounted ? "duration-0" : "" // No transition on first render
       )}
     >
@@ -53,22 +55,50 @@ export default function TopNav({ title, onMenuClick }: TopNavProps) {
       )}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden h-8 w-8"
-              onClick={onMenuClick}
-              aria-label="Toggle navigation menu"
-            >
-              <Menu className="h-4 w-4" />
-            </Button>
+            {isMobile ? (
+              // Mobile menu toggle
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden h-8 w-8"
+                onClick={onMenuClick}
+                aria-label="Toggle navigation menu"
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+            ) : (
+              // Desktop sidebar toggle
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleCollapsed}
+                className="hidden lg:flex h-8 w-8 mr-2"
+                aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                <motion.div
+                  animate={{ rotate: isCollapsed ? 180 : 0 }}
+                  transition={{
+                    duration: prefersReducedMotion ? 0 : 0.2,
+                    ease: "easeInOut",
+                  }}
+                >
+                  {isCollapsed ? (
+                    <ChevronRight className="h-4 w-4" />
+                  ) : (
+                    <ChevronLeft className="h-4 w-4" />
+                  )}
+                </motion.div>
+              </Button>
+            )}
             
-            <h1 className={cn(
-              "font-medium truncate", 
-              isMobile ? "text-lg" : "text-xl"
-            )}>
+            <motion.h1 
+              className="fluid-h5 font-semibold truncate"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              key={title}
+            >
               {title}
-            </h1>
+            </motion.h1>
           </div>
           
           <div className="flex items-center gap-2">
@@ -87,23 +117,8 @@ export default function TopNav({ title, onMenuClick }: TopNavProps) {
               </div>
             )}
             
-            {/* Theme Toggle Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-              className={cn(
-                "transition-all duration-150", 
-                isMobile ? "h-8 w-8" : "h-9 w-9"
-              )}
-            >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </Button>
+            {/* Theme Toggle Component */}
+            <ThemeToggle />
           </div>
         </div>
       </div>

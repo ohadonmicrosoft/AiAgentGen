@@ -1,6 +1,81 @@
+# Dependency directories
 node_modules
+.pnp
+.pnp.js
+
+# Build outputs
 dist
+build
+out
+.next
+.nuxt
+.cache
+storybook-static
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# OS specific files
 .DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor and IDE files
+.idea
+.vscode
+*.swp
+*.swo
+.project
+.classpath
+.settings
+*.sublime-*
+
+# Testing and coverage
+coverage
+.nyc_output
+.jest-cache
+
+# Misc
 server/public
-vite.config.ts.*
 *.tar.gz
+*.tgz
+*.zip
+*.gz
+*.bz2
+*.xz
+.directory
+*.tsbuildinfo
+vite.config.ts.*
+
+# SQLite databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Doc build directories
+/doc/api
+/doc/site
+
+# Cache directories
+/.eslintcache
+/.stylelintcache
+/tmp
+/.tmp
+/.temp
+
+# Generated files
+/generated

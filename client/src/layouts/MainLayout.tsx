@@ -4,15 +4,19 @@ import TopNav from "@/components/TopNav";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Backdrop } from "@/components/ui/backdrop";
+import { SidebarProvider, useSidebarState } from "@/hooks/use-sidebar-state";
+import { motion } from "framer-motion";
 
 interface MainLayoutProps {
   children: ReactNode;
   title: string;
 }
 
-export default function MainLayout({ children, title }: MainLayoutProps) {
+// Inner layout component that uses the sidebar state
+function MainLayoutInner({ children, title }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { isCollapsed, isHovering } = useSidebarState();
 
   // Close sidebar when transitioning from mobile to desktop
   useEffect(() => {
@@ -68,10 +72,24 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
       />
 
       {/* Main content area with responsive adjustments */}
-      <div className={cn(
-        "flex flex-col flex-grow min-h-screen transition-all duration-300 ease-in-out",
-        isMobile ? "w-full" : "lg:ml-64"
-      )}>
+      <motion.div 
+        className={cn(
+          "flex flex-col flex-grow min-h-screen transition-all duration-300 ease-in-out",
+          isMobile 
+            ? "w-full" 
+            : isCollapsed && !isHovering 
+              ? "lg:ml-[4.5rem]" 
+              : "lg:ml-64"
+        )}
+        animate={{
+          marginLeft: isMobile
+            ? 0
+            : isCollapsed && !isHovering
+              ? "4.5rem"
+              : "16rem",
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+      >
         {/* Top navigation with improved styling */}
         <TopNav title={title} onMenuClick={toggleSidebar} />
 
@@ -111,7 +129,16 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
             </div>
           </div>
         </footer>
-      </div>
+      </motion.div>
     </div>
+  );
+}
+
+// Wrapper component that provides the sidebar state
+export default function MainLayout(props: MainLayoutProps) {
+  return (
+    <SidebarProvider>
+      <MainLayoutInner {...props} />
+    </SidebarProvider>
   );
 }
