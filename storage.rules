@@ -1,0 +1,62 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Common functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && 
+        firestore.exists(/databases/(default)/documents/userProfiles/$(request.auth.uid)) &&
+        firestore.get(/databases/(default)/documents/userProfiles/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // User profile images
+    match /users/{userId}/profile/{fileName} {
+      // Users can read, create, update their own profile images
+      // Admins can read all profile images
+      // Anyone can read public profile images
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isOwner(userId) || isAdmin();
+      allow create, update: if isOwner(userId) && 
+        request.resource.size < 5 * 1024 * 1024 && // 5MB max
+        request.resource.contentType.matches('image/.*'); // Only images
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+    
+    // Agent assets
+    match /agents/{agentId}/{fileName} {
+      // Public agent assets can be read by anyone
+      // Private agent assets can only be read by their owner or admins
+      // Agent assets can only be created, updated, or deleted by their owner or admins
+      allow get, list: if 
+        firestore.get(/databases/(default)/documents/agents/$(agentId)).data.isPublic == true || 
+        isOwner(firestore.get(/databases/(default)/documents/agents/$(agentId)).data.ownerId) || 
+        isAdmin();
+      allow create, update: if 
+        isOwner(firestore.get(/databases/(default)/documents/agents/$(agentId)).data.ownerId) || 
+        isAdmin();
+      allow delete: if 
+        isOwner(firestore.get(/databases/(default)/documents/agents/$(agentId)).data.ownerId) || 
+        isAdmin();
+    }
+    
+    // Public assets
+    match /public/{fileName} {
+      // Anyone can read public assets
+      // Only admins can create, update, or delete public assets
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Default deny
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+} 

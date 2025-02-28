@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getAnalytics, isSupported } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 // Replace these values with your Firebase project configuration from:
@@ -27,5 +28,23 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Initialize Analytics conditionally (only in browser environments)
+export const initAnalytics = async () => {
+  try {
+    if (await isSupported()) {
+      return getAnalytics(app);
+    }
+    return null;
+  } catch (error) {
+    console.error("Firebase Analytics not supported:", error);
+    return null;
+  }
+};
+
+// Initialize Analytics if in browser environment
+if (typeof window !== "undefined") {
+  initAnalytics();
+}
 
 export default app;
