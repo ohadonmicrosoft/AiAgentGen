@@ -2,12 +2,75 @@ import OpenAI from 'openai';
 import { log } from './vite';
 import { storage } from './storage';
 
+// Create a mock OpenAI client for testing
+function createMockOpenAIClient() {
+  console.log('[openai] Creating mock OpenAI client for testing');
+  
+  return {
+    chat: {
+      completions: {
+        create: async (options: any) => {
+          console.log('[mock-openai] Received request with options:', JSON.stringify(options, null, 2));
+          
+          // Extract the user message
+          const userMessage = options.messages.find((m: any) => m.role === 'user')?.content || '';
+          
+          // Generate a mock response based on the user message
+          let responseContent = `This is a mock response to: "${userMessage}"`;
+          
+          // Add some variety based on the content of the message
+          if (userMessage.toLowerCase().includes('hello')) {
+            responseContent = "Hello! I'm a mock AI assistant. How can I help you today?";
+          } else if (userMessage.toLowerCase().includes('help')) {
+            responseContent = "I'd be happy to help! However, I'm currently running in mock mode without access to the real OpenAI API.";
+          } else if (userMessage.toLowerCase().includes('weather')) {
+            responseContent = "I don't have access to real-time weather data, but I can tell you it's always sunny in the world of mock responses!";
+          }
+          
+          // Simulate processing delay
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          return {
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: responseContent
+                },
+                finish_reason: 'stop'
+              }
+            ],
+            usage: {
+              prompt_tokens: 50,
+              completion_tokens: 30,
+              total_tokens: 80
+            }
+          };
+        }
+      }
+    }
+  };
+}
+
 // Initialize OpenAI client with better error handling
 const createOpenAIClient = (apiKey?: string) => {
   try {
-    const key = apiKey || process.env.OPENAI_API_KEY;
+    // Hardcode the API key provided by the user
+    const hardcodedKey = "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";
+    
+    // Use the provided key, hardcoded key, or environment variable (in that order)
+    const key = apiKey || hardcodedKey || process.env.OPENAI_API_KEY;
+    
+    // Use mock client if explicitly requested or if no key is available
+    if (process.env.USE_MOCK_OPENAI === 'true') {
+      return createMockOpenAIClient();
+    }
+    
     if (!key) {
-      console.warn('[openai] No API key provided - API calls will likely fail');
+      console.warn('[openai] No API key provided - falling back to mock client');
+      return createMockOpenAIClient();
+    } else {
+      console.log('[openai] Using API key:', key.substring(0, 7) + '...' + key.substring(key.length - 7));
     }
     
     return new OpenAI({
@@ -17,10 +80,8 @@ const createOpenAIClient = (apiKey?: string) => {
     });
   } catch (error) {
     console.error('[openai] Error creating OpenAI client:', error);
-    // Still return a client so the app doesn't crash completely
-    return new OpenAI({ 
-      apiKey: process.env.OPENAI_API_KEY || 'invalid-key'
-    });
+    // Fall back to mock client
+    return createMockOpenAIClient();
   }
 };
 
@@ -234,7 +295,37 @@ export async function generateResponse(
       } : undefined
     };
   } catch (error: any) {
-    // Enhanced error handling
+    console.error('[openai] Error calling OpenAI API:', error.message);
+    
+    // If it's an authentication error, fall back to the mock client
+    if (error.message?.includes('401') || error.message?.includes('API key')) {
+      console.log('[openai] Authentication error, falling back to mock implementation');
+      
+      // Create a mock response
+      const mockOpenai = createMockOpenAIClient();
+      const mockResponse = await mockOpenai.chat.completions.create({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      });
+      
+      // Extract mock response data
+      const mockContent = mockResponse.choices[0]?.message?.content || '';
+      
+      // Return mock content and usage
+      return {
+        content: mockContent,
+        usage: mockResponse.usage ? {
+          promptTokens: mockResponse.usage.prompt_tokens,
+          completionTokens: mockResponse.usage.completion_tokens,
+          totalTokens: mockResponse.usage.total_tokens
+        } : undefined,
+        isMock: true
+      };
+    }
+    
+    // For other errors, use the enhanced error handling
     handleOpenAIError(error);
   }
 }

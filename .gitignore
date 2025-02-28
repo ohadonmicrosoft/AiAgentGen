@@ -1,16 +1,16 @@
 # Dependency directories
-node_modules
-.pnp
-.pnp.js
+node_modules/
+.pnp/
+.pnp.js/
 
 # Build outputs
-dist
-build
-out
-.next
-.nuxt
-.cache
-storybook-static
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+storybook-static/
 
 # Environment variables
 .env
@@ -20,7 +20,7 @@ storybook-static
 .env.production.local
 
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -35,22 +35,27 @@ ehthumbs.db
 Desktop.ini
 
 # Editor and IDE files
-.idea
-.vscode
+.idea/
+.vscode/
 *.swp
 *.swo
 .project
 .classpath
-.settings
+.settings/
 *.sublime-*
 
 # Testing and coverage
-coverage
-.nyc_output
-.jest-cache
+coverage/
+.nyc_output/
+.jest-cache/
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
 
 # Misc
-server/public
+server/public/
 *.tar.gz
 *.tgz
 *.zip
@@ -61,24 +66,19 @@ server/public
 *.tsbuildinfo
 vite.config.ts.*
 
-# SQLite databases
-*.sqlite
-*.sqlite3
-*.db
-
 # Doc build directories
-/doc/api
-/doc/site
+/doc/api/
+/doc/site/
 
 # Cache directories
 /.eslintcache
 /.stylelintcache
-/tmp
-/.tmp
-/.temp
+/tmp/
+/.tmp/
+/.temp/
 
 # Generated files
-/generated
+/generated/
 
 # Backup and temporary files
 *.bak
@@ -91,3 +91,18 @@ vite.config.ts.*
 .replit
 replit.nix
 .config/
+
+# Service worker generated files
+sw.js
+workbox-*.js
+
+# Local server files
+.localhost-cert/
+localhost-key.pem
+localhost.pem
+
+# Type checking incremental files
+.type-check-cache/
+
+# Project specific ignores
+cookies.txt

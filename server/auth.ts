@@ -15,13 +15,33 @@ declare global {
 
 const scryptAsync = promisify(scrypt);
 
+// Flag to identify if we're in development testing mode
+const isDevelopmentTesting = !process.env.DATABASE_URL || process.env.USE_MOCK_STORAGE === 'true';
+
 async function hashPassword(password: string) {
+  // In testing mode, use a simplified format that's easier to work with
+  if (isDevelopmentTesting) {
+    console.log("[Auth] Using simplified password hashing for testing");
+    const salt = "mocktestsalt";
+    const hash = password + salt;
+    return `${hash}.${salt}`;
+  }
+  
+  // In production mode, use secure hashing
   const salt = randomBytes(16).toString("hex");
   const buf = (await scryptAsync(password, salt, 64)) as Buffer;
   return `${buf.toString("hex")}.${salt}`;
 }
 
 async function comparePasswords(supplied: string, stored: string) {
+  // In testing mode, use simplified comparison
+  if (isDevelopmentTesting) {
+    console.log("[Auth] Using simplified password comparison for testing");
+    const [hash, salt] = stored.split(".");
+    return hash === supplied + salt;
+  }
+  
+  // In production mode, use secure comparison
   const [hashed, salt] = stored.split(".");
   const hashedBuf = Buffer.from(hashed, "hex");
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;

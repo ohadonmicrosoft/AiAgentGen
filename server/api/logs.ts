@@ -29,10 +29,32 @@ const LogPayloadSchema = z.object({
   metadata: MetadataSchema,
 });
 
+// Schema for validating client-side error reports
+const ClientErrorSchema = z.object({
+  name: z.string(),
+  message: z.string(),
+  stack: z.string().optional(),
+  componentStack: z.string().optional(),
+  componentName: z.string().optional(),
+  url: z.string(),
+  timestamp: z.string().datetime(),
+  category: z.string().optional(),
+  status: z.number().optional(),
+  endpoint: z.string().optional(),
+  requestId: z.string().optional(),
+});
+
 // Ensure log directory exists
 const LOG_DIR = path.join(process.cwd(), 'logs');
+const ERROR_DIR = path.join(LOG_DIR, 'errors');
+
+// Create the directories
 if (!fs.existsSync(LOG_DIR)) {
   fs.mkdirSync(LOG_DIR, { recursive: true });
+}
+
+if (!fs.existsSync(ERROR_DIR)) {
+  fs.mkdirSync(ERROR_DIR, { recursive: true });
 }
 
 /**
@@ -75,10 +97,12 @@ export const serverLogger = {
   /**
    * Write a log entry to a file
    */
-  writeToFile(logEntry: any): void {
+  writeToFile(logEntry: any, errorLog: boolean = false): void {
     try {
       const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-      const logFile = path.join(LOG_DIR, `${date}.log`);
+      const logFile = errorLog 
+        ? path.join(ERROR_DIR, `${date}-errors.log`)
+        : path.join(LOG_DIR, `${date}.log`);
       const logLine = JSON.stringify(logEntry) + '\n';
 
       fs.appendFileSync(logFile, logLine);
@@ -102,6 +126,43 @@ export const serverLogger = {
         }
       );
     });
+  },
+  
+  /**
+   * Log client-side error to server
+   */
+  logClientError(error: any): void {
+    const timestamp = new Date().toISOString();
+    const errorEntry = {
+      level: 'error',
+      source: 'client',
+      message: `[CLIENT ERROR] ${error.name}: ${error.message}`,
+      timestamp,
+      error,
+    };
+    
+    // Log to console with limited data
+    console.error(
+      `[${timestamp}] [ERROR] [CLIENT] ${error.name}: ${error.message}`, 
+      { 
+        url: error.url,
+        component: error.componentName,
+        ...(error.status && { status: error.status }),
+        ...(error.endpoint && { endpoint: error.endpoint }),
+      }
+    );
+    
+    // Write full details to error log
+    this.writeToFile(errorEntry, true);
+    
+    // Also write to the regular log (but with less detail)
+    this.log('error', `[CLIENT ERROR] ${error.name}: ${error.message}`, {
+      url: error.url,
+      component: error.componentName,
+      errorType: error.name,
+    });
+    
+    // TODO: Add error aggregation and alerting for critical errors
   },
 };
 
@@ -139,6 +200,37 @@ export function setupLogsRouter(): express.Router {
     } catch (error) {
       serverLogger.log('error', 'Error processing client logs', error);
       return res.status(500).json({ error: 'Failed to process logs' });
+    }
+  });
+  
+  // Endpoint to receive client-side error reports
+  router.post('/api/logs/client-error', (req, res) => {
+    try {
+      // Validate the request body
+      const validationResult = ClientErrorSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        serverLogger.log('warn', 'Invalid client error payload received', {
+          errors: validationResult.error.errors,
+          body: req.body,
+        });
+        
+        return res.status(400).json({
+          error: 'Invalid error payload',
+          details: validationResult.error.errors,
+        });
+      }
+
+      const errorData = validationResult.data;
+      
+      // Log the client error to the server
+      serverLogger.logClientError(errorData);
+      
+      // Respond with success
+      return res.status(200).json({ success: true });
+    } catch (error) {
+      serverLogger.log('error', 'Error processing client error report', error);
+      return res.status(500).json({ error: 'Failed to process error report' });
     }
   });
 

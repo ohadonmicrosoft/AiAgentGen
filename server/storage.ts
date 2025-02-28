@@ -832,5 +832,299 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Always use PostgreSQL storage since we have a database configured
-export const storage = new PostgresStorage();
+// Add a mock in-memory storage for testing
+const mockUsers: User[] = [];
+let mockUserId = 1;
+
+class MockStorage implements IStorage {
+  sessionStore: SessionStore;
+  private mockAgents: Map<number, Agent> = new Map();
+  private mockPrompts: Map<number, Prompt> = new Map();
+  private mockConversations: Map<number, Conversation> = new Map();
+  private mockMessages: Map<number, Message> = new Map();
+  private mockAgentIdCounter = 1;
+  private mockPromptIdCounter = 1;
+  private mockConversationIdCounter = 1;
+  private mockMessageIdCounter = 1;
+  
+  constructor() {
+    console.log("[Storage] Using in-memory storage for testing");
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000 // prune expired entries every 24h
+    });
+    
+    // Pre-create a developer account for testing (with simplified password)
+    this.createUser({
+      username: "developer",
+      password: "password123mocktestsalt.mocktestsalt", // Matches our simplified hashing in auth.ts
+      email: "dev@example.com",
+      role: "ADMIN"
+    });
+  }
+  
+  // User methods
+  async getUser(id: number): Promise<User | undefined> {
+    return mockUsers.find(u => u.id === id);
+  }
+  
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return mockUsers.find(u => u.username === username);
+  }
+  
+  async createUser(user: InsertUser): Promise<User> {
+    const newUser: User = {
+      ...user,
+      id: mockUserId++,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    mockUsers.push(newUser);
+    console.log("[Storage] Created mock user:", newUser.username);
+    return newUser;
+  }
+  
+  async updateUser(id: number, userData: Partial<User>): Promise<User> {
+    const userIndex = mockUsers.findIndex(u => u.id === id);
+    if (userIndex === -1) throw new Error("User not found");
+    
+    mockUsers[userIndex] = {
+      ...mockUsers[userIndex],
+      ...userData,
+      updatedAt: new Date()
+    };
+    
+    return mockUsers[userIndex];
+  }
+  
+  async getAllUsers(): Promise<User[]> {
+    return [...mockUsers];
+  }
+  
+  async saveApiKey(userId: number, apiKey: string): Promise<void> {
+    // Just mock the API key storage
+    console.log(`[Storage] Saved API key for user ID ${userId}`);
+  }
+  
+  async getApiKey(userId: number): Promise<string | null> {
+    return "mock-api-key-for-testing";
+  }
+  
+  async updateUserRole(userId: number, role: Role, customPermissions?: string[]): Promise<User> {
+    const user = await this.getUser(userId);
+    if (!user) throw new Error("User not found");
+    
+    return this.updateUser(userId, { role });
+  }
+  
+  async getUserPermissions(userId: number): Promise<Permission[]> {
+    const user = await this.getUser(userId);
+    if (!user) return [];
+    
+    // Return all permissions for simplicity in testing
+    return Object.values(PERMISSIONS);
+  }
+  
+  async hasPermission(userId: number, permission: Permission): Promise<boolean> {
+    // Allow all permissions in testing
+    return true;
+  }
+  
+  // Agent methods
+  async getAgent(id: number): Promise<Agent | undefined> {
+    return this.mockAgents.get(id);
+  }
+  
+  async getAgentsByUserId(userId: number): Promise<Agent[]> {
+    return Array.from(this.mockAgents.values())
+      .filter(agent => agent.userId === userId);
+  }
+  
+  async getAllAgents(): Promise<Agent[]> {
+    return Array.from(this.mockAgents.values());
+  }
+  
+  async createAgent(agent: InsertAgent): Promise<Agent> {
+    const id = this.mockAgentIdCounter++;
+    const now = new Date();
+    
+    const newAgent: Agent = {
+      ...agent,
+      id,
+      description: agent.description || null,
+      responseStyle: agent.responseStyle || null,
+      systemPrompt: agent.systemPrompt || null,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    this.mockAgents.set(id, newAgent);
+    return newAgent;
+  }
+  
+  async updateAgent(id: number, agent: Partial<Agent>): Promise<Agent> {
+    const existingAgent = this.mockAgents.get(id);
+    if (!existingAgent) throw new Error(`Agent with id ${id} not found`);
+    
+    const updatedAgent: Agent = {
+      ...existingAgent,
+      ...agent,
+      updatedAt: new Date()
+    };
+    
+    this.mockAgents.set(id, updatedAgent);
+    return updatedAgent;
+  }
+  
+  async deleteAgent(id: number): Promise<void> {
+    this.mockAgents.delete(id);
+  }
+  
+  // Prompt methods
+  async getPrompt(id: number): Promise<Prompt | undefined> {
+    return this.mockPrompts.get(id);
+  }
+  
+  async getPromptsByUserId(userId: number): Promise<Prompt[]> {
+    return Array.from(this.mockPrompts.values())
+      .filter(prompt => prompt.userId === userId);
+  }
+  
+  async getAllPrompts(): Promise<Prompt[]> {
+    return Array.from(this.mockPrompts.values());
+  }
+  
+  async createPrompt(prompt: InsertPrompt): Promise<Prompt> {
+    const id = this.mockPromptIdCounter++;
+    const now = new Date();
+    
+    const newPrompt: Prompt = {
+      ...prompt,
+      id,
+      tags: prompt.tags || null,
+      isFavorite: prompt.isFavorite || false,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    this.mockPrompts.set(id, newPrompt);
+    return newPrompt;
+  }
+  
+  async updatePrompt(id: number, prompt: Partial<Prompt>): Promise<Prompt> {
+    const existingPrompt = this.mockPrompts.get(id);
+    if (!existingPrompt) throw new Error(`Prompt with id ${id} not found`);
+    
+    const updatedPrompt: Prompt = {
+      ...existingPrompt,
+      ...prompt,
+      updatedAt: new Date()
+    };
+    
+    this.mockPrompts.set(id, updatedPrompt);
+    return updatedPrompt;
+  }
+  
+  async deletePrompt(id: number): Promise<void> {
+    this.mockPrompts.delete(id);
+  }
+  
+  // Conversation methods
+  async getConversation(id: number): Promise<Conversation | undefined> {
+    return this.mockConversations.get(id);
+  }
+  
+  async getConversationsByUserId(userId: number): Promise<Conversation[]> {
+    return Array.from(this.mockConversations.values())
+      .filter(conversation => conversation.userId === userId)
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  }
+  
+  async getConversationsByAgentId(agentId: number): Promise<Conversation[]> {
+    return Array.from(this.mockConversations.values())
+      .filter(conversation => conversation.agentId === agentId)
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  }
+  
+  async createConversation(conversation: InsertConversation): Promise<Conversation> {
+    const id = this.mockConversationIdCounter++;
+    const now = new Date();
+    
+    const newConversation: Conversation = {
+      ...conversation,
+      id,
+      title: conversation.title || null,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    this.mockConversations.set(id, newConversation);
+    return newConversation;
+  }
+  
+  async updateConversation(id: number, conversation: Partial<Conversation>): Promise<Conversation> {
+    const existingConversation = this.mockConversations.get(id);
+    if (!existingConversation) throw new Error(`Conversation with id ${id} not found`);
+    
+    const updatedConversation: Conversation = {
+      ...existingConversation,
+      ...conversation,
+      updatedAt: new Date()
+    };
+    
+    this.mockConversations.set(id, updatedConversation);
+    return updatedConversation;
+  }
+  
+  async deleteConversation(id: number): Promise<void> {
+    // Delete all messages in this conversation
+    Array.from(this.mockMessages.values())
+      .filter(message => message.conversationId === id)
+      .forEach(message => this.mockMessages.delete(message.id));
+    
+    // Delete the conversation
+    this.mockConversations.delete(id);
+  }
+  
+  // Message methods
+  async getMessage(id: number): Promise<Message | undefined> {
+    return this.mockMessages.get(id);
+  }
+  
+  async getMessagesByConversationId(conversationId: number): Promise<Message[]> {
+    return Array.from(this.mockMessages.values())
+      .filter(message => message.conversationId === conversationId)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  }
+  
+  async createMessage(message: InsertMessage): Promise<Message> {
+    const id = this.mockMessageIdCounter++;
+    
+    const newMessage: Message = {
+      ...message,
+      id,
+      tokenCount: message.tokenCount || null,
+      createdAt: new Date()
+    };
+    
+    this.mockMessages.set(id, newMessage);
+    return newMessage;
+  }
+  
+  // For compatibility with the PostgresStorage implementation
+  async getConversationWithMessages(id: number): Promise<{ conversation: Conversation; messages: Message[] } | null> {
+    const conversation = await this.getConversation(id);
+    if (!conversation) return null;
+    
+    const messages = await this.getMessagesByConversationId(id);
+    
+    return { conversation, messages };
+  }
+}
+
+// Determine whether to use the mock or real storage
+const isDevelopmentTesting = !process.env.DATABASE_URL || process.env.USE_MOCK_STORAGE === 'true';
+
+// Export the appropriate storage implementation
+export const storage = isDevelopmentTesting 
+  ? new MockStorage() 
+  : new PostgresStorage();

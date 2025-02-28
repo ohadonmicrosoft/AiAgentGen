@@ -1,6 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { setupVite, serveStatic } from "./vite";
 import { setupAuthRouter } from './api/auth';
 import { setupApiRouter } from './api/api';
 import { setupLogsRouter } from './api/logs';
@@ -15,6 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 // Apply rate limiting to all API routes
 app.use('/api', adaptiveRateLimiter());
 
+// Request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -38,14 +39,23 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(logLine);
+      logger.debug(logLine);
     }
   });
 
   next();
 });
 
-(async () => {
+/**
+ * Run database migrations if needed
+ */
+async function setupDatabase() {
+  // Skip migrations if using mock storage
+  if (process.env.USE_MOCK_STORAGE === 'true') {
+    logger.info('Using mock storage - skipping database migrations');
+    return;
+  }
+  
   try {
     // Check and run migrations before starting the server
     logger.info('Checking database migrations status');
@@ -57,15 +67,43 @@ app.use((req, res, next) => {
     } else {
       logger.info('Database is up to date, no migrations needed');
     }
+  } catch (error: any) {
+    // Log the error but don't fail startup - we have mock fallback
+    logger.error('Database migration check failed', { 
+      error: error.message,
+      stack: error.stack
+    });
     
+    if (process.env.NODE_ENV === 'production') {
+      // In production, database issues are critical
+      throw new Error('Database setup failed in production environment');
+    } else {
+      // In development, we can continue with mock storage
+      logger.warn('Continuing with mock storage due to database migration failure');
+      process.env.USE_MOCK_STORAGE = 'true';
+    }
+  }
+}
+
+(async () => {
+  try {
+    // Setup database and run migrations if needed
+    await setupDatabase();
+    
+    // Register routes and create server
     const server = await registerRoutes(app);
 
+    // Global error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
 
       // Log the error but don't throw it again
-      console.error(`Error: ${status} - ${message}`, err);
+      logger.error(`API Error: ${status} - ${message}`, { 
+        error: err.message,
+        stack: err.stack,
+        status
+      });
       
       // Only send a response if headers haven't been sent yet
       if (!res.headersSent) {
@@ -78,27 +116,46 @@ app.use((req, res, next) => {
     app.use(setupApiRouter());
     app.use(setupLogsRouter());
 
-    // importantly only setup vite in development and after
-    // setting up all the other routes so the catch-all route
-    // doesn't interfere with the other routes
+    // Setup Vite or static serving
     if (app.get("env") === "development") {
       await setupVite(app, server);
     } else {
       serveStatic(app);
     }
 
-    // ALWAYS serve the app on port 5000
-    // this serves both the API and the client
-    const port = 5000;
+    // Start server
+    const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
     server.listen({
       port,
       host: "0.0.0.0",
       reusePort: true,
     }, () => {
-      log(`serving on port ${port}`);
+      logger.info(`Server started and listening on port ${port}`);
     });
-  } catch (error) {
-    logger.error('Failed to start server', error);
+    
+    // Handle graceful shutdown
+    const shutdown = async () => {
+      logger.info('Shutting down server...');
+      server.close(() => {
+        logger.info('Server shutdown complete');
+        process.exit(0);
+      });
+      
+      // Force exit after timeout
+      setTimeout(() => {
+        logger.error('Forced shutdown due to timeout');
+        process.exit(1);
+      }, 10000);
+    };
+    
+    process.on('SIGTERM', shutdown);
+    process.on('SIGINT', shutdown);
+    
+  } catch (error: any) {
+    logger.error('Failed to start server', { 
+      error: error.message,
+      stack: error.stack
+    });
     process.exit(1);
   }
 })();

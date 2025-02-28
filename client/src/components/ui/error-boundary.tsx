@@ -2,17 +2,23 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, RefreshCw } from 'lucide-react';
+import { Logger } from '@/lib/logger';
+
+// Create a dedicated logger instance for error boundaries
+const logger = new Logger('ErrorBoundary');
 
 interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
   onReset?: () => void;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  name?: string; // Component name for better error tracking
 }
 
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
+  errorInfo?: ErrorInfo;
 }
 
 /**
@@ -25,6 +31,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.state = {
       hasError: false,
       error: null,
+      errorInfo: undefined,
     };
   }
 
@@ -37,26 +44,77 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log the error to an error reporting service
-    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+    // Update state with error info
+    this.setState({
+      errorInfo
+    });
+    
+    // Log the error using the logger
+    const componentName = this.props.name || 'UnnamedComponent';
+    logger.error(`Error in component ${componentName}:`, {
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      name: error.name
+    });
     
     // Call onError callback if provided
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
+    
+    // Send error to server for tracking if in production
+    if (process.env.NODE_ENV === 'production') {
+      this.reportErrorToServer(error, errorInfo, componentName);
+    }
   }
+  
+  /**
+   * Send error data to server for tracking and analysis
+   */
+  private reportErrorToServer = (error: Error, errorInfo: ErrorInfo, componentName: string): void => {
+    try {
+      fetch('/api/logs/client-error', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          componentStack: errorInfo.componentStack,
+          componentName,
+          url: window.location.href,
+          timestamp: new Date().toISOString(),
+        }),
+        // Use keepalive to ensure the request completes even if the page is unloading
+        keepalive: true,
+      }).catch(err => {
+        // Log silently if reporting fails
+        console.error('Failed to report error to server:', err);
+      });
+    } catch (reportError) {
+      // Catch any errors in error reporting to prevent cascading issues
+      console.error('Error reporting failed:', reportError);
+    }
+  };
 
   resetErrorBoundary = (): void => {
     // Reset the error boundary state
     this.setState({
       hasError: false,
       error: null,
+      errorInfo: undefined,
     });
 
     // Call onReset callback if provided
     if (this.props.onReset) {
       this.props.onReset();
     }
+    
+    // Log the reset action
+    logger.info('Error boundary reset by user');
   };
 
   render(): ReactNode {
@@ -104,8 +162,14 @@ export function withErrorBoundary<P extends object>(
 ): React.FC<P> {
   const displayName = Component.displayName || Component.name || 'Component';
   
+  // Include the component name in the error boundary props
+  const mergedProps = {
+    ...errorBoundaryProps,
+    name: displayName,
+  };
+  
   const WrappedComponent: React.FC<P> = (props) => (
-    <ErrorBoundary {...errorBoundaryProps}>
+    <ErrorBoundary {...mergedProps}>
       <Component {...props} />
     </ErrorBoundary>
   );

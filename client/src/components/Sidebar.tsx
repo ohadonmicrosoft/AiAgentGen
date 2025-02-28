@@ -99,6 +99,19 @@ export default function Sidebar({ open, onClose, navItems, demoItems, adminItems
     },
   };
 
+  const navItemVariants = {
+    expanded: { 
+      paddingLeft: "0.75rem", 
+      paddingRight: "0.75rem",
+      justifyContent: "flex-start" 
+    },
+    collapsed: { 
+      paddingLeft: "0.5rem", 
+      paddingRight: "0.5rem",
+      justifyContent: "center" 
+    },
+  };
+
   // Animation transition based on reduced motion preference
   const getTransition = () => {
     return prefersReducedMotion

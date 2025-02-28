@@ -8,11 +8,70 @@ import { SidebarProvider, useSidebarState } from "@/hooks/use-sidebar-state";
 import { motion } from "framer-motion";
 import { SkipLink } from "@/components/SkipLink";
 import { useAnnouncer, useFocusTrap } from "@/lib/accessibility";
+import { useAuth } from "@/hooks/use-auth";
+import { usePreferences } from "@/context/preferences-context";
+import { useBreakpoint } from "@/hooks/use-breakpoint";
+import { Icons } from "@/components/ui/icons";
+import { PERMISSIONS } from "@/constants";
+import { NavItem } from "@/types";
+import { Bot, Home, Users, MessagesSquare, Compass, Settings, Sparkles, Database } from "lucide-react";
 
 interface MainLayoutProps {
   children: ReactNode;
   title: string;
 }
+
+// Define navigation items
+const navItems: NavItem[] = [
+  {
+    label: "Dashboard",
+    path: "/",
+    icon: <Home className="w-5 h-5" />,
+  },
+  {
+    label: "Agents",
+    path: "/agents",
+    icon: <Bot className="w-5 h-5" />,
+  },
+  {
+    label: "Conversations",
+    path: "/conversations",
+    icon: <MessagesSquare className="w-5 h-5" />,
+  },
+  {
+    label: "Explore",
+    path: "/explore",
+    icon: <Compass className="w-5 h-5" />,
+  },
+  {
+    label: "Settings",
+    path: "/settings",
+    icon: <Settings className="w-5 h-5" />,
+  },
+];
+
+// Define demo items
+const demoItems: NavItem[] = [
+  {
+    label: "UI Components",
+    path: "/demo/components",
+    icon: <Sparkles className="w-5 h-5" />,
+  },
+];
+
+// Define admin items
+const adminItems: NavItem[] = [
+  {
+    label: "User Management",
+    path: "/admin/users",
+    icon: <Users className="w-5 h-5" />,
+  },
+  {
+    label: "System Status",
+    path: "/admin/system",
+    icon: <Database className="w-5 h-5" />,
+  },
+];
 
 // Inner layout component that uses the sidebar state
 function MainLayoutInner({ children, title }: MainLayoutProps) {
@@ -93,6 +152,9 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
         <Sidebar 
           open={sidebarOpen} 
           onClose={() => setSidebarOpen(false)} 
+          navItems={navItems}
+          demoItems={demoItems}
+          adminItems={adminItems}
         />
       </div>
 
