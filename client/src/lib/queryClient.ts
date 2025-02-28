@@ -41,12 +41,7 @@ export async function apiRequest(
   data?: unknown | undefined,
   options?: ApiRequestOptions,
 ): Promise<Response> {
-  const {
-    timeout = 10000,
-    headers = {},
-    retries = 3,
-    retryDelay = 1000,
-  } = options || {};
+  const { timeout = 10000, headers = {}, retries = 3, retryDelay = 1000 } = options || {};
 
   // Add timeout support with AbortController
   const controller = new AbortController();
@@ -95,10 +90,7 @@ export const getQueryFn: <T>(options: {
         signal,
       });
 
-      if (
-        unauthorizedBehavior === UnauthorizedBehavior.ReturnNull &&
-        res.status === 401
-      ) {
+      if (unauthorizedBehavior === UnauthorizedBehavior.ReturnNull && res.status === 401) {
         return null;
       }
 

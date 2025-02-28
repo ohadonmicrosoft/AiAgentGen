@@ -1,17 +1,8 @@
 import { MainLayout } from '@/components/layouts/main-layout';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
-import {
-  CompactErrorFallback,
-  ErrorFallback,
-} from '@/components/ui/error-fallback';
+import { CompactErrorFallback, ErrorFallback } from '@/components/ui/error-fallback';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useErrorBoundary } from '@/hooks/use-error-boundary';
@@ -59,11 +50,7 @@ function DelayedErrorComponent() {
     throw new Error('Delayed error after component mount');
   }
 
-  return (
-    <div className="p-4">
-      This component will throw an error after 2 seconds...
-    </div>
-  );
+  return <div className="p-4">This component will throw an error after 2 seconds...</div>;
 }
 
 // Component using the hook approach
@@ -74,8 +61,7 @@ function HookBasedErrorHandling() {
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Hook-based Error Handling</h3>
       <p className="text-sm text-muted-foreground">
-        This example uses the <code>useErrorBoundary</code> hook to manage
-        errors.
+        This example uses the <code>useErrorBoundary</code> hook to manage errors.
       </p>
 
       <ErrorBoundaryWrapper
@@ -102,9 +88,7 @@ export default function ErrorHandlingDemo() {
     <MainLayout>
       <div className="container mx-auto py-10 space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Error Handling Demo
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Error Handling Demo</h1>
           <p className="text-muted-foreground mt-2">
             Explore different error handling patterns using Error Boundaries
           </p>
@@ -123,20 +107,14 @@ export default function ErrorHandlingDemo() {
               <Card>
                 <CardHeader>
                   <CardTitle>Basic Error Boundary</CardTitle>
-                  <CardDescription>
-                    Simple error boundary with a fallback UI
-                  </CardDescription>
+                  <CardDescription>Simple error boundary with a fallback UI</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <h3 className="text-lg font-medium mb-4">
-                        Interactive Error
-                      </h3>
+                      <h3 className="text-lg font-medium mb-4">Interactive Error</h3>
                       <ErrorBoundary
-                        fallback={
-                          <ErrorFallback message="Error in interactive component" />
-                        }
+                        fallback={<ErrorFallback message="Error in interactive component" />}
                       >
                         <ErrorThrower />
                       </ErrorBoundary>
@@ -145,9 +123,7 @@ export default function ErrorHandlingDemo() {
                     <div>
                       <h3 className="text-lg font-medium mb-4">Render Error</h3>
                       <ErrorBoundary
-                        fallback={
-                          <ErrorFallback message="Error during component render" />
-                        }
+                        fallback={<ErrorFallback message="Error during component render" />}
                       >
                         <BrokenComponent />
                       </ErrorBoundary>
@@ -167,17 +143,11 @@ export default function ErrorHandlingDemo() {
                 </CardHeader>
                 <CardContent>
                   <ErrorBoundary
-                    fallback={
-                      <ErrorFallback message="Outer boundary caught an error" />
-                    }
+                    fallback={<ErrorFallback message="Outer boundary caught an error" />}
                   >
                     <div className="p-6 border rounded-md mb-6">
-                      <h3 className="text-lg font-medium mb-4">
-                        Outer Component
-                      </h3>
-                      <p className="mb-4">
-                        This component has its own error boundary
-                      </p>
+                      <h3 className="text-lg font-medium mb-4">Outer Component</h3>
+                      <p className="mb-4">This component has its own error boundary</p>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <ErrorBoundary
@@ -186,24 +156,16 @@ export default function ErrorHandlingDemo() {
                           }
                         >
                           <div className="p-4 border rounded-md">
-                            <h4 className="font-medium mb-2">
-                              Inner Component 1
-                            </h4>
+                            <h4 className="font-medium mb-2">Inner Component 1</h4>
                             <ErrorThrower />
                           </div>
                         </ErrorBoundary>
 
                         <div className="p-4 border rounded-md">
-                          <h4 className="font-medium mb-2">
-                            Inner Component 2
-                          </h4>
-                          <p className="text-sm mb-4">
-                            This component has no error boundary
-                          </p>
+                          <h4 className="font-medium mb-2">Inner Component 2</h4>
+                          <p className="text-sm mb-4">This component has no error boundary</p>
                           <ErrorBoundary
-                            fallback={
-                              <CompactErrorFallback message="Deeply nested error" />
-                            }
+                            fallback={<CompactErrorFallback message="Deeply nested error" />}
                           >
                             <DelayedErrorComponent />
                           </ErrorBoundary>
@@ -233,15 +195,11 @@ export default function ErrorHandlingDemo() {
               <Card>
                 <CardHeader>
                   <CardTitle>Advanced Error Handling</CardTitle>
-                  <CardDescription>
-                    Error recovery patterns and error logging
-                  </CardDescription>
+                  <CardDescription>Error recovery patterns and error logging</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium mb-4">
-                      Error with Recovery
-                    </h3>
+                    <h3 className="text-lg font-medium mb-4">Error with Recovery</h3>
                     <ErrorBoundary
                       fallback={({ error, resetErrorBoundary }) => (
                         <div className="p-6 border rounded-md bg-amber-50 dark:bg-amber-950/20">
@@ -292,9 +250,7 @@ export default function ErrorHandlingDemo() {
                   <Separator />
 
                   <div>
-                    <h3 className="text-lg font-medium mb-4">
-                      Error Boundary with HOC
-                    </h3>
+                    <h3 className="text-lg font-medium mb-4">Error Boundary with HOC</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       This component is wrapped with the withErrorBoundary HOC
                     </p>
@@ -302,18 +258,12 @@ export default function ErrorHandlingDemo() {
                     {/* We would normally use the HOC outside the component, but for demo purposes: */}
                     {(() => {
                       // Import at the top in a real component
-                      const {
-                        withErrorBoundary,
-                      } = require('@/components/ui/error-boundary');
+                      const { withErrorBoundary } = require('@/components/ui/error-boundary');
 
-                      const WrappedComponent = withErrorBoundary(
-                        () => <DelayedErrorComponent />,
-                        {
-                          FallbackComponent: ErrorFallback,
-                          onError: (error) =>
-                            console.log('HOC caught:', error.message),
-                        },
-                      );
+                      const WrappedComponent = withErrorBoundary(() => <DelayedErrorComponent />, {
+                        FallbackComponent: ErrorFallback,
+                        onError: (error) => console.log('HOC caught:', error.message),
+                      });
 
                       return <WrappedComponent />;
                     })()}

@@ -1,12 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -94,9 +88,7 @@ export default function AdminUsersPage() {
   });
 
   // Fetch permissions
-  const { data: permissions, isLoading: permissionsLoading } = useQuery<
-    string[]
-  >({
+  const { data: permissions, isLoading: permissionsLoading } = useQuery<string[]>({
     queryKey: ['/api/admin/permissions'],
     queryFn: getQueryFn({ on401: 'throw' }),
   });
@@ -104,13 +96,9 @@ export default function AdminUsersPage() {
   // Update user role mutation
   const updateRoleMutation = useMutation({
     mutationFn: async (data: UserRoleFormValues) => {
-      const res = await apiRequest(
-        'PUT',
-        `/api/admin/users/${data.userId}/role`,
-        {
-          role: data.role,
-        },
-      );
+      const res = await apiRequest('PUT', `/api/admin/users/${data.userId}/role`, {
+        role: data.role,
+      });
       return await res.json();
     },
     onSuccess: () => {
@@ -172,14 +160,10 @@ export default function AdminUsersPage() {
       <MainLayout title="User Management">
         <div className="flex flex-col items-center justify-center h-64">
           <h2 className="text-xl font-semibold mb-2">Error</h2>
-          <p className="text-muted-foreground">
-            Could not load users. Please try again.
-          </p>
+          <p className="text-muted-foreground">Could not load users. Please try again.</p>
           <Button
             className="mt-4"
-            onClick={() =>
-              queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] })
-            }
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] })}
           >
             Retry
           </Button>
@@ -194,9 +178,7 @@ export default function AdminUsersPage() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold">User Management</h1>
-            <p className="text-muted-foreground">
-              Manage user roles and permissions
-            </p>
+            <p className="text-muted-foreground">Manage user roles and permissions</p>
           </div>
           <Badge variant="outline" className="bg-primary/10 text-primary">
             Admin Area
@@ -206,9 +188,7 @@ export default function AdminUsersPage() {
         <Card>
           <CardHeader>
             <CardTitle>User List</CardTitle>
-            <CardDescription>
-              Manage user roles and access control
-            </CardDescription>
+            <CardDescription>Manage user roles and access control</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -224,9 +204,7 @@ export default function AdminUsersPage() {
                 {users && users.length > 0 ? (
                   users.map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell className="font-medium">
-                        {user.username}
-                      </TableCell>
+                      <TableCell className="font-medium">{user.username}</TableCell>
                       <TableCell>{user.email || '-'}</TableCell>
                       <TableCell>
                         <Badge
@@ -257,10 +235,7 @@ export default function AdminUsersPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center py-6 text-muted-foreground"
-                    >
+                    <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
                       No users found
                     </TableCell>
                   </TableRow>
@@ -281,8 +256,7 @@ export default function AdminUsersPage() {
           {selectedUser && (
             <div className="mb-4">
               <p>
-                <span className="font-semibold">Username:</span>{' '}
-                {selectedUser.username}
+                <span className="font-semibold">Username:</span> {selectedUser.username}
               </p>
               <p>
                 <span className="font-semibold">Current Role:</span>{' '}
@@ -292,10 +266,7 @@ export default function AdminUsersPage() {
           )}
 
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmitRoleForm)}
-              className="space-y-4"
-            >
+            <form onSubmit={form.handleSubmit(onSubmitRoleForm)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="role"

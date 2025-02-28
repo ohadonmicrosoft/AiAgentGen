@@ -1,7 +1,4 @@
-import {
-  PerformanceMetric,
-  performanceMonitor,
-} from '@/lib/performance-metrics';
+import { PerformanceMetric, performanceMonitor } from '@/lib/performance-metrics';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
@@ -70,11 +67,7 @@ export function usePerformance({
       performanceMonitor.startComponentFPS(name);
     }
 
-    performanceMonitor.recordMetric(
-      `component:${name}:tracking:start`,
-      performance.now(),
-      'ms',
-    );
+    performanceMonitor.recordMetric(`component:${name}:tracking:start`, performance.now(), 'ms');
   }, [isTracking, name, trackFPS]);
 
   // Stop tracking performance
@@ -87,20 +80,12 @@ export function usePerformance({
       performanceMonitor.stopComponentFPS(name);
     }
 
-    performanceMonitor.recordMetric(
-      `component:${name}:tracking:stop`,
-      performance.now(),
-      'ms',
-    );
+    performanceMonitor.recordMetric(`component:${name}:tracking:stop`, performance.now(), 'ms');
   }, [isTracking, name, trackFPS]);
 
   // Track a specific operation
   const trackOperation = useCallback(
-    (
-      operationName: string,
-      operation: () => any,
-      metadata?: Record<string, any>,
-    ) => {
+    (operationName: string, operation: () => any, metadata?: Record<string, any>) => {
       if (!isTracking) return operation();
 
       return performanceMonitor.measureFunction(
@@ -153,14 +138,9 @@ export function usePerformance({
     const renderTime = now - lastRenderTimeRef.current;
     renderCountRef.current += 1;
 
-    performanceMonitor.recordMetric(
-      `component:${name}:render`,
-      renderTime,
-      'ms',
-      {
-        renderCount: renderCountRef.current,
-      },
-    );
+    performanceMonitor.recordMetric(`component:${name}:render`, renderTime, 'ms', {
+      renderCount: renderCountRef.current,
+    });
 
     lastRenderTimeRef.current = now;
   });
@@ -174,8 +154,7 @@ export function usePerformance({
       // Only track metrics for this component or global metrics
       if (
         metric.name.startsWith(`component:${name}:`) ||
-        (!metric.name.startsWith('component:') &&
-          metricFilter?.(metric) !== false)
+        (!metric.name.startsWith('component:') && metricFilter?.(metric) !== false)
       ) {
         setMetrics((prev) => [...prev, metric]);
       }
@@ -196,14 +175,9 @@ export function usePerformance({
 
     return () => {
       if (isTracking) {
-        performanceMonitor.recordMetric(
-          `component:${name}:unmount`,
-          performance.now(),
-          'ms',
-          {
-            renderCount: renderCountRef.current,
-          },
-        );
+        performanceMonitor.recordMetric(`component:${name}:unmount`, performance.now(), 'ms', {
+          renderCount: renderCountRef.current,
+        });
 
         if (trackFPS) {
           performanceMonitor.stopComponentFPS(name);
@@ -226,17 +200,12 @@ export function usePerformance({
 /**
  * Hook for measuring the performance of a specific component operation
  */
-export function useOperationPerformance(
-  componentName: string,
-  operationName: string,
-) {
+export function useOperationPerformance(componentName: string, operationName: string) {
   const startTimeRef = useRef(0);
 
   const start = useCallback(() => {
     startTimeRef.current = performance.now();
-    performanceMonitor.startMarker(
-      `component:${componentName}:operation:${operationName}`,
-    );
+    performanceMonitor.startMarker(`component:${componentName}:operation:${operationName}`);
   }, [componentName, operationName]);
 
   const end = useCallback(

@@ -9,14 +9,7 @@ import { motion } from 'framer-motion';
 import * as React from 'react';
 
 // Define haptic feedback types
-type HapticType =
-  | 'light'
-  | 'medium'
-  | 'heavy'
-  | 'success'
-  | 'warning'
-  | 'error'
-  | boolean;
+type HapticType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | boolean;
 
 interface TouchButtonProps extends ButtonProps {
   /**
@@ -78,10 +71,7 @@ interface TouchButtonProps extends ButtonProps {
  * A touch-optimized button component that enhances the touch experience on mobile devices.
  * It provides visual feedback through animations and optional haptic feedback.
  */
-const TouchButtonComponent = React.forwardRef<
-  HTMLButtonElement,
-  TouchButtonProps
->(
+const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProps>(
   (
     {
       children,
@@ -134,9 +124,7 @@ const TouchButtonComponent = React.forwardRef<
       return (elementRef: HTMLButtonElement) => {
         // Update internal ref
         if (buttonRef) {
-          (
-            buttonRef as React.MutableRefObject<HTMLButtonElement | null>
-          ).current = elementRef;
+          (buttonRef as React.MutableRefObject<HTMLButtonElement | null>).current = elementRef;
         }
         // Forward the ref
         if (typeof ref === 'function') {
@@ -195,11 +183,7 @@ const TouchButtonComponent = React.forwardRef<
 
     // Create a ripple effect centered on the touch/click point
     const createRipple = React.useCallback(
-      (
-        e:
-          | React.MouseEvent<HTMLButtonElement>
-          | React.TouchEvent<HTMLButtonElement>,
-      ) => {
+      (e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>) => {
         if (!showRipple || disabled) return;
 
         try {
@@ -298,9 +282,7 @@ const TouchButtonComponent = React.forwardRef<
           // Increase touch target size
           padding: padValue,
           // Remove outline on touch devices
-          WebkitTapHighlightColor: tapHighlight
-            ? tapHighlightColor
-            : 'transparent',
+          WebkitTapHighlightColor: tapHighlight ? tapHighlightColor : 'transparent',
           // Prevent text selection during taps
           WebkitUserSelect: 'none' as const,
           userSelect: 'none' as const,
@@ -321,9 +303,7 @@ const TouchButtonComponent = React.forwardRef<
     return (
       <motion.div
         whileTap={shouldAnimate ? { scale: pressScale } : undefined}
-        animate={
-          isPressed && shouldAnimate ? { scale: pressScale } : { scale: 1 }
-        }
+        animate={isPressed && shouldAnimate ? { scale: pressScale } : { scale: 1 }}
         transition={{
           duration: pressDuration,
           // Use more performant animations on mobile

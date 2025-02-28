@@ -95,8 +95,7 @@ export function useDraggable(item: DraggableItem, config: DraggableConfig) {
   }, [isDragging, dragState.isDragging, controls, prefersReducedMotion]);
 
   // Check if this item is currently being dragged
-  const isThisItemDragging =
-    dragState.isDragging && dragState.draggedId === item.id;
+  const isThisItemDragging = dragState.isDragging && dragState.draggedId === item.id;
 
   return {
     ref: elementRef,

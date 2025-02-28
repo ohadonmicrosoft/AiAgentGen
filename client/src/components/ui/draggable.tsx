@@ -39,8 +39,10 @@ const Draggable = forwardRef<HTMLDivElement, DraggableProps>(
       onDragEnd,
     };
 
-    const { draggableProps, dragHandleProps, isDragging, animationControls } =
-      useDraggable(item, config);
+    const { draggableProps, dragHandleProps, isDragging, animationControls } = useDraggable(
+      item,
+      config,
+    );
 
     return (
       <motion.div
@@ -52,9 +54,7 @@ const Draggable = forwardRef<HTMLDivElement, DraggableProps>(
       >
         {children}
 
-        {dragHandleSelector &&
-          dragHandleRender &&
-          dragHandleRender(dragHandleProps)}
+        {dragHandleSelector && dragHandleRender && dragHandleRender(dragHandleProps)}
       </motion.div>
     );
   },

@@ -114,9 +114,7 @@ export function OfflineIndicator({ className }: OfflineIndicatorProps) {
       {online ? <Wifi className="h-5 w-5" /> : <WifiOff className="h-5 w-5" />}
 
       <div className="flex flex-col">
-        <span className="text-sm font-medium">
-          {online ? 'Online' : 'Offline'}
-        </span>
+        <span className="text-sm font-medium">{online ? 'Online' : 'Offline'}</span>
         {pendingCount > 0 && (
           <span className="text-xs">
             {pendingCount} {pendingCount === 1 ? 'item' : 'items'} pending

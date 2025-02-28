@@ -36,15 +36,13 @@ interface AnnouncerProps {
  */
 export function Announcer({
   message,
-  type = 'polite',
+  _type = 'polite',
   politeness = 'polite',
   role = 'status',
   clearAfter = true,
 }: AnnouncerProps) {
   const [currentMessage, setCurrentMessage] = useState(message);
-  const announcementTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const announcementTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Update the message when the prop changes
   useEffect(() => {
@@ -111,7 +109,7 @@ export function LiveRegion({
   errorMessage = 'Error loading items',
   politeness = 'polite',
 }: {
-  items: any[];
+  items: Record<string, unknown>[];
   itemType: string;
   loading?: boolean;
   error?: Error | null;

@@ -1,8 +1,4 @@
-import {
-  generateResponse,
-  generateStreamingResponse,
-  testAgentResponse,
-} from '../openai';
+import { generateResponse, generateStreamingResponse, testAgentResponse } from '../openai';
 
 // Mock the storage module
 jest.mock('../storage', () => ({
@@ -153,15 +149,10 @@ describe('OpenAI Integration', () => {
         }
       };
 
-      openaiModule._mockStreamingCompletionsCreate.mockResolvedValueOnce(
-        mockStream,
-      );
+      openaiModule._mockStreamingCompletionsCreate.mockResolvedValueOnce(mockStream);
 
       // Collect all yielded values
-      const generator = generateStreamingResponse(
-        'System prompt',
-        'User prompt',
-      );
+      const generator = generateStreamingResponse('System prompt', 'User prompt');
       const results = [];
 
       for await (const chunk of generator) {
@@ -178,18 +169,16 @@ describe('OpenAI Integration', () => {
       expect(results[3].timing).toBeDefined();
 
       // Check OpenAI was called correctly
-      expect(openaiModule._mockStreamingCompletionsCreate).toHaveBeenCalledWith(
-        {
-          model: 'gpt-4o',
-          messages: [
-            { role: 'system', content: 'System prompt' },
-            { role: 'user', content: 'User prompt' },
-          ],
-          temperature: 0.7,
-          max_tokens: 1000,
-          stream: true,
-        },
-      );
+      expect(openaiModule._mockStreamingCompletionsCreate).toHaveBeenCalledWith({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: 'System prompt' },
+          { role: 'user', content: 'User prompt' },
+        ],
+        temperature: 0.7,
+        max_tokens: 1000,
+        stream: true,
+      });
     });
 
     it('should save to conversation history when IDs are provided', async () => {
@@ -201,9 +190,7 @@ describe('OpenAI Integration', () => {
         }
       };
 
-      openaiModule._mockStreamingCompletionsCreate.mockResolvedValueOnce(
-        mockStream,
-      );
+      openaiModule._mockStreamingCompletionsCreate.mockResolvedValueOnce(mockStream);
 
       // Call with conversation IDs
       const generator = generateStreamingResponse('System', 'User', {

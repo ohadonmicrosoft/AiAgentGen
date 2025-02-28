@@ -32,8 +32,7 @@ export default function StatsCard({
     gray: 'bg-gray-500 text-white',
   };
 
-  const bgColorClass =
-    colorMap[color as keyof typeof colorMap] || colorMap.primary;
+  const bgColorClass = colorMap[color as keyof typeof colorMap] || colorMap.primary;
 
   // Animation for counting up the number
   const countVariants = {
@@ -114,7 +113,7 @@ function CountUp({ value }: { value: number }) {
   React.useEffect(() => {
     if (!isVisible) return;
 
-    const start = 0;
+    const _start = 0;
     const end = value;
     const duration = 1500;
     const startTime = Date.now();

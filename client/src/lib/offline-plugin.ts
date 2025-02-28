@@ -213,12 +213,7 @@ export function isOffline(): boolean {
 export function initOfflineSupport(queryClient: QueryClient): void {
   const plugin = offlinePlugin({
     defaultTTL: 24 * 60 * 60 * 1000, // 24 hours
-    persistQueries: [
-      /^\/api\/user/,
-      /^\/api\/agents/,
-      /^\/api\/prompts/,
-      /^\/api\/conversations/,
-    ],
+    persistQueries: [/^\/api\/user/, /^\/api\/agents/, /^\/api\/prompts/, /^\/api\/conversations/],
   });
 
   plugin.register(queryClient);

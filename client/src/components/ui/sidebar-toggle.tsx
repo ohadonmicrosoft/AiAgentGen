@@ -19,10 +19,7 @@ export function SidebarToggle({ className }: SidebarToggleProps) {
       variant="ghost"
       size="icon"
       onClick={toggleCollapsed}
-      className={cn(
-        'h-8 w-8 p-0 rounded-full bg-background border shadow-sm',
-        className,
-      )}
+      className={cn('h-8 w-8 p-0 rounded-full bg-background border shadow-sm', className)}
       aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       aria-expanded={!isCollapsed}
       aria-controls="main-sidebar"

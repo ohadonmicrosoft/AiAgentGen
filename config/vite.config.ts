@@ -43,13 +43,7 @@ export default defineConfig(async ({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: {
-            vendor: [
-              'react',
-              'react-dom',
-              'framer-motion',
-              'tailwind-merge',
-              'clsx',
-            ],
+            vendor: ['react', 'react-dom', 'framer-motion', 'tailwind-merge', 'clsx'],
             ui: [
               '@radix-ui/react-accordion',
               '@radix-ui/react-alert-dialog',

@@ -6,14 +6,7 @@ import { useSidebarState } from '@/hooks/use-sidebar-state';
 import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Menu,
-  Moon,
-  Search,
-  Sun,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, Moon, Search, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface TopNavProps {

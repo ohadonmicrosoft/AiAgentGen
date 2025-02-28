@@ -28,13 +28,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -115,9 +109,7 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
   const { announce } = useAnnouncer();
 
   // Focus trap for mobile sidebar
-  const sidebarFocusTrapRef = useFocusTrap(isMobile && sidebarOpen, () =>
-    setSidebarOpen(false),
-  );
+  const sidebarFocusTrapRef = useFocusTrap(isMobile && sidebarOpen, () => setSidebarOpen(false));
 
   // Close sidebar when transitioning from mobile to desktop
   useEffect(() => {
@@ -220,9 +212,7 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
               fallback={
                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
                   <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
-                  <h2 className="text-2xl font-semibold mb-2">
-                    Something went wrong
-                  </h2>
+                  <h2 className="text-2xl font-semibold mb-2">Something went wrong</h2>
                   <p className="text-muted-foreground mb-4">
                     An error occurred while loading this page content.
                   </p>
@@ -241,9 +231,7 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
                 {title && <h1 className="sr-only">{title}</h1>}
 
                 {/* Animated page entry */}
-                <div className="animate-in fade-in duration-500">
-                  {children}
-                </div>
+                <div className="animate-in fade-in duration-500">{children}</div>
               </div>
             </ErrorBoundary>
           </main>

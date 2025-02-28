@@ -65,10 +65,7 @@ export function getLuminance(color: string): number {
  * Calculate the contrast ratio between two colors
  * @see https://www.w3.org/TR/WCAG20/#contrast-ratiodef
  */
-export function getContrastRatio(
-  foreground: string,
-  background: string,
-): number {
+export function getContrastRatio(foreground: string, background: string): number {
   const foregroundLuminance = getLuminance(foreground);
   const backgroundLuminance = getLuminance(background);
 
@@ -82,10 +79,7 @@ export function getContrastRatio(
 /**
  * Check if two colors have sufficient contrast according to WCAG guidelines
  */
-export function checkContrast(
-  foreground: string,
-  background: string,
-): ContrastResult {
+export function checkContrast(foreground: string, background: string): ContrastResult {
   const ratio = getContrastRatio(foreground, background);
 
   return {

@@ -24,8 +24,7 @@ export function useHaptic() {
   /**
    * Check if vibration is supported on this device
    */
-  const isSupported =
-    typeof navigator !== 'undefined' && 'vibrate' in navigator;
+  const isSupported = typeof navigator !== 'undefined' && 'vibrate' in navigator;
 
   /**
    * Trigger haptic feedback with the specified pattern.

@@ -3,29 +3,10 @@ import path from 'path';
 import { glob } from 'glob';
 
 // Directories to exclude from the mapping
-const EXCLUDE_DIRS = [
-  'node_modules',
-  'dist',
-  'build',
-  '.git',
-  'coverage',
-  'tmp',
-  'temp',
-  '.cache',
-];
+const EXCLUDE_DIRS = ['node_modules', 'dist', 'build', '.git', 'coverage', 'tmp', 'temp', '.cache'];
 
 // File extensions to include in the mapping
-const INCLUDE_EXTENSIONS = [
-  '.ts',
-  '.tsx',
-  '.js',
-  '.jsx',
-  '.json',
-  '.md',
-  '.css',
-  '.scss',
-  '.html',
-];
+const INCLUDE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json', '.md', '.css', '.scss', '.html'];
 
 interface FileInfo {
   path: string;
@@ -43,7 +24,7 @@ async function mapDirectory(
   dirPath: string,
   relativePath: string = '',
   depth: number = 0,
-  maxDepth: number = 5
+  maxDepth: number = 5,
 ): Promise<FileInfo[]> {
   if (depth > maxDepth) {
     return [];
@@ -65,13 +46,8 @@ async function mapDirectory(
       const stats = await fs.stat(fullPath);
 
       if (stats.isDirectory()) {
-        const children = await mapDirectory(
-          fullPath,
-          entryRelativePath,
-          depth + 1,
-          maxDepth
-        );
-        
+        const children = await mapDirectory(fullPath, entryRelativePath, depth + 1, maxDepth);
+
         result.push({
           path: entryRelativePath,
           type: 'directory',
@@ -128,7 +104,10 @@ function printStructure(structure: FileInfo[], indent: string = ''): void {
   }
 }
 
-async function generateMarkdownStructure(structure: FileInfo[], indent: string = ''): Promise<string> {
+async function generateMarkdownStructure(
+  structure: FileInfo[],
+  indent: string = '',
+): Promise<string> {
   let markdown = '';
 
   for (const item of structure) {
@@ -150,20 +129,20 @@ async function mapProject() {
   try {
     const projectRoot = process.cwd();
     console.log(`Mapping project structure for: ${projectRoot}`);
-    
+
     const structure = await mapDirectory(projectRoot);
-    
+
     // Print to console
     console.log('\nProject Structure:');
     printStructure(structure);
-    
+
     // Generate markdown
     const markdown = `# Project Structure\n\n${await generateMarkdownStructure(structure)}`;
-    
+
     // Write to file
     const outputPath = path.join(projectRoot, 'project-structure.md');
     await fs.writeFile(outputPath, markdown);
-    
+
     console.log(`\nProject structure map saved to: ${outputPath}`);
   } catch (error) {
     console.error('Error mapping project:', error);
@@ -176,4 +155,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   mapProject().catch(console.error);
 }
 
-export { mapProject }; 
+export { mapProject };

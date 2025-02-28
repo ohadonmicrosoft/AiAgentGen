@@ -12,12 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTheme } from '@/hooks/use-theme';
 import {
   generatePalette,
@@ -65,8 +60,7 @@ const ColorSwatch = ({
   const isAAA = contrastRatio >= 7;
 
   let badgeText = '';
-  let badgeVariant: 'default' | 'destructive' | 'outline' | 'secondary' =
-    'destructive';
+  let badgeVariant: 'default' | 'destructive' | 'outline' | 'secondary' = 'destructive';
 
   if (isAAA) {
     badgeText = 'AAA';
@@ -90,16 +84,11 @@ const ColorSwatch = ({
       `}
       style={{ backgroundColor: color }}
     >
-      <div
-        className="h-full w-full p-2 flex flex-col justify-between"
-        style={{ color: textColor }}
-      >
+      <div className="h-full w-full p-2 flex flex-col justify-between" style={{ color: textColor }}>
         {label && <div className="text-xs font-medium opacity-80">{label}</div>}
 
         <div className="flex justify-between items-end">
-          {showHex && (
-            <div className="text-xs font-mono">{color.toUpperCase()}</div>
-          )}
+          {showHex && <div className="text-xs font-mono">{color.toUpperCase()}</div>}
 
           {badgeText && size !== 'sm' && (
             <Badge variant={badgeVariant} className="text-[0.65rem] h-4">
@@ -112,11 +101,7 @@ const ColorSwatch = ({
             className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10"
             aria-label="Copy color code"
           >
-            {copied ? (
-              <Check className="h-3 w-3" />
-            ) : (
-              <Copy className="h-3 w-3" />
-            )}
+            {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
           </button>
         </div>
       </div>
@@ -135,12 +120,7 @@ const ColorRow = ({ colors, label }: ColorRowProps) => {
       {label && <h3 className="text-sm font-medium">{label}</h3>}
       <div className="grid grid-cols-5 gap-2">
         {colors.map((color, index) => (
-          <ColorSwatch
-            key={`${color}-${index}`}
-            color={color}
-            size="sm"
-            showHex={false}
-          />
+          <ColorSwatch key={`${color}-${index}`} color={color} size="sm" showHex={false} />
         ))}
       </div>
     </div>
@@ -218,9 +198,7 @@ export function PaletteGenerator() {
             <span>Color Palette Generator</span>
           </div>
         </CardTitle>
-        <CardDescription>
-          Create and preview harmonious color palettes
-        </CardDescription>
+        <CardDescription>Create and preview harmonious color palettes</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-6">
@@ -277,17 +255,8 @@ export function PaletteGenerator() {
               <div className="space-y-2">
                 <h3 className="text-sm font-medium">Base & Complementary</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <ColorSwatch
-                    color={palette.base}
-                    label="Base"
-                    size="lg"
-                    selected={true}
-                  />
-                  <ColorSwatch
-                    color={palette.complementary}
-                    label="Complementary"
-                    size="lg"
-                  />
+                  <ColorSwatch color={palette.base} label="Base" size="lg" selected={true} />
+                  <ColorSwatch color={palette.complementary} label="Complementary" size="lg" />
                 </div>
               </div>
 
@@ -297,9 +266,7 @@ export function PaletteGenerator() {
                 <h3 className="text-sm font-medium">Harmonious Combinations</h3>
 
                 <div>
-                  <h4 className="text-xs text-muted-foreground mb-2">
-                    Analogous Colors
-                  </h4>
+                  <h4 className="text-xs text-muted-foreground mb-2">Analogous Colors</h4>
                   <div className="grid grid-cols-3 gap-2">
                     {palette.analogous.map((color, index) => (
                       <ColorSwatch
@@ -312,16 +279,10 @@ export function PaletteGenerator() {
                 </div>
 
                 <div>
-                  <h4 className="text-xs text-muted-foreground mb-2">
-                    Triadic Colors
-                  </h4>
+                  <h4 className="text-xs text-muted-foreground mb-2">Triadic Colors</h4>
                   <div className="grid grid-cols-3 gap-2">
                     {palette.triadic.map((color, index) => (
-                      <ColorSwatch
-                        key={`triadic-${index}`}
-                        color={color}
-                        selected={index === 0}
-                      />
+                      <ColorSwatch key={`triadic-${index}`} color={color} selected={index === 0} />
                     ))}
                   </div>
                 </div>
@@ -346,10 +307,7 @@ export function PaletteGenerator() {
                   <div className="space-y-2">
                     <h4 className="text-xs text-muted-foreground">Primary</h4>
                     <div className="grid grid-cols-1 gap-2">
-                      <ColorSwatch
-                        color={themePreview.primary || ''}
-                        label="Primary"
-                      />
+                      <ColorSwatch color={themePreview.primary || ''} label="Primary" />
                       <ColorSwatch
                         color={themePreview.primaryForeground || ''}
                         label="Primary Foreground"
@@ -359,19 +317,10 @@ export function PaletteGenerator() {
                   </div>
 
                   <div className="space-y-2">
-                    <h4 className="text-xs text-muted-foreground">
-                      Secondary & Accent
-                    </h4>
+                    <h4 className="text-xs text-muted-foreground">Secondary & Accent</h4>
                     <div className="grid grid-cols-1 gap-2">
-                      <ColorSwatch
-                        color={themePreview.secondary || ''}
-                        label="Secondary"
-                      />
-                      <ColorSwatch
-                        color={themePreview.accent || ''}
-                        label="Accent"
-                        size="sm"
-                      />
+                      <ColorSwatch color={themePreview.secondary || ''} label="Secondary" />
+                      <ColorSwatch color={themePreview.accent || ''} label="Accent" size="sm" />
                     </div>
                   </div>
                 </div>
@@ -383,13 +332,8 @@ export function PaletteGenerator() {
                 <h3 className="text-sm font-medium">Background & Surfaces</h3>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <h4 className="text-xs text-muted-foreground">
-                      Background
-                    </h4>
-                    <ColorSwatch
-                      color={themePreview.background || ''}
-                      label="Background"
-                    />
+                    <h4 className="text-xs text-muted-foreground">Background</h4>
+                    <ColorSwatch color={themePreview.background || ''} label="Background" />
                     <ColorSwatch
                       color={themePreview.foreground || ''}
                       label="Foreground"
@@ -398,9 +342,7 @@ export function PaletteGenerator() {
                   </div>
 
                   <div className="space-y-2">
-                    <h4 className="text-xs text-muted-foreground">
-                      Card/Surface
-                    </h4>
+                    <h4 className="text-xs text-muted-foreground">Card/Surface</h4>
                     <ColorSwatch color={themePreview.card || ''} label="Card" />
                     <ColorSwatch
                       color={themePreview.cardForeground || ''}
@@ -417,14 +359,8 @@ export function PaletteGenerator() {
                 <h3 className="text-sm font-medium">UI Elements</h3>
                 <div className="grid grid-cols-3 gap-3">
                   <ColorSwatch color={themePreview.muted || ''} label="Muted" />
-                  <ColorSwatch
-                    color={themePreview.border || ''}
-                    label="Border"
-                  />
-                  <ColorSwatch
-                    color={themePreview.destructive || ''}
-                    label="Destructive"
-                  />
+                  <ColorSwatch color={themePreview.border || ''} label="Border" />
+                  <ColorSwatch color={themePreview.destructive || ''} label="Destructive" />
                 </div>
               </div>
 
@@ -433,15 +369,11 @@ export function PaletteGenerator() {
                   className="rounded-md border p-4"
                   style={{ backgroundColor: themePreview.background }}
                 >
-                  <div
-                    className="space-y-3"
-                    style={{ color: themePreview.foreground }}
-                  >
+                  <div className="space-y-3" style={{ color: themePreview.foreground }}>
                     <div style={{ color: themePreview.primary }}>
                       <h3 className="text-lg font-semibold">Theme Preview</h3>
                       <p className="text-sm opacity-80">
-                        This is how your theme would look with the selected
-                        colors.
+                        This is how your theme would look with the selected colors.
                       </p>
                     </div>
 
@@ -496,10 +428,7 @@ export function PaletteGenerator() {
                       }}
                     >
                       <h4 className="text-sm font-medium">Card Component</h4>
-                      <p
-                        className="text-xs mt-1"
-                        style={{ color: themePreview.mutedForeground }}
-                      >
+                      <p className="text-xs mt-1" style={{ color: themePreview.mutedForeground }}>
                         Cards will appear with these colors
                       </p>
                     </div>

@@ -12,8 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import React, { useState, useEffect, useRef, memo } from 'react';
 
-export interface OptimizedImageProps
-  extends React.ImgHTMLAttributes<HTMLImageElement> {
+export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   /**
    * Source URL of the image
    */
@@ -125,10 +124,7 @@ export interface OptimizedImageProps
 /**
  * A responsive, optimized image component with blur-up loading effect
  */
-const OptimizedImageComponent = React.forwardRef<
-  HTMLImageElement,
-  OptimizedImageProps
->(
+const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImageProps>(
   (
     {
       src,
@@ -171,11 +167,7 @@ const OptimizedImageComponent = React.forwardRef<
     });
 
     // Override loading mode if priority is set
-    const loading = priority
-      ? 'eager'
-      : nativeLazyLoading
-        ? initialLoading
-        : undefined;
+    const loading = priority ? 'eager' : nativeLazyLoading ? initialLoading : undefined;
     const fetchPriority = priority ? 'high' : undefined;
 
     // Get best supported image format if enabled
@@ -270,8 +262,7 @@ const OptimizedImageComponent = React.forwardRef<
     }
 
     // Determine blur animation duration based on reduced motion preference
-    const blurAnimationDuration =
-      disableAnimation || prefersReducedMotion ? 0 : 300;
+    const blurAnimationDuration = disableAnimation || prefersReducedMotion ? 0 : 300;
 
     // Determine if we need a container
     if (fill || containerClassName) {
@@ -302,24 +293,14 @@ const OptimizedImageComponent = React.forwardRef<
 
           <img
             ref={combinedRef}
-            src={
-              nativeLazyLoading
-                ? optimizedSrc
-                : priority
-                  ? optimizedSrc
-                  : undefined
-            }
+            src={nativeLazyLoading ? optimizedSrc : priority ? optimizedSrc : undefined}
             alt={alt}
             width={width}
             height={height}
             loading={loading}
             onLoad={() => setIsLoaded(true)}
             onError={() => setError(true)}
-            className={cn(
-              'transition-opacity',
-              !isLoaded && blurUp && 'opacity-0',
-              className,
-            )}
+            className={cn('transition-opacity', !isLoaded && blurUp && 'opacity-0', className)}
             style={{
               ...combinedStyles,
               transitionDuration: `${blurAnimationDuration}ms`,
@@ -354,24 +335,14 @@ const OptimizedImageComponent = React.forwardRef<
 
         <img
           ref={combinedRef}
-          src={
-            nativeLazyLoading
-              ? optimizedSrc
-              : priority || inView
-                ? optimizedSrc
-                : undefined
-          }
+          src={nativeLazyLoading ? optimizedSrc : priority || inView ? optimizedSrc : undefined}
           alt={alt}
           width={width}
           height={height}
           loading={loading}
           onLoad={() => setIsLoaded(true)}
           onError={() => setError(true)}
-          className={cn(
-            'transition-opacity',
-            !isLoaded && blurUp && 'opacity-0',
-            className,
-          )}
+          className={cn('transition-opacity', !isLoaded && blurUp && 'opacity-0', className)}
           style={{
             ...combinedStyles,
             transitionDuration: `${blurAnimationDuration}ms`,
@@ -417,9 +388,7 @@ export const OptimizedImage = memo(OptimizedImageComponent);
  * @param images Array of image URLs or objects with src and options
  */
 export function preloadImages(
-  images: Array<
-    string | { src: string; options?: Partial<ImageOptimizationOptions> }
-  >,
+  images: Array<string | { src: string; options?: Partial<ImageOptimizationOptions> }>,
 ): void {
   images.forEach((image) => {
     const src = typeof image === 'string' ? image : image.src;

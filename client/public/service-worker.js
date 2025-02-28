@@ -29,7 +29,6 @@ self.addEventListener('install', (event) => {
     caches
       .open(CACHE_NAME)
       .then((cache) => {
-        console.log('Pre-caching resources');
         return cache.addAll(PRECACHE_URLS);
       })
       .then(() => self.skipWaiting()),
@@ -44,9 +43,7 @@ self.addEventListener('activate', (event) => {
     caches
       .keys()
       .then((cacheNames) => {
-        return cacheNames.filter(
-          (cacheName) => !currentCaches.includes(cacheName),
-        );
+        return cacheNames.filter((cacheName) => !currentCaches.includes(cacheName));
       })
       .then((cachesToDelete) => {
         return Promise.all(

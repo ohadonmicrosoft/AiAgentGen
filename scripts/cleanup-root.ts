@@ -6,31 +6,25 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 
 // Files to be moved to assets directory
-const ASSET_FILES = [
-  'generated-icon.png',
-  'fetch-ui.js'
-];
+const ASSET_FILES = ['generated-icon.png', 'fetch-ui.js'];
 
 // Files to be moved to scripts directory
-const SCRIPT_FILES = [
-  'migrate.js',
-  'setup-db.ts'
-];
+const SCRIPT_FILES = ['migrate.js', 'setup-db.ts'];
 
 // Empty directories to be removed
 const EMPTY_DIRS_TO_REMOVE = [
-  'e2e' // Since we moved its contents to tests/
+  'e2e', // Since we moved its contents to tests/
 ];
 
 async function createBackup() {
   const projectRoot = process.cwd();
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const backupDir = path.join(projectRoot, '..', `AI-Aget-Gen-backup-${timestamp}`);
-  
+
   console.log('Creating backup...');
   await execAsync(`cp -r "${projectRoot}/." "${backupDir}/"`);
   console.log(`Backup created at: ${backupDir}`);
-  
+
   return backupDir;
 }
 
@@ -48,13 +42,13 @@ async function moveFile(sourcePath: string, destPath: string) {
     // Ensure the destination directory exists
     const destDir = path.dirname(destPath);
     await ensureDirectoryExists(destDir);
-    
+
     // Copy the file to the new location
     await fs.copyFile(sourcePath, destPath);
-    
+
     // Remove the original file
     await fs.unlink(sourcePath);
-    
+
     console.log(`Moved: ${sourcePath} -> ${destPath}`);
     return true;
   } catch (error) {
@@ -71,7 +65,7 @@ async function removeEmptyDirectory(dirPath: string) {
   try {
     // Check if directory exists
     await fs.access(dirPath);
-    
+
     // Check if directory is empty
     const files = await fs.readdir(dirPath);
     if (files.length === 0) {
@@ -96,14 +90,14 @@ async function cleanupRoot() {
   try {
     const projectRoot = process.cwd();
     console.log('Starting root directory cleanup...');
-    
+
     // Create backup
     await createBackup();
-    
+
     // Create assets directory if it doesn't exist
     const assetsDir = path.join(projectRoot, 'assets');
     await ensureDirectoryExists(assetsDir);
-    
+
     // Move asset files
     let movedAssetFiles = 0;
     for (const file of ASSET_FILES) {
@@ -112,7 +106,7 @@ async function cleanupRoot() {
       const success = await moveFile(sourcePath, destPath);
       if (success) movedAssetFiles++;
     }
-    
+
     // Move script files
     let movedScriptFiles = 0;
     for (const file of SCRIPT_FILES) {
@@ -121,7 +115,7 @@ async function cleanupRoot() {
       const success = await moveFile(sourcePath, destPath);
       if (success) movedScriptFiles++;
     }
-    
+
     // Remove empty directories
     let removedDirs = 0;
     for (const dir of EMPTY_DIRS_TO_REMOVE) {
@@ -129,7 +123,7 @@ async function cleanupRoot() {
       const success = await removeEmptyDirectory(dirPath);
       if (success) removedDirs++;
     }
-    
+
     // Check for .eslintrc.cjs which should be removed since we have eslint.config.js
     try {
       const eslintrcPath = path.join(projectRoot, '.eslintrc.cjs');
@@ -141,12 +135,11 @@ async function cleanupRoot() {
         console.error(`Error removing .eslintrc.cjs:`, error);
       }
     }
-    
+
     console.log('\nRoot directory cleanup completed!');
     console.log(`Moved ${movedAssetFiles} asset files to ${assetsDir}`);
     console.log(`Moved ${movedScriptFiles} script files to scripts directory`);
     console.log(`Removed ${removedDirs} empty directories`);
-    
   } catch (error) {
     console.error('Error during root directory cleanup:', error);
     process.exit(1);
@@ -158,4 +151,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   cleanupRoot().catch(console.error);
 }
 
-export { cleanupRoot }; 
+export { cleanupRoot };

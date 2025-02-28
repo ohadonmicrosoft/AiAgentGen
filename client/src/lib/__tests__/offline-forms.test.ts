@@ -1,9 +1,4 @@
-import {
-  getPendingForms,
-  isOnline,
-  submitForm,
-  syncOfflineForms,
-} from '../offline-forms';
+import { getPendingForms, isOnline, submitForm, syncOfflineForms } from '../offline-forms';
 
 // Mock fetch
 global.fetch = jest.fn(() =>
@@ -204,9 +199,7 @@ describe('Offline Forms Utility', () => {
 
     it('saves form data for later when fetch fails with network error', async () => {
       // Mock fetch failing
-      (global.fetch as jest.Mock).mockRejectedValue(
-        new TypeError('Failed to fetch'),
-      );
+      (global.fetch as jest.Mock).mockRejectedValue(new TypeError('Failed to fetch'));
 
       const formData = {
         url: '/api/test',

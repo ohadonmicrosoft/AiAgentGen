@@ -282,12 +282,9 @@ function calculateRelativeLuminance(rgb: RGB): number {
   const gsrgb = rgb.g / 255;
   const bsrgb = rgb.b / 255;
 
-  const r =
-    rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
-  const g =
-    gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
-  const b =
-    bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
+  const r = rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
+  const g = gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
+  const b = bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
 
   // Calculate luminance using the formula: L = 0.2126 * R + 0.7152 * G + 0.0722 * B
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;

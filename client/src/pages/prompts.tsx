@@ -10,13 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -44,16 +38,7 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Prompt } from '@shared/schema';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import {
-  Clock,
-  Edit,
-  Loader2,
-  Plus,
-  Search,
-  Star,
-  StarOff,
-  Trash2,
-} from 'lucide-react';
+import { Clock, Edit, Loader2, Plus, Search, Star, StarOff, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -85,9 +70,7 @@ export default function Prompts() {
   // Create new prompt mutation
   const createPromptMutation = useMutation({
     mutationFn: async (values: PromptFormValues) => {
-      const tagsArray = values.tags
-        ? values.tags.split(',').map((tag) => tag.trim())
-        : [];
+      const tagsArray = values.tags ? values.tags.split(',').map((tag) => tag.trim()) : [];
       const promptData = {
         title: values.title,
         content: values.content,
@@ -120,9 +103,7 @@ export default function Prompts() {
   const updatePromptMutation = useMutation({
     mutationFn: async (values: PromptFormValues & { id: number }) => {
       const { id, ...promptData } = values;
-      const tagsArray = values.tags
-        ? values.tags.split(',').map((tag) => tag.trim())
-        : [];
+      const tagsArray = values.tags ? values.tags.split(',').map((tag) => tag.trim()) : [];
 
       const res = await apiRequest('PUT', `/api/prompts/${id}`, {
         ...promptData,
@@ -268,14 +249,10 @@ export default function Prompts() {
       prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       prompt.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (Array.isArray(prompt.tags) &&
-        prompt.tags.some((tag: string) =>
-          tag.toLowerCase().includes(searchQuery.toLowerCase()),
-        )),
+        prompt.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))),
   );
 
-  const favoritePrompts = filteredPrompts?.filter(
-    (prompt) => prompt.isFavorite,
-  );
+  const favoritePrompts = filteredPrompts?.filter((prompt) => prompt.isFavorite);
 
   return (
     <MainLayout title="Prompts">
@@ -292,10 +269,7 @@ export default function Prompts() {
             />
           </div>
 
-          <Dialog
-            open={isCreateDialogOpen}
-            onOpenChange={setIsCreateDialogOpen}
-          >
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
@@ -311,10 +285,7 @@ export default function Prompts() {
               </DialogHeader>
 
               <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-4"
-                >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
                     control={form.control}
                     name="title"
@@ -322,10 +293,7 @@ export default function Prompts() {
                       <FormItem>
                         <FormLabel>Title</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Enter a descriptive title"
-                            {...field}
-                          />
+                          <Input placeholder="Enter a descriptive title" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -339,11 +307,7 @@ export default function Prompts() {
                       <FormItem>
                         <FormLabel>Prompt</FormLabel>
                         <FormControl>
-                          <Textarea
-                            placeholder="Enter your prompt text..."
-                            rows={6}
-                            {...field}
-                          />
+                          <Textarea placeholder="Enter your prompt text..." rows={6} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -357,10 +321,7 @@ export default function Prompts() {
                       <FormItem>
                         <FormLabel>Tags (comma separated)</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="e.g. customer-service, sales"
-                            {...field}
-                          />
+                          <Input placeholder="e.g. customer-service, sales" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -375,10 +336,7 @@ export default function Prompts() {
                     >
                       Cancel
                     </Button>
-                    <Button
-                      type="submit"
-                      disabled={createPromptMutation.isPending}
-                    >
+                    <Button type="submit" disabled={createPromptMutation.isPending}>
                       {createPromptMutation.isPending ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -400,16 +358,11 @@ export default function Prompts() {
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>Edit Prompt</DialogTitle>
-              <DialogDescription>
-                Make changes to your prompt template.
-              </DialogDescription>
+              <DialogDescription>Make changes to your prompt template.</DialogDescription>
             </DialogHeader>
 
             <Form {...editForm}>
-              <form
-                onSubmit={editForm.handleSubmit(onEditSubmit)}
-                className="space-y-4"
-              >
+              <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
                 <FormField
                   control={editForm.control}
                   name="title"
@@ -417,10 +370,7 @@ export default function Prompts() {
                     <FormItem>
                       <FormLabel>Title</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter a descriptive title"
-                          {...field}
-                        />
+                        <Input placeholder="Enter a descriptive title" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -434,11 +384,7 @@ export default function Prompts() {
                     <FormItem>
                       <FormLabel>Prompt</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Enter your prompt text..."
-                          rows={6}
-                          {...field}
-                        />
+                        <Textarea placeholder="Enter your prompt text..." rows={6} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -452,10 +398,7 @@ export default function Prompts() {
                     <FormItem>
                       <FormLabel>Tags (comma separated)</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="e.g. customer-service, sales"
-                          {...field}
-                        />
+                        <Input placeholder="e.g. customer-service, sales" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -490,10 +433,7 @@ export default function Prompts() {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    disabled={updatePromptMutation.isPending}
-                  >
+                  <Button type="submit" disabled={updatePromptMutation.isPending}>
                     {updatePromptMutation.isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -510,24 +450,18 @@ export default function Prompts() {
         </Dialog>
 
         {/* Delete Confirmation Dialog */}
-        <AlertDialog
-          open={isDeleteDialogOpen}
-          onOpenChange={setIsDeleteDialogOpen}
-        >
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                prompt "{currentPrompt?.title}".
+                This action cannot be undone. This will permanently delete the prompt "
+                {currentPrompt?.title}".
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={confirmDelete}
-                disabled={deletePromptMutation.isPending}
-              >
+              <AlertDialogAction onClick={confirmDelete} disabled={deletePromptMutation.isPending}>
                 {deletePromptMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -543,12 +477,8 @@ export default function Prompts() {
 
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="mb-4">
-            <TabsTrigger value="all">
-              All Prompts ({filteredPrompts?.length || 0})
-            </TabsTrigger>
-            <TabsTrigger value="favorites">
-              Favorites ({favoritePrompts?.length || 0})
-            </TabsTrigger>
+            <TabsTrigger value="all">All Prompts ({filteredPrompts?.length || 0})</TabsTrigger>
+            <TabsTrigger value="favorites">Favorites ({favoritePrompts?.length || 0})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all">
@@ -573,28 +503,19 @@ export default function Prompts() {
                     <div className="flex flex-wrap gap-1 mt-2">
                       {Array.isArray(prompt.tags) &&
                         prompt.tags.map((tag: string) => (
-                          <Badge
-                            key={tag}
-                            variant="secondary"
-                            className="text-xs"
-                          >
+                          <Badge key={tag} variant="secondary" className="text-xs">
                             {tag}
                           </Badge>
                         ))}
                     </div>
                   </CardHeader>
                   <CardContent className="pb-3">
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {prompt.content}
-                    </p>
+                    <p className="text-sm text-muted-foreground line-clamp-3">{prompt.content}</p>
                   </CardContent>
                   <CardFooter className="border-t bg-muted/50 py-3 px-5 flex justify-between">
                     <div className="flex items-center text-xs text-muted-foreground">
                       <Clock className="mr-1 h-3 w-3" />
-                      <span>
-                        Updated{' '}
-                        {new Date(prompt.updatedAt).toLocaleDateString()}
-                      </span>
+                      <span>Updated {new Date(prompt.updatedAt).toLocaleDateString()}</span>
                     </div>
                     <Button variant="ghost" size="sm">
                       <Edit className="h-4 w-4 mr-1" />
@@ -606,8 +527,7 @@ export default function Prompts() {
               {filteredPrompts?.length === 0 && (
                 <div className="col-span-full py-8 text-center">
                   <p className="text-muted-foreground">
-                    No prompts found. Try a different search term or create a
-                    new prompt.
+                    No prompts found. Try a different search term or create a new prompt.
                   </p>
                 </div>
               )}
@@ -632,28 +552,19 @@ export default function Prompts() {
                     <div className="flex flex-wrap gap-1 mt-2">
                       {Array.isArray(prompt.tags) &&
                         prompt.tags.map((tag: string) => (
-                          <Badge
-                            key={tag}
-                            variant="secondary"
-                            className="text-xs"
-                          >
+                          <Badge key={tag} variant="secondary" className="text-xs">
                             {tag}
                           </Badge>
                         ))}
                     </div>
                   </CardHeader>
                   <CardContent className="pb-3">
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {prompt.content}
-                    </p>
+                    <p className="text-sm text-muted-foreground line-clamp-3">{prompt.content}</p>
                   </CardContent>
                   <CardFooter className="border-t bg-muted/50 py-3 px-5 flex justify-between">
                     <div className="flex items-center text-xs text-muted-foreground">
                       <Clock className="mr-1 h-3 w-3" />
-                      <span>
-                        Updated{' '}
-                        {new Date(prompt.updatedAt).toLocaleDateString()}
-                      </span>
+                      <span>Updated {new Date(prompt.updatedAt).toLocaleDateString()}</span>
                     </div>
                     <Button variant="ghost" size="sm">
                       <Edit className="h-4 w-4 mr-1" />
@@ -665,8 +576,7 @@ export default function Prompts() {
               {favoritePrompts?.length === 0 && (
                 <div className="col-span-full py-8 text-center">
                   <p className="text-muted-foreground">
-                    No favorite prompts found. Star your most used prompts to
-                    access them quickly.
+                    No favorite prompts found. Star your most used prompts to access them quickly.
                   </p>
                 </div>
               )}

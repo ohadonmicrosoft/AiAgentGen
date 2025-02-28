@@ -1,11 +1,5 @@
 import { execSync } from 'node:child_process';
-import {
-  existsSync,
-  readFileSync,
-  readdirSync,
-  statSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as jscodeshift from 'jscodeshift';
@@ -92,31 +86,19 @@ function fixTypescriptSyntax(content: string): string {
   content = content.replace(/\[\s*key:\s*string\s*\]:\s*any;\s*/g, '');
 
   // Fix object type annotations
-  content = content.replace(
-    /{\s*\[key:\s*string\]:\s*any\s*}/g,
-    'Record<string, any>',
-  );
+  content = content.replace(/{\s*\[key:\s*string\]:\s*any\s*}/g, 'Record<string, any>');
 
   // Add type parameters to reduce calls
-  content = content.replace(
-    /\.reduce\((.*?)\)/g,
-    '.reduce<Record<string, any>>($1)',
-  );
+  content = content.replace(/\.reduce\((.*?)\)/g, '.reduce<Record<string, any>>($1)');
 
   // Fix empty interfaces
-  content = content.replace(
-    /interface\s+(\w+)\s+extends\s+(\w+)\s*\{\s*\}/g,
-    'type $1 = $2',
-  );
+  content = content.replace(/interface\s+(\w+)\s+extends\s+(\w+)\s*\{\s*\}/g, 'type $1 = $2');
 
   return content;
 }
 
 // Process a single file
-async function processFile(
-  filePath: string,
-  fix: boolean = false,
-): Promise<void> {
+async function processFile(filePath: string, fix: boolean = false): Promise<void> {
   try {
     console.log(`Processing ${filePath}...`);
     const source = readFileSync(filePath, 'utf-8');
@@ -134,9 +116,7 @@ async function processFile(
       // Format the code
       try {
         const parser =
-          filePath.endsWith('.tsx') || filePath.endsWith('.ts')
-            ? 'typescript'
-            : 'babel';
+          filePath.endsWith('.tsx') || filePath.endsWith('.ts') ? 'typescript' : 'babel';
         const prettierOptions = {
           parser,
           semi: true,
@@ -160,10 +140,7 @@ async function processFile(
 }
 
 // Process a directory recursively
-async function processDirectory(
-  dirPath: string,
-  options: FixOptions,
-): Promise<void> {
+async function processDirectory(dirPath: string, options: FixOptions): Promise<void> {
   try {
     const entries = readdirSync(dirPath);
 

@@ -88,9 +88,7 @@ async function saveFormForLater(formData: OfflineFormData): Promise<void> {
  * @param options Form submission options
  * @returns Promise that resolves with the response data
  */
-export async function submitForm<T = any>(
-  options: SubmitFormOptions,
-): Promise<T> {
+export async function submitForm<T = any>(options: SubmitFormOptions): Promise<T> {
   const { url, method, data, headers = {} } = options;
 
   // Default headers
@@ -126,9 +124,7 @@ export async function submitForm<T = any>(
       });
 
       if (!response.ok) {
-        throw new Error(
-          `HTTP error ${response.status}: ${response.statusText}`,
-        );
+        throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
       }
 
       return await response.json();

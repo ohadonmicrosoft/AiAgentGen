@@ -16,11 +16,11 @@ async function removeRedundantFiles() {
   try {
     const projectRoot = process.cwd();
     console.log('Starting removal of redundant files...');
-    
+
     // Create a backup first
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const backupDir = path.join(projectRoot, '..', `AI-Aget-Gen-backup-${timestamp}`);
-    
+
     console.log('Creating backup...');
     await execAsync(`cp -r "${projectRoot}/." "${backupDir}/"`);
     console.log(`Backup created at: ${backupDir}`);
@@ -62,4 +62,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   removeRedundantFiles().catch(console.error);
 }
 
-export { removeRedundantFiles }; 
+export { removeRedundantFiles };

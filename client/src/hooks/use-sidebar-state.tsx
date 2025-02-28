@@ -1,10 +1,4 @@
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { useLocalStorage } from './use-local-storage';
 import { useIsMobile } from './use-mobile';
 
@@ -24,10 +18,7 @@ interface SidebarProviderProps {
 
 export function SidebarProvider({ children }: SidebarProviderProps) {
   const isMobile = useIsMobile();
-  const [isCollapsed, setIsCollapsed] = useLocalStorage<boolean>(
-    'sidebar-collapsed',
-    false,
-  );
+  const [isCollapsed, setIsCollapsed] = useLocalStorage<boolean>('sidebar-collapsed', false);
   const [isHovering, setIsHovering] = useState(false);
 
   // Always expand sidebar on mobile

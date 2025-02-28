@@ -1,14 +1,6 @@
 import { useToast } from '@/hooks/use-toast';
-import {
-  InsertUser,
-  User as SelectUser,
-  insertUserSchema,
-} from '@shared/schema';
-import {
-  UseMutationResult,
-  useMutation,
-  useQuery,
-} from '@tanstack/react-query';
+import { InsertUser, User as SelectUser, insertUserSchema } from '@shared/schema';
+import { UseMutationResult, useMutation, useQuery } from '@tanstack/react-query';
 import { ReactNode, createContext, useContext } from 'react';
 import { apiRequest, getQueryFn, queryClient } from '../lib/queryClient';
 

@@ -1,12 +1,4 @@
-import {
-  boolean,
-  integer,
-  json,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-} from 'drizzle-orm/pg-core';
+import { boolean, integer, json, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
@@ -199,12 +191,7 @@ export type Role = (typeof ROLES)[keyof typeof ROLES];
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
 // Role validation schema
-export const roleSchema = z.enum([
-  ROLES.ADMIN,
-  ROLES.MANAGER,
-  ROLES.CREATOR,
-  ROLES.VIEWER,
-]);
+export const roleSchema = z.enum([ROLES.ADMIN, ROLES.MANAGER, ROLES.CREATOR, ROLES.VIEWER]);
 
 // User with role update schema
 export const userRoleUpdateSchema = z.object({

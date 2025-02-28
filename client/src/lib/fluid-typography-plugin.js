@@ -33,15 +33,12 @@ module.exports = plugin(function ({ addUtilities, theme, e }) {
   };
 
   // Create fluid font size utilities
-  const fluidFontSizes = Object.entries(fluidTypeScale).reduce(
-    (acc, [name, { min, max }]) => {
-      acc[`.fluid-${e(name)}`] = {
-        fontSize: fluidType(min, max),
-      };
-      return acc;
-    },
-    {},
-  );
+  const fluidFontSizes = Object.entries(fluidTypeScale).reduce((acc, [name, { min, max }]) => {
+    acc[`.fluid-${e(name)}`] = {
+      fontSize: fluidType(min, max),
+    };
+    return acc;
+  }, {});
 
   // Create fluid line height utilities based on ratios
   const fluidLineHeights = {

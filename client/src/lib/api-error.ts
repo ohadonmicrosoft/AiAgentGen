@@ -188,10 +188,7 @@ export class ApiError extends Error {
 /**
  * Factory function to create an ApiError from a Response object
  */
-export async function createApiError(
-  response: Response,
-  endpoint: string,
-): Promise<ApiError> {
+export async function createApiError(response: Response, endpoint: string): Promise<ApiError> {
   let data;
   let errorMessage;
   const requestId = response.headers.get('x-request-id') || undefined;
@@ -246,10 +243,7 @@ export function createNetworkError(error: Error, endpoint: string): ApiError {
 /**
  * Check if a Response is ok, otherwise throw an ApiError
  */
-export async function checkResponse(
-  response: Response,
-  endpoint: string,
-): Promise<Response> {
+export async function checkResponse(response: Response, endpoint: string): Promise<Response> {
   if (!response.ok) {
     throw await createApiError(response, endpoint);
   }

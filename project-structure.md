@@ -2,13 +2,15 @@
 
 - 📁 **.github/**
   - 📁 **workflows/**
+- 📁 **assets/**
+  - 📄 fetch-ui.js (1.4 KB)
 - 📁 **attached_assets/**
 - 📁 **client/**
   - 📁 **public/**
     - 📄 manifest.json (2.7 KB)
     - 📄 service-worker.js (7.1 KB)
   - 📁 **src/**
-    - 📁 **__tests__/**
+    - 📁 ****tests**/**
       - 📁 **integration/**
         - 📄 login-flow.test.tsx (6.5 KB)
     - 📁 **components/**
@@ -17,7 +19,7 @@
         - 📄 swipe-container.tsx (6.3 KB)
         - 📄 touch-list.tsx (8.5 KB)
       - 📁 **ui/**
-        - 📁 **__tests__/**
+        - 📁 ****tests**/**
           - 📄 button.test.tsx (2.0 KB)
           - 📄 offline-indicator.test.tsx (6.1 KB)
           - 📄 touch-button.test.tsx (3.6 KB)
@@ -138,7 +140,7 @@
     - 📁 **layouts/**
       - 📄 MainLayout.tsx (8.1 KB)
     - 📁 **lib/**
-      - 📁 **__tests__/**
+      - 📁 ****tests**/**
         - 📄 fluid-spacing.test.ts (2.4 KB)
         - 📄 offline-forms.test.ts (9.1 KB)
         - 📄 offline-plugin.test.ts (7.1 KB)
@@ -196,6 +198,22 @@
     - 📄 service-worker.ts (5.2 KB)
     - 📄 types.ts (207.0 B)
   - 📄 index.html (1.1 KB)
+- 📁 **config/**
+  - 📄 .prettierrc.json (38.0 B)
+  - 📄 biome.json (4.7 KB)
+  - 📄 drizzle.config.ts (325.0 B)
+  - 📄 eslint.config.js (1.5 KB)
+  - 📄 jest.config.js (1009.0 B)
+  - 📄 jest.integration.config.js (1.0 KB)
+  - 📄 jest.server.config.js (596.0 B)
+  - 📄 jest.setup.js (1.4 KB)
+  - 📄 lighthouserc.js (1.3 KB)
+  - 📄 playwright.config.ts (1.7 KB)
+  - 📄 postcss.config.js (81.0 B)
+  - 📄 tailwind.config.ts (2.8 KB)
+  - 📄 theme.json (104.0 B)
+  - 📄 tsconfig.json (784.0 B)
+  - 📄 vite.config.ts (2.2 KB)
 - 📁 **doc/**
   - 📄 accessibility-enhancements.md (3.6 KB)
   - 📄 color-contrast-system-overview.md (5.2 KB)
@@ -213,17 +231,18 @@
   - 📄 README.md (2.3 KB)
   - 📄 testing-summary.md (3.8 KB)
   - 📄 ui-ux-enhancement-plan.md (8.1 KB)
-- 📁 **e2e/**
-  - 📄 agent-creation.spec.ts (5.9 KB)
-  - 📄 visual-regression.spec.ts (4.5 KB)
 - 📁 **migrations/**
 - 📁 **scripts/**
+  - 📄 cleanup-root.ts (4.6 KB)
   - 📄 cleanup.ts (6.1 KB)
   - 📄 fix-code.ts (6.3 KB)
   - 📄 map-project.ts (4.4 KB)
+  - 📄 migrate.js (367.0 B)
+  - 📄 organize-project.ts (6.3 KB)
   - 📄 remove-redundant.ts (1.8 KB)
+  - 📄 setup-db.ts (2.7 KB)
 - 📁 **server/**
-  - 📁 **__tests__/**
+  - 📁 ****tests**/**
     - 📄 auth.test.ts (3.0 KB)
     - 📄 cache.test.ts (9.6 KB)
     - 📄 db.test.ts (5.7 KB)
@@ -254,26 +273,12 @@
   - 📄 schema.ts (5.9 KB)
 - 📁 **src/**
   - 📄 main.tsx (246.0 B)
-- 📄 .prettierrc.json (38.0 B)
-- 📄 biome.json (4.7 KB)
-- 📄 drizzle.config.ts (325.0 B)
-- 📄 eslint.config.js (1.5 KB)
-- 📄 fetch-ui.js (1.4 KB)
+- 📁 **tests/**
+  - 📄 agent-creation.spec.ts (5.9 KB)
+  - 📄 test-memory-cache.ts (4.9 KB)
+  - 📄 visual-regression.spec.ts (4.5 KB)
 - 📄 implementation-plan.md (17.2 KB)
-- 📄 jest.config.js (1009.0 B)
-- 📄 jest.integration.config.js (1.0 KB)
-- 📄 jest.server.config.js (596.0 B)
-- 📄 jest.setup.js (1.4 KB)
-- 📄 lighthouserc.js (1.3 KB)
-- 📄 migrate.js (367.0 B)
 - 📄 package-lock.json (611.9 KB)
 - 📄 package.json (5.8 KB)
-- 📄 playwright.config.ts (1.7 KB)
-- 📄 postcss.config.js (81.0 B)
+- 📄 project-structure.md (9.8 KB)
 - 📄 README.md (3.2 KB)
-- 📄 setup-db.ts (2.7 KB)
-- 📄 tailwind.config.ts (2.8 KB)
-- 📄 test-memory-cache.ts (4.9 KB)
-- 📄 theme.json (104.0 B)
-- 📄 tsconfig.json (657.0 B)
-- 📄 vite.config.ts (2.2 KB)

@@ -38,8 +38,7 @@ export function preventIOSOverscroll(): void {
   if (typeof window === 'undefined') return;
 
   // Check if the device is iOS
-  const isIOS =
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
 
   if (isIOS) {
     // Prevent touchmove events on the body when at the edge

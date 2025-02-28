@@ -27,9 +27,7 @@ export async function runMigrations(migrationDir?: string) {
 
   // Check if DATABASE_URL is defined
   if (!process.env.DATABASE_URL) {
-    throw new Error(
-      'DATABASE_URL environment variable is required for migrations',
-    );
+    throw new Error('DATABASE_URL environment variable is required for migrations');
   }
 
   // Check if migrations directory exists
@@ -98,9 +96,7 @@ export async function runMigrations(migrationDir?: string) {
         logger.error('Database migration failed after maximum retry attempts', {
           error,
         });
-        throw new Error(
-          `Migration failed after ${MAX_RETRY_ATTEMPTS} attempts: ${error.message}`,
-        );
+        throw new Error(`Migration failed after ${MAX_RETRY_ATTEMPTS} attempts: ${error.message}`);
       }
     }
   }
@@ -196,9 +192,7 @@ export async function getMigrationHistory() {
 /**
  * Check if database is up to date with all migrations
  */
-export async function isDatabaseUpToDate(
-  migrationDir?: string,
-): Promise<boolean> {
+export async function isDatabaseUpToDate(migrationDir?: string): Promise<boolean> {
   // Check if USE_MOCK_STORAGE is true
   if (process.env.USE_MOCK_STORAGE === 'true') {
     logger.info('Using mock storage - assuming database is up to date');
@@ -210,9 +204,7 @@ export async function isDatabaseUpToDate(
 
   // Check if migrations directory exists
   if (!fs.existsSync(migrationsDir)) {
-    logger.info(
-      'No migrations directory found - database is considered up to date',
-    );
+    logger.info('No migrations directory found - database is considered up to date');
     return true; // No migrations to apply
   }
 
@@ -224,9 +216,7 @@ export async function isDatabaseUpToDate(
       .sort();
 
     if (migrationFiles.length === 0) {
-      logger.info(
-        'No migration files found - database is considered up to date',
-      );
+      logger.info('No migration files found - database is considered up to date');
       return true; // No migrations to apply
     }
 

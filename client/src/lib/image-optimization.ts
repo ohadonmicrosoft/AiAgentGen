@@ -101,10 +101,7 @@ export function supportsImageFormat(format: ImageFormat): boolean {
   }
 
   if (format === 'avif') {
-    return document
-      .createElement('canvas')
-      .toDataURL('image/avif')
-      .startsWith('data:image/avif');
+    return document.createElement('canvas').toDataURL('image/avif').startsWith('data:image/avif');
   }
 
   return true;
@@ -130,20 +127,12 @@ export function getOptimizedImageUrl(
   const opts = { ...defaultOptions, ...options };
 
   // Handle data URLs, blobs, and relative URLs directly
-  if (
-    src.startsWith('data:') ||
-    src.startsWith('blob:') ||
-    src.startsWith('/')
-  ) {
+  if (src.startsWith('data:') || src.startsWith('blob:') || src.startsWith('/')) {
     return src;
   }
 
   // Handle already optimized CDN URLs
-  if (
-    src.includes('?w=') ||
-    src.includes('?format=') ||
-    src.includes('?quality=')
-  ) {
+  if (src.includes('?w=') || src.includes('?format=') || src.includes('?quality=')) {
     return src;
   }
 
@@ -156,8 +145,7 @@ export function getOptimizedImageUrl(
 
     // Add width if specified or from size
     const width =
-      opts.width ||
-      (opts.size !== 'original' ? sizeDimensions[opts.size!].width : undefined);
+      opts.width || (opts.size !== 'original' ? sizeDimensions[opts.size!].width : undefined);
 
     if (width) {
       url.searchParams.append('w', width.toString());
@@ -207,9 +195,7 @@ export function preloadImage(
  * Create preload link tags for images
  */
 export function createImagePreloadLinks(
-  images: Array<
-    string | { src: string; options?: Partial<ImageOptimizationOptions> }
-  >,
+  images: Array<string | { src: string; options?: Partial<ImageOptimizationOptions> }>,
 ): void {
   if (typeof document === 'undefined') return;
 
@@ -220,9 +206,7 @@ export function createImagePreloadLinks(
     const optimizedUrl = getOptimizedImageUrl(src, options);
 
     // Check if a preload link already exists
-    const existingLink = document.querySelector(
-      `link[rel="preload"][href="${optimizedUrl}"]`,
-    );
+    const existingLink = document.querySelector(`link[rel="preload"][href="${optimizedUrl}"]`);
     if (existingLink) return;
 
     // Create a preload link
@@ -256,9 +240,7 @@ export function getLowQualityImagePlaceholder(src: string): string {
 /**
  * Get sizes attribute for responsive images
  */
-export function getResponsiveSizeAttribute(
-  breakpoints: Record<string, number>,
-): string {
+export function getResponsiveSizeAttribute(breakpoints: Record<string, number>): string {
   return Object.entries(breakpoints)
     .map(([breakpoint, size]) => `(max-width: ${breakpoint}px) ${size}px`)
     .concat(['100vw'])

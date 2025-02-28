@@ -119,12 +119,9 @@ async function initializeDatabase() {
           },
           // Add retry logic for connection errors
           onretry: (err, attempts) => {
-            logger.warn(
-              `Connection error, retrying (${attempts}/${MAX_CONNECTIONS * 2})`,
-              {
-                error: err.message,
-              },
-            );
+            logger.warn(`Connection error, retrying (${attempts}/${MAX_CONNECTIONS * 2})`, {
+              error: err.message,
+            });
             return true; // Continue retrying
           },
         });
@@ -158,18 +155,13 @@ async function initializeDatabase() {
     }
 
     // All retry attempts failed
-    logger.error(
-      '[DB] Failed to establish database connection after multiple attempts',
-      {
-        lastError,
-      },
-    );
+    logger.error('[DB] Failed to establish database connection after multiple attempts', {
+      lastError,
+    });
 
     // Fallback to mock in development, but throw in production
     if (isDevelopment) {
-      logger.warn(
-        '[DB] Falling back to mock database since connection failed in development mode',
-      );
+      logger.warn('[DB] Falling back to mock database since connection failed in development mode');
 
       // Create a mock postgres client as fallback
       pool = new MockPostgresClient();
@@ -208,9 +200,7 @@ async function initializeDatabase() {
 
       return { pool, db };
     } else {
-      throw new Error(
-        'Failed to establish database connection in production environment',
-      );
+      throw new Error('Failed to establish database connection in production environment');
     }
   }
 }
@@ -273,9 +263,7 @@ export function startHealthCheck(intervalMs = 30000): void {
 
       // If we have several consecutive failures, restart the connection pool
       if (failedHealthChecks >= 3) {
-        logger.warn(
-          'Multiple database health check failures, attempting to reset pool',
-        );
+        logger.warn('Multiple database health check failures, attempting to reset pool');
         try {
           await pool.end({ timeout: 5 });
 

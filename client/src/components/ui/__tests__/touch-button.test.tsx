@@ -31,13 +31,13 @@ jest.mock('@/hooks/use-fluid-spacing', () => ({
 // Mock framer-motion to avoid animation-related issues in tests
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: any) => (
+    div: ({ children, ...props }: React.ComponentProps<any>) => (
       <div data-testid="motion-div" {...props}>
         {children}
       </div>
     ),
   },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
+  AnimatePresence: ({ children }: React.ComponentProps<any>) => <>{children}</>,
 }));
 
 describe('TouchButton Component', () => {

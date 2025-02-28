@@ -28,7 +28,7 @@ async function runTests() {
       console.log(`❌ Test 1 failed: Expected 'value1', got '${value}'`);
       failedTests++;
     }
-  } catch (error: any) {
+  } catch (error: Error) {
     console.log(`❌ Test 1 failed with error: ${error.message}`);
     failedTests++;
   }
@@ -48,7 +48,7 @@ async function runTests() {
       );
       failedTests++;
     }
-  } catch (error: any) {
+  } catch (error: Error) {
     console.log(`❌ Test 2 failed with error: ${error.message}`);
     failedTests++;
   }
@@ -66,7 +66,7 @@ async function runTests() {
       console.log(`❌ Test 3 failed: Expected undefined, got '${value}'`);
       failedTests++;
     }
-  } catch (error: any) {
+  } catch (error: Error) {
     console.log(`❌ Test 3 failed with error: ${error.message}`);
     failedTests++;
   }
@@ -86,7 +86,7 @@ async function runTests() {
       );
       failedTests++;
     }
-  } catch (error: any) {
+  } catch (error: Error) {
     console.log(`❌ Test 4 failed with error: ${error.message}`);
     failedTests++;
   }
@@ -112,7 +112,7 @@ async function runTests() {
       );
       failedTests++;
     }
-  } catch (error: any) {
+  } catch (error: Error) {
     console.log(`❌ Test 5 failed with error: ${error.message}`);
     failedTests++;
   }
@@ -136,7 +136,7 @@ async function runTests() {
       console.log(`❌ Test 6 failed: Value not set correctly`);
       failedTests++;
     }
-  } catch (error: any) {
+  } catch (error: Error) {
     console.log(`❌ Test 6 failed with error: ${error.message}`);
     failedTests++;
   }
@@ -171,7 +171,7 @@ async function runTests() {
       console.log(`❌ Test 7 failed: LRU eviction not working correctly`);
       failedTests++;
     }
-  } catch (error: any) {
+  } catch (error: Error) {
     console.log(`❌ Test 7 failed with error: ${error.message}`);
     failedTests++;
   }

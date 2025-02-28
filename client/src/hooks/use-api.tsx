@@ -29,10 +29,7 @@ interface ApiState<T> {
   isValidating: boolean;
 }
 
-type ApiHookResult<T> = [
-  (endpoint: string, options?: ApiOptions) => Promise<T>,
-  ApiState<T>,
-];
+type ApiHookResult<T> = [(endpoint: string, options?: ApiOptions) => Promise<T>, ApiState<T>];
 
 /**
  * A hook for making API calls with built-in error handling and retry capability
@@ -96,9 +93,7 @@ export function useApi<T = any>(): ApiHookResult<T> {
       // Function to perform the actual fetch with retry logic
       async function performFetchWithRetry(attempt: number): Promise<T> {
         try {
-          logger.debug(
-            `API Request [${attempt}/${retryCount + 1}]: ${endpoint}`,
-          );
+          logger.debug(`API Request [${attempt}/${retryCount + 1}]: ${endpoint}`);
 
           // Add authorization header if needed
           const headers = new Headers(fetchOptions.headers);
@@ -170,12 +165,7 @@ export function useApi<T = any>(): ApiHookResult<T> {
         } catch (error) {
           // Handle abort errors
           if (error instanceof DOMException && error.name === 'AbortError') {
-            const abortError = new ApiError(
-              'Request timed out',
-              408,
-              'Request Timeout',
-              endpoint,
-            );
+            const abortError = new ApiError('Request timed out', 408, 'Request Timeout', endpoint);
             throw abortError;
           }
 
@@ -200,9 +190,7 @@ export function useApi<T = any>(): ApiHookResult<T> {
 
           if (shouldRetry) {
             // Log retry attempt
-            logger.debug(
-              `Retrying API call (${attempt}/${retryCount}): ${endpoint}`,
-            );
+            logger.debug(`Retrying API call (${attempt}/${retryCount}): ${endpoint}`);
 
             // Wait before retry using exponential backoff
             const delay = retryDelay * Math.pow(2, attempt - 1);
@@ -234,10 +222,7 @@ export function useApi<T = any>(): ApiHookResult<T> {
         if (!hideErrorToast) {
           toast({
             title: 'Error',
-            description:
-              error instanceof Error
-                ? error.message
-                : 'An unexpected error occurred',
+            description: error instanceof Error ? error.message : 'An unexpected error occurred',
             variant: 'destructive',
           });
         }

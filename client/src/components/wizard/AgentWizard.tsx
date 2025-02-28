@@ -102,11 +102,7 @@ export default function AgentWizard({ preview = false }: AgentWizardProps) {
         )}
 
         {currentStep === 4 && (
-          <AgentReview
-            formData={formData}
-            onBack={handleBack}
-            preview={preview}
-          />
+          <AgentReview formData={formData} onBack={handleBack} preview={preview} />
         )}
       </div>
     </Card>

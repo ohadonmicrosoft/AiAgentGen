@@ -69,14 +69,10 @@ describe('Login Flow Integration', () => {
     renderWithProviders();
 
     // Check that the login form is rendered
-    expect(
-      screen.getByRole('heading', { name: /sign in/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /sign in/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /sign in/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 
   it('should show validation errors for empty fields', async () => {
@@ -163,15 +159,11 @@ describe('Login Flow Integration', () => {
 
     // Should show error message
     await waitFor(() => {
-      expect(
-        screen.getByText(/invalid email or password/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/invalid email or password/i)).toBeInTheDocument();
     });
 
     // Should not redirect
-    expect(
-      screen.getByRole('button', { name: /sign in/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 
   it('should handle network errors during login', async () => {

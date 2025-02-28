@@ -79,9 +79,7 @@ async function setupDatabase() {
       throw new Error('Database setup failed in production environment');
     } else {
       // In development, we can continue with mock storage
-      logger.warn(
-        'Continuing with mock storage due to database migration failure',
-      );
+      logger.warn('Continuing with mock storage due to database migration failure');
       process.env.USE_MOCK_STORAGE = 'true';
     }
   }

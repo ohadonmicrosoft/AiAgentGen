@@ -14,11 +14,7 @@ interface AgentReviewProps {
   preview?: boolean;
 }
 
-export default function AgentReview({
-  formData,
-  onBack,
-  preview = false,
-}: AgentReviewProps) {
+export default function AgentReview({ formData, onBack, preview = false }: AgentReviewProps) {
   const [isTestingAgent, setIsTestingAgent] = useState(false);
   const [testMessage, setTestMessage] = useState('');
   const [testResponse, setTestResponse] = useState('');
@@ -36,12 +32,7 @@ export default function AgentReview({
       config: any;
       message: string;
     }) => {
-      console.log(
-        'Testing agent with config:',
-        config,
-        'and message:',
-        message,
-      );
+      console.log('Testing agent with config:', config, 'and message:', message);
       const res = await apiRequest('POST', '/api/agents/test', {
         systemPrompt: config.systemPrompt,
         model: config.model,
@@ -121,8 +112,7 @@ export default function AgentReview({
     if (!testMessage.trim()) {
       toast({
         title: 'Test message required',
-        description:
-          "Please enter a test message to check your agent's response.",
+        description: "Please enter a test message to check your agent's response.",
       });
       return;
     }
@@ -131,8 +121,7 @@ export default function AgentReview({
     if (!formData.systemPrompt?.trim()) {
       toast({
         title: 'System prompt required',
-        description:
-          'Please go back and provide a system prompt for your agent.',
+        description: 'Please go back and provide a system prompt for your agent.',
         variant: 'destructive',
       });
       return;
@@ -160,8 +149,7 @@ export default function AgentReview({
       <div>
         <h3 className="text-lg font-medium mb-4">Review Agent Configuration</h3>
         <p className="text-muted-foreground mb-6">
-          Please review the information below to ensure your agent is configured
-          correctly.
+          Please review the information below to ensure your agent is configured correctly.
         </p>
       </div>
 
@@ -176,9 +164,7 @@ export default function AgentReview({
 
               <div className="space-y-1">
                 <p className="text-sm font-medium">Agent Type</p>
-                <p className="text-sm capitalize">
-                  {formData.type || 'Custom'}
-                </p>
+                <p className="text-sm capitalize">{formData.type || 'Custom'}</p>
               </div>
 
               <div className="space-y-1">
@@ -193,9 +179,7 @@ export default function AgentReview({
           <CardContent className="p-4">
             <div className="space-y-3">
               <p className="text-sm font-medium">Description</p>
-              <p className="text-sm">
-                {formData.description || 'No description provided'}
-              </p>
+              <p className="text-sm">{formData.description || 'No description provided'}</p>
             </div>
           </CardContent>
         </Card>
@@ -220,9 +204,7 @@ export default function AgentReview({
 
               <div className="space-y-1">
                 <p className="text-sm font-medium">Response Style</p>
-                <p className="text-sm capitalize">
-                  {formData.responseStyle || 'Formal'}
-                </p>
+                <p className="text-sm capitalize">{formData.responseStyle || 'Formal'}</p>
               </div>
             </div>
           </CardContent>
@@ -279,9 +261,7 @@ export default function AgentReview({
                   <div className="mt-4 space-y-2">
                     <p className="text-sm font-medium">Agent Response:</p>
                     <div className="bg-muted p-3 rounded-md overflow-auto max-h-[200px]">
-                      <p className="text-sm whitespace-pre-wrap">
-                        {testResponse}
-                      </p>
+                      <p className="text-sm whitespace-pre-wrap">{testResponse}</p>
                     </div>
                   </div>
                 )}

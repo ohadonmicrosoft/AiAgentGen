@@ -11,11 +11,11 @@ const execAsync = promisify(exec);
 async function createBackup(projectRoot: string) {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const backupDir = path.join(projectRoot, '..', `AI-Aget-Gen-backup-${timestamp}`);
-  
+
   console.log('Creating backup...');
   await execAsync(`cp -r "${projectRoot}/." "${backupDir}/"`);
   console.log(`Backup created at: ${backupDir}`);
-  
+
   return backupDir;
 }
 
@@ -26,7 +26,7 @@ async function ensureGitInitialized(projectRoot: string) {
   } catch {
     console.log('Git not initialized. Initializing...');
     await execAsync('git init && git add . && git commit -m "Initial commit with project backup"', {
-      cwd: projectRoot
+      cwd: projectRoot,
     });
     console.log('Git repository initialized with initial commit');
   }
@@ -61,7 +61,7 @@ const CRITICAL_PATTERNS = [
 
   // Git
   '.git/**',
-  '.github/**'
+  '.github/**',
 ];
 
 // Patterns for files that are safe to remove
@@ -70,20 +70,20 @@ const CLEANUP_PATTERNS = [
   '**/temp/**',
   '**/tmp/**',
   '**/*.log',
-  
+
   // Build artifacts
   'dist/**',
   'build/**',
   '.cache/**',
   '.next/**',
-  
+
   // Development files
   '.vscode/**',
   '.idea/**',
   '*.sublime-*',
   '.DS_Store',
   'Thumbs.db',
-  '**/node_modules/.cache/**'
+  '**/node_modules/.cache/**',
 ];
 
 const isMainModule = import.meta.url === `file://${process.argv[1]}`;

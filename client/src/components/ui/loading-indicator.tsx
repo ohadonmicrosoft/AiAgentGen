@@ -78,8 +78,8 @@ export const LoadingIndicator: FC<LoadingIndicatorProps> = ({
 /**
  * A specialized loading indicator for use with infinite scroll
  */
-export const InfiniteScrollLoader: FC<
-  Omit<LoadingIndicatorProps, 'text' | 'centered'>
-> = (props) => {
+export const InfiniteScrollLoader: FC<Omit<LoadingIndicatorProps, 'text' | 'centered'>> = (
+  props,
+) => {
   return <LoadingIndicator text="Loading more items..." centered {...props} />;
 };

@@ -22,14 +22,11 @@ const CONFIG_FILES = [
   'eslint.config.js',
   '.prettierrc.json',
   'playwright.config.ts',
-  'theme.json'
+  'theme.json',
 ];
 
 // Files to be moved to tests directory
-const TEST_FILES = [
-  'test-memory-cache.ts',
-  'e2e/**/*'
-];
+const TEST_FILES = ['test-memory-cache.ts', 'e2e/**/*'];
 
 // Files that should remain in the root directory
 const ROOT_FILES = [
@@ -38,18 +35,18 @@ const ROOT_FILES = [
   'README.md',
   '.gitignore',
   '.env',
-  'implementation-plan.md'
+  'implementation-plan.md',
 ];
 
 async function createBackup() {
   const projectRoot = process.cwd();
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const backupDir = path.join(projectRoot, '..', `AI-Aget-Gen-backup-${timestamp}`);
-  
+
   console.log('Creating backup...');
   await execAsync(`cp -r "${projectRoot}/." "${backupDir}/"`);
   console.log(`Backup created at: ${backupDir}`);
-  
+
   return backupDir;
 }
 
@@ -67,13 +64,13 @@ async function moveFile(sourcePath: string, destPath: string) {
     // Ensure the destination directory exists
     const destDir = path.dirname(destPath);
     await ensureDirectoryExists(destDir);
-    
+
     // Copy the file to the new location
     await fs.copyFile(sourcePath, destPath);
-    
+
     // Remove the original file
     await fs.unlink(sourcePath);
-    
+
     console.log(`Moved: ${sourcePath} -> ${destPath}`);
     return true;
   } catch (error) {
@@ -91,9 +88,9 @@ async function updateImportPaths(filePath: string, oldPath: string, newPath: str
     const content = await fs.readFile(filePath, 'utf-8');
     const updatedContent = content.replace(
       new RegExp(`from ['"]${oldPath}['"]`, 'g'),
-      `from '${newPath}'`
+      `from '${newPath}'`,
     );
-    
+
     if (content !== updatedContent) {
       await fs.writeFile(filePath, updatedContent);
       console.log(`Updated imports in: ${filePath}`);
@@ -108,29 +105,35 @@ async function updatePackageJsonScripts(configDir: string) {
   try {
     const content = await fs.readFile(packageJsonPath, 'utf-8');
     const packageJson = JSON.parse(content);
-    
+
     // Update paths in scripts
     for (const [key, value] of Object.entries(packageJson.scripts)) {
       if (typeof value === 'string') {
         // Update jest config paths
         let updatedValue = value
           .replace(/--config=jest\.config\.js/g, `--config=${configDir}/jest.config.js`)
-          .replace(/--config=jest\.integration\.config\.js/g, `--config=${configDir}/jest.integration.config.js`)
-          .replace(/--config=jest\.server\.config\.js/g, `--config=${configDir}/jest.server.config.js`);
-        
+          .replace(
+            /--config=jest\.integration\.config\.js/g,
+            `--config=${configDir}/jest.integration.config.js`,
+          )
+          .replace(
+            /--config=jest\.server\.config\.js/g,
+            `--config=${configDir}/jest.server.config.js`,
+          );
+
         // Update other config references
-        CONFIG_FILES.forEach(file => {
+        CONFIG_FILES.forEach((file) => {
           const fileName = path.basename(file);
           updatedValue = updatedValue.replace(
             new RegExp(`\\b${fileName}\\b`, 'g'),
-            `${configDir}/${fileName}`
+            `${configDir}/${fileName}`,
           );
         });
-        
+
         packageJson.scripts[key] = updatedValue;
       }
     }
-    
+
     await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
     console.log('Updated package.json scripts with new config paths');
   } catch (error) {
@@ -142,17 +145,17 @@ async function organizeProject() {
   try {
     const projectRoot = process.cwd();
     console.log('Starting project organization...');
-    
+
     // Create backup
     await createBackup();
-    
+
     // Create directories if they don't exist
     const configDir = path.join(projectRoot, 'config');
     const testsDir = path.join(projectRoot, 'tests');
-    
+
     await ensureDirectoryExists(configDir);
     await ensureDirectoryExists(testsDir);
-    
+
     // Move config files
     let movedConfigFiles = 0;
     for (const file of CONFIG_FILES) {
@@ -161,7 +164,7 @@ async function organizeProject() {
       const success = await moveFile(sourcePath, destPath);
       if (success) movedConfigFiles++;
     }
-    
+
     // Move test files
     let movedTestFiles = 0;
     for (const pattern of TEST_FILES) {
@@ -173,10 +176,10 @@ async function organizeProject() {
         if (success) movedTestFiles++;
       }
     }
-    
+
     // Update package.json scripts to reference new config locations
     await updatePackageJsonScripts('config');
-    
+
     // Update tsconfig.json to include new directories
     const tsconfigPath = path.join(configDir, 'tsconfig.json');
     try {
@@ -189,11 +192,10 @@ async function organizeProject() {
     } catch (error) {
       console.error('Error updating tsconfig.json:', error);
     }
-    
+
     console.log('\nProject organization completed!');
     console.log(`Moved ${movedConfigFiles} config files to ${configDir}`);
     console.log(`Moved ${movedTestFiles} test files to ${testsDir}`);
-    
   } catch (error) {
     console.error('Error during project organization:', error);
     process.exit(1);
@@ -205,4 +207,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   organizeProject().catch(console.error);
 }
 
-export { organizeProject }; 
+export { organizeProject };

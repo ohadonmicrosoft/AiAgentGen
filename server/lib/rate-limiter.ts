@@ -32,9 +32,7 @@ const defaultOptions: RateLimitOptions = {
 };
 
 // Cache to store rate limit info
-const cache = new MemoryCache<{ count: number; resetTime: number }>(
-  60 * 60 * 1000,
-); // 1 hour TTL
+const cache = new MemoryCache<{ count: number; resetTime: number }>(60 * 60 * 1000); // 1 hour TTL
 
 /**
  * Create a rate limiter middleware
@@ -91,10 +89,7 @@ export function rateLimiter(options: Partial<RateLimitOptions> = {}) {
     if (opts.headers) {
       res.setHeader('X-RateLimit-Limit', opts.maxRequests.toString());
       res.setHeader('X-RateLimit-Remaining', remaining.toString());
-      res.setHeader(
-        'X-RateLimit-Reset',
-        Math.ceil(resetTime / 1000).toString(),
-      );
+      res.setHeader('X-RateLimit-Reset', Math.ceil(resetTime / 1000).toString());
     }
 
     // If rate limit is exceeded, return error
@@ -110,10 +105,7 @@ export function rateLimiter(options: Partial<RateLimitOptions> = {}) {
       });
 
       // Set retry-after header
-      res.setHeader(
-        'Retry-After',
-        Math.ceil((resetTime - now) / 1000).toString(),
-      );
+      res.setHeader('Retry-After', Math.ceil((resetTime - now) / 1000).toString());
 
       // Return error
       return res.status(opts.statusCode!).json({

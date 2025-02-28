@@ -34,15 +34,7 @@ type DeviceType = 'mobile' | 'tablet' | 'desktop';
  * });
  */
 export function useFluidSpacing(options: FluidSpacingOptions = {}) {
-  const {
-    space,
-    gap,
-    padding,
-    margin,
-    maxWidth,
-    hierarchy,
-    deviceSpecific = false,
-  } = options;
+  const { space, gap, padding, margin, maxWidth, hierarchy, deviceSpecific = false } = options;
 
   const activeBreakpoint = useActiveBreakpoint();
 
@@ -190,8 +182,7 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
               translatedSize,
             );
           } else {
-            result.paddingLeft = result.paddingRight =
-              fluidSpaceScale[padding.x];
+            result.paddingLeft = result.paddingRight = fluidSpaceScale[padding.x];
           }
         }
 
@@ -221,8 +212,7 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
               translatedSize,
             );
           } else {
-            result.paddingTop = result.paddingBottom =
-              fluidSpaceScale[padding.y];
+            result.paddingTop = result.paddingBottom = fluidSpaceScale[padding.y];
           }
         }
       }
@@ -328,16 +318,7 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
     }
 
     return result;
-  }, [
-    space,
-    gap,
-    padding,
-    margin,
-    maxWidth,
-    hierarchy,
-    deviceSpecific,
-    currentDevice,
-  ]);
+  }, [space, gap, padding, margin, maxWidth, hierarchy, deviceSpecific, currentDevice]);
 
   // Size mapping for consistent class names
   const sizeMap = useMemo(() => {
@@ -357,10 +338,7 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
 
   // Generate spacing classes for use with Tailwind
   const getSpacingClass = useMemo(() => {
-    return (
-      type: 'gap' | 'p' | 'px' | 'py' | 'm' | 'mx' | 'my',
-      size: SpaceScaleKey,
-    ): string => {
+    return (type: 'gap' | 'p' | 'px' | 'py' | 'm' | 'mx' | 'my', size: SpaceScaleKey): string => {
       // For device-specific spacing, use a different prefix
       if (
         deviceSpecific &&
@@ -369,8 +347,7 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
         size !== 'section-gap' &&
         size !== 'container-padding'
       ) {
-        const translatedSize =
-          (sizeMap as Record<string, string>)[size] || 'md';
+        const translatedSize = (sizeMap as Record<string, string>)[size] || 'md';
         return `${currentDevice}-${type}-${translatedSize}`;
       }
       return `fluid-${type}-${size}`;
@@ -395,12 +372,7 @@ export function useContainerPadding(
     return {
       padding: containerPadding(options),
     };
-  }, [
-    options.minPadding,
-    options.maxPadding,
-    options.minWidth,
-    options.maxWidth,
-  ]);
+  }, [options.minPadding, options.maxPadding, options.minWidth, options.maxWidth]);
 }
 
 /**
@@ -431,9 +403,7 @@ export function useResponsiveGap(
  * });
  * // Result: "fluid-px-lg fluid-py-md fluid-my-sm"
  */
-export function fluidSpacingToClassName(
-  options: FluidSpacingOptions = {},
-): string {
+export function fluidSpacingToClassName(options: FluidSpacingOptions = {}): string {
   const classes: string[] = [];
   const { space, gap, padding, margin, deviceSpecific } = options;
 

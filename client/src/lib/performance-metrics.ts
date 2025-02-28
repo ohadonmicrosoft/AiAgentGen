@@ -64,8 +64,7 @@ class PerformanceMonitor {
   private markers: Record<string, PerformanceMarker> = {};
   private listeners: Array<(metric: PerformanceMetric) => void> = [];
   private isMonitoring = false;
-  private frameCounters: Record<string, { count: number; lastTime: number }> =
-    {};
+  private frameCounters: Record<string, { count: number; lastTime: number }> = {};
   private memoryUsageInterval: number | null = null;
 
   /**
@@ -111,12 +110,7 @@ class PerformanceMonitor {
   /**
    * Record a performance metric
    */
-  recordMetric(
-    name: string,
-    value: number,
-    unit: string,
-    metadata?: Record<string, any>,
-  ): void {
+  recordMetric(name: string, value: number, unit: string, metadata?: Record<string, any>): void {
     const metric: PerformanceMetric = {
       name,
       value,
@@ -150,10 +144,7 @@ class PerformanceMonitor {
   /**
    * End a performance marker and record its duration
    */
-  endMarker(
-    name: string,
-    additionalMetadata?: Record<string, any>,
-  ): number | undefined {
+  endMarker(name: string, additionalMetadata?: Record<string, any>): number | undefined {
     const marker = this.markers[name];
 
     if (!marker) {
@@ -210,11 +201,7 @@ class PerformanceMonitor {
   /**
    * Measure the execution time of a function
    */
-  measureFunction<T>(
-    name: string,
-    fn: () => T,
-    metadata?: Record<string, any>,
-  ): T {
+  measureFunction<T>(name: string, fn: () => T, metadata?: Record<string, any>): T {
     this.startMarker(name, metadata);
     const result = fn();
     this.endMarker(name);
@@ -281,21 +268,9 @@ class PerformanceMonitor {
         const memory = (performance as any).memory;
 
         if (memory) {
-          this.recordMetric(
-            'memory:used',
-            memory.usedJSHeapSize / (1024 * 1024),
-            'MB',
-          );
-          this.recordMetric(
-            'memory:total',
-            memory.totalJSHeapSize / (1024 * 1024),
-            'MB',
-          );
-          this.recordMetric(
-            'memory:limit',
-            memory.jsHeapSizeLimit / (1024 * 1024),
-            'MB',
-          );
+          this.recordMetric('memory:used', memory.usedJSHeapSize / (1024 * 1024), 'MB');
+          this.recordMetric('memory:total', memory.totalJSHeapSize / (1024 * 1024), 'MB');
+          this.recordMetric('memory:limit', memory.jsHeapSizeLimit / (1024 * 1024), 'MB');
         }
       }, 5000) as unknown as number;
     }
@@ -426,10 +401,7 @@ export const performanceMonitor = new PerformanceMonitor();
  */
 export function usePerformanceMonitoring(componentName: string): {
   measureRender: (renderName: string) => void;
-  measureEffect: (
-    effectName: string,
-    fn: () => void | (() => void),
-  ) => void | (() => void);
+  measureEffect: (effectName: string, fn: () => void | (() => void)) => void | (() => void);
   measureAsyncEffect: (
     effectName: string,
     fn: () => Promise<void | (() => void)>,

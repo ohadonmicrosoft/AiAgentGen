@@ -186,9 +186,7 @@ describe('OfflineIndicator Component', () => {
     ]);
 
     // Mock sync failure
-    (offlineForms.syncOfflineForms as jest.Mock).mockRejectedValue(
-      new Error('Sync failed'),
-    );
+    (offlineForms.syncOfflineForms as jest.Mock).mockRejectedValue(new Error('Sync failed'));
 
     const mockToast = jest.fn();
     (useToast as jest.Mock).mockReturnValue({

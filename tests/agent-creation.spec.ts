@@ -5,8 +5,7 @@ const USER_EMAIL = 'test@example.com';
 const USER_PASSWORD = 'password123';
 const AGENT_NAME = 'Test Agent';
 const AGENT_DESCRIPTION = 'This is a test agent created by automated tests';
-const AGENT_SYSTEM_PROMPT =
-  'You are a helpful assistant that provides information about testing.';
+const AGENT_SYSTEM_PROMPT = 'You are a helpful assistant that provides information about testing.';
 
 test.describe('Agent Creation Flow', () => {
   // Before each test, log in
@@ -59,9 +58,7 @@ test.describe('Agent Creation Flow', () => {
 
     // Verify agent appears in the list
     await expect(page.locator(`h3:has-text("${AGENT_NAME}")`)).toBeVisible();
-    await expect(
-      page.locator(`p:has-text("${AGENT_DESCRIPTION}")`),
-    ).toBeVisible();
+    await expect(page.locator(`p:has-text("${AGENT_DESCRIPTION}")`)).toBeVisible();
   });
 
   test('should validate required fields', async ({ page }) => {
@@ -135,10 +132,7 @@ test.describe('Agent Creation Flow', () => {
     await page.click('button:has-text("Test Agent")');
 
     // Type a test message
-    await page.fill(
-      'textarea[placeholder="Type a message"]',
-      'Tell me about testing',
-    );
+    await page.fill('textarea[placeholder="Type a message"]', 'Tell me about testing');
 
     // Send message
     await page.click('button:has-text("Send")');
@@ -174,8 +168,6 @@ test.describe('Agent Creation Flow', () => {
     await expect(page.locator('text=Agent deleted successfully')).toBeVisible();
 
     // Verify agent no longer appears in list
-    await expect(
-      page.locator(`h3:has-text("${AGENT_NAME}")`),
-    ).not.toBeVisible();
+    await expect(page.locator(`h3:has-text("${AGENT_NAME}")`)).not.toBeVisible();
   });
 });
