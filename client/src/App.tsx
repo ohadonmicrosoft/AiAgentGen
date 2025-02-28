@@ -3,7 +3,7 @@ import { ErrorFallback } from "@/components/ui/error-fallback";
 import { OfflineIndicator } from "@/components/ui/offline-indicator";
 import { Spinner } from "@/components/ui/spinner";
 import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from "@/context/auth-context";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { DragProvider } from "@/contexts/drag-context";
 import { useReducedMotion } from "@/hooks/animations/useReducedMotion";
 import { SidebarProvider } from "@/hooks/use-sidebar-state";
@@ -15,7 +15,7 @@ import { Suspense, lazy, useEffect, useState } from "react";
 import { Route, Switch, useLocation } from "wouter";
 import { initOfflineSupport } from "./lib/offline-plugin";
 import { PageTransition } from "./lib/page-transition";
-import { ProtectedRoute } from "./lib/protected-route";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { queryClient } from "./lib/queryClient";
 
 // Initialize logger
@@ -35,7 +35,7 @@ const ROUTE_GROUPS = {
 // Lazy load page components with route-based code splitting
 // Auth routes
 const AuthPage = lazy(
-  () => import(/* webpackChunkName: "auth" */ "@/pages/auth-page"),
+  () => import(/* webpackChunkName: "auth" */ "@/pages/auth"),
 );
 
 // Main app routes
@@ -56,6 +56,9 @@ const Prompts = lazy(
 );
 const Settings = lazy(
   () => import(/* webpackChunkName: "main" */ "@/pages/settings"),
+);
+const Profile = lazy(
+  () => import(/* webpackChunkName: "main" */ "@/pages/profile"),
 );
 
 // Admin routes
@@ -176,7 +179,7 @@ const GlobalErrorFallback = ({
 // Preload critical routes
 function preloadRoutes() {
   // Preload auth routes
-  import("@/pages/auth-page");
+  import("@/pages/auth");
 
   // Preload main routes
   setTimeout(() => {
@@ -246,41 +249,47 @@ function Router() {
         >
           <Suspense fallback={<LoadingFallback />}>
             <Switch>
+              {/* Auth routes */}
+              <Route path="/login" component={AuthPage} />
               <Route path="/auth" component={AuthPage} />
+
+              {/* Protected routes */}
               <ProtectedRoute path="/" component={Dashboard} />
               <ProtectedRoute path="/agents" component={Agents} />
               <ProtectedRoute path="/create-agent" component={CreateAgent} />
-              <ProtectedRoute path="/agents/:id/test" component={TestAgent} />
-              <ProtectedRoute path="/test-agent" component={TestAgent} />
-              <ProtectedRoute path="/test-agent/:id" component={TestAgent} />
+              <ProtectedRoute path="/test-agent/:id?" component={TestAgent} />
               <ProtectedRoute path="/prompts" component={Prompts} />
               <ProtectedRoute path="/settings" component={Settings} />
+              <ProtectedRoute path="/profile" component={Profile} />
+
+              {/* Admin routes */}
               <ProtectedRoute path="/admin/agents" component={AdminAgents} />
               <ProtectedRoute path="/admin/users" component={AdminUsers} />
-              <ProtectedRoute path="/form-demo" component={FormDemo} />
-              <ProtectedRoute
-                path="/typography-demo"
-                component={TypographyDemo}
-              />
-              <ProtectedRoute path="/palette-demo" component={PaletteDemo} />
-              <ProtectedRoute path="/spacing-demo" component={SpacingDemo} />
-              <ProtectedRoute path="/drag-drop-demo" component={DragDropDemo} />
-              <ProtectedRoute
+
+              {/* Demo routes */}
+              <Route path="/form-demo" component={FormDemo} />
+              <Route path="/typography-demo" component={TypographyDemo} />
+              <Route path="/palette-demo" component={PaletteDemo} />
+              <Route path="/spacing-demo" component={SpacingDemo} />
+              <Route path="/drag-drop-demo" component={DragDropDemo} />
+              <Route
                 path="/infinite-scroll-demo"
                 component={InfiniteScrollDemo}
               />
-              <ProtectedRoute
+              <Route
                 path="/contrast-checker-demo"
                 component={ContrastCheckerDemo}
               />
-              <ProtectedRoute
+              <Route
                 path="/performance-dashboard"
                 component={PerformanceDashboard}
               />
-              <ProtectedRoute
+              <Route
                 path="/error-handling-demo"
                 component={ErrorHandlingDemo}
               />
+
+              {/* 404 route */}
               <Route component={NotFound} />
             </Switch>
           </Suspense>
@@ -345,15 +354,15 @@ function App() {
     >
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <SidebarProvider>
-            <DragProvider>
-              <ThemeProvider>
+          <ThemeProvider>
+            <SidebarProvider>
+              <DragProvider>
                 <Router />
                 <Toaster />
                 <OfflineIndicator />
-              </ThemeProvider>
-            </DragProvider>
-          </SidebarProvider>
+              </DragProvider>
+            </SidebarProvider>
+          </ThemeProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>

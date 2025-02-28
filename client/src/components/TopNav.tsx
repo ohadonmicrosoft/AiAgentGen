@@ -15,6 +15,7 @@ import {
   Sun,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { UserProfile } from "./auth/UserProfile";
 
 interface TopNavProps {
   title: string;
@@ -128,6 +129,9 @@ export default function TopNav({ title, onMenuClick }: TopNavProps) {
 
             {/* Theme Toggle Component */}
             <ThemeToggle />
+
+            {/* User Profile Component */}
+            <UserProfile />
           </div>
         </div>
       </div>
