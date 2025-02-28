@@ -74,7 +74,8 @@ export function BottomNavigation({
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
-  const { triggerSuccessFeedback } = useHaptic();
+  const { success: triggerSuccessFeedback } = useHaptic();
+  const { light: triggerLightFeedback } = useHaptic();
   const shouldReduceMotion = useReducedMotion();
   const { getDeviceSpacing } = useFluidSpacing();
   

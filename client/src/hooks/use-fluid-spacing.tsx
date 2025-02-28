@@ -53,6 +53,18 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
     return 'desktop';
   }, [activeBreakpoint]);
   
+  // Function to get device-specific spacing
+  const getDeviceSpacing = useMemo(() => {
+    return (deviceSizes: { 
+      mobile?: 'xs' | 'sm' | 'md' | 'lg' | 'xl',
+      tablet?: 'xs' | 'sm' | 'md' | 'lg' | 'xl',
+      desktop?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' 
+    }): string => {
+      const size = deviceSizes[currentDevice] || 'md';
+      return deviceSpecificSpace(currentDevice, size);
+    };
+  }, [currentDevice]);
+  
   // Build the style object based on provided options
   const style = useMemo(() => {
     const result: Record<string, string> = {};
@@ -248,7 +260,7 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
     };
   }, [deviceSpecific, currentDevice, sizeMap]);
   
-  return { style, getSpacingClass };
+  return { style, getSpacingClass, getDeviceSpacing };
 }
 
 /**

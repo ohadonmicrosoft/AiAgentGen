@@ -1,4 +1,4 @@
-import { Logger } from '@/lib/logger';
+import { logger } from '@/lib/logger';
 
 // Create a dedicated logger instance for API errors
 const logger = new Logger('ApiError');

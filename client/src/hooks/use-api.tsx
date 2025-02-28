@@ -8,7 +8,7 @@ import {
   createNetworkError,
   ErrorCategory
 } from '@/lib/api-error';
-import { Logger } from '@/lib/logger';
+import { logger } from '@/lib/logger';
 
 // Create a dedicated logger for API calls
 const logger = new Logger('APIClient');

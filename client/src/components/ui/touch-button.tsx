@@ -95,12 +95,13 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
   
   // Get haptic feedback methods from hook
   const {
-    triggerLightFeedback,
-    triggerMediumFeedback,
-    triggerHeavyFeedback,
-    triggerSuccessFeedback,
-    triggerWarningFeedback,
-    triggerErrorFeedback
+    isSupported: hapticSupported,
+    light: triggerLightFeedback,
+    medium: triggerMediumFeedback,
+    heavy: triggerHeavyFeedback,
+    success: triggerSuccessFeedback,
+    warning: triggerWarningFeedback,
+    error: triggerErrorFeedback
   } = useHaptic();
   
   // Manage ripple effect state

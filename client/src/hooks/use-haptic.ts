@@ -1,8 +1,6 @@
 import { useCallback } from 'react';
 import { useIsMobile } from './use-mobile';
-import { Logger } from '@/lib/logger';
-
-const logger = new Logger('useHaptic');
+import { logger } from '@/lib/logger';
 
 /**
  * Haptic patterns for different feedback types
