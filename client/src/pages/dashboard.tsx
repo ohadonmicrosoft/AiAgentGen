@@ -6,11 +6,12 @@ import QuickActionCard from "@/components/QuickActionCard";
 import AgentCard from "@/components/AgentCard";
 import AgentWizard from "@/components/wizard/AgentWizard";
 import { useQuery } from "@tanstack/react-query";
-import { Bot, MessageSquare, BarChart3, Plus, Edit2, Terminal, HelpCircle, Settings, Palette, FormInput, Layout, Move, GripVertical, ScrollText, EyeIcon, BarChart2 } from "lucide-react";
+import { Bot, MessageSquare, BarChart3, Plus, Edit2, Terminal, HelpCircle, Settings, Palette, FormInput, Layout, Move, GripVertical, ScrollText, EyeIcon, BarChart2, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/animations";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 interface Agent {
   id: string;
@@ -225,6 +226,16 @@ export default function Dashboard() {
                       <BarChart2 className="mr-2 h-4 w-4" />
                       <span className="fluid-body">Performance</span>
                     </Button>
+                  </Link>
+                  <Link
+                    to="/error-handling-demo"
+                    className={buttonVariants({
+                      variant: "outline",
+                      className: "justify-start",
+                    })}
+                  >
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    Error Handling
                   </Link>
                 </div>
               </CardContent>

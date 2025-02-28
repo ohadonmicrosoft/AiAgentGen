@@ -27,6 +27,7 @@ import DragDropDemo from "@/pages/drag-drop-demo";
 import InfiniteScrollDemo from "@/pages/infinite-scroll-demo";
 import ContrastCheckerDemo from "@/pages/contrast-checker-demo";
 import PerformanceDashboard from "@/pages/performance-dashboard";
+import ErrorHandlingDemo from "@/pages/error-handling-demo";
 
 function Router() {
   const [location] = useLocation();
@@ -54,6 +55,7 @@ function Router() {
           <ProtectedRoute path="/infinite-scroll-demo" component={InfiniteScrollDemo} />
           <ProtectedRoute path="/contrast-checker-demo" component={ContrastCheckerDemo} />
           <ProtectedRoute path="/performance-dashboard" component={PerformanceDashboard} />
+          <ProtectedRoute path="/error-handling-demo" component={ErrorHandlingDemo} />
           <Route component={NotFound} />
         </Switch>
       </PageTransition>

@@ -21,7 +21,8 @@ import {
   ListFilter,
   ScrollText,
   EyeIcon,
-  BarChart2
+  BarChart2,
+  AlertTriangle
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -86,6 +87,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
     { path: "/infinite-scroll-demo", label: "Infinite Scroll", icon: <ScrollText className="h-4 w-4" /> },
     { path: "/contrast-checker-demo", label: "Contrast Checker", icon: <EyeIcon className="h-4 w-4" /> },
     { path: "/performance-dashboard", label: "Performance", icon: <BarChart2 className="h-4 w-4" /> },
+    { path: "/error-handling-demo", label: "Error Handling", icon: <AlertTriangle className="h-5 w-5" /> },
   ];
 
   const sidebarVariants = {
