@@ -1,6 +1,8 @@
 import { ReactNode, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useActiveBreakpoint } from "@/hooks/use-mobile";
+import { useActiveBreakpoint, useIsMobile, useIsTablet } from "@/hooks/use-mobile";
+import { useFluidSpacing, fluidSpacingToClassName } from "@/hooks/use-fluid-spacing";
+import { SpaceScaleKey } from "@/hooks/use-fluid-spacing";
 
 interface ResponsiveContainerProps {
   children: ReactNode;
@@ -10,90 +12,138 @@ interface ResponsiveContainerProps {
   desktopClassName?: string;
   fullWidth?: boolean;
   withTransition?: boolean;
+  maxWidth?: 'text' | 'ui' | 'full' | number;
+  padding?: SpaceScaleKey | { x?: SpaceScaleKey; y?: SpaceScaleKey };
+  margin?: SpaceScaleKey | { x?: SpaceScaleKey; y?: SpaceScaleKey };
+  deviceSpecific?: boolean;
 }
 
 /**
- * A responsive container component that applies different styles based on screen size
- * and transitions smoothly between them
+ * A container component that applies different styles based on screen size
+ * Uses our fluid spacing system for consistent spacing across breakpoints
  */
 export function ResponsiveContainer({
   children,
-  className,
-  mobileClassName,
-  tabletClassName,
-  desktopClassName,
+  className = '',
+  mobileClassName = '',
+  tabletClassName = '',
+  desktopClassName = '',
   fullWidth = false,
-  withTransition = true
+  withTransition = true,
+  maxWidth,
+  padding,
+  margin,
+  deviceSpecific = false,
 }: ResponsiveContainerProps) {
-  const breakpoint = useActiveBreakpoint();
-  const [mounted, setMounted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const activeBreakpoint = useActiveBreakpoint();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   
-  // Used for the initial render to prevent transition flickering
+  // Get fluid spacing styles
+  const { style: spacingStyle } = useFluidSpacing({
+    maxWidth,
+    padding,
+    margin,
+    deviceSpecific,
+  });
+  
+  // Generate responsive classes based on current device
+  const responsiveClasses = cn(
+    className,
+    isMobile && mobileClassName,
+    isTablet && tabletClassName,
+    !isMobile && !isTablet && desktopClassName,
+    // Automatically apply fluid container classes if fullWidth is false
+    !fullWidth && 'fluid-container',
+    // Generate classes from fluid spacing options
+    padding && fluidSpacingToClassName({ padding, deviceSpecific }),
+    margin && fluidSpacingToClassName({ margin, deviceSpecific }),
+  );
+  
+  // Prevent transition flickering on initial render
   useEffect(() => {
-    setMounted(true);
+    setIsClient(true);
   }, []);
-
-  const getBreakpointClassName = () => {
-    if (breakpoint === "xs" || breakpoint === "sm") {
-      return mobileClassName || "";
-    } else if (breakpoint === "md") {
-      return tabletClassName || "";
-    } else {
-      return desktopClassName || "";
-    }
+  
+  const containerStyles = {
+    ...(!fullWidth && !maxWidth ? {} : spacingStyle),
+    ...(withTransition && isClient ? {
+      transition: 'padding 0.3s ease, margin 0.3s ease, max-width 0.3s ease',
+    } : {}),
   };
-
+  
   return (
-    <div
-      className={cn(
-        "w-full mx-auto",
-        fullWidth ? "" : "container px-4 md:px-6",
-        withTransition ? "transition-all duration-300 ease-in-out" : "",
-        !mounted && withTransition ? "duration-0" : "",
-        getBreakpointClassName(),
-        className
-      )}
-    >
+    <div className={responsiveClasses} style={containerStyles}>
       {children}
     </div>
   );
 }
 
+interface ScreenSizeOnlyProps {
+  children: ReactNode;
+  mobile?: boolean;
+  tablet?: boolean;
+  desktop?: boolean;
+  className?: string;
+}
+
 /**
- * A component that only renders on specific screen sizes
+ * A component that conditionally renders its children based on screen size
  */
 export function ScreenSizeOnly({
   children,
-  showOnMobile = false,
-  showOnTablet = false,
-  showOnDesktop = false
-}: {
-  children: ReactNode;
-  showOnMobile?: boolean;
-  showOnTablet?: boolean;
-  showOnDesktop?: boolean;
-}) {
-  const breakpoint = useActiveBreakpoint();
-  
-  // Don't render anything during SSR
+  mobile = false,
+  tablet = false,
+  desktop = false,
+  className = '',
+}: ScreenSizeOnlyProps) {
   const [mounted, setMounted] = useState(false);
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const isDesktop = !isMobile && !isTablet;
+  
+  // Only render after component has mounted to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
   
+  // Don't render anything on the server
   if (!mounted) return null;
   
-  const isMobile = breakpoint === "xs" || breakpoint === "sm";
-  const isTablet = breakpoint === "md";
-  const isDesktop = breakpoint === "lg" || breakpoint === "xl" || breakpoint === "2xl";
-  
-  if (
-    (showOnMobile && isMobile) ||
-    (showOnTablet && isTablet) ||
-    (showOnDesktop && isDesktop)
-  ) {
-    return <>{children}</>;
+  // Only render if current screen size matches the requested sizes
+  if ((mobile && isMobile) || (tablet && isTablet) || (desktop && isDesktop)) {
+    return <div className={className}>{children}</div>;
   }
   
   return null;
+}
+
+/**
+ * A component that adds device-specific padding around its children
+ */
+export function DeviceAdaptiveContainer({
+  children,
+  className = '',
+  horizontalPadding = 'md',
+  verticalPadding,
+}: {
+  children: ReactNode;
+  className?: string;
+  horizontalPadding?: SpaceScaleKey;
+  verticalPadding?: SpaceScaleKey;
+}) {
+  const { style } = useFluidSpacing({
+    padding: {
+      x: horizontalPadding,
+      ...(verticalPadding ? { y: verticalPadding } : {})
+    },
+    deviceSpecific: true,
+  });
+  
+  return (
+    <div className={cn('w-full', className)} style={style}>
+      {children}
+    </div>
+  );
 }

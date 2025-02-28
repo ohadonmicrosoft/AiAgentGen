@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { 
   getOptimizedImageUrl, 
@@ -6,8 +6,11 @@ import {
   getResponsiveSrcSet,
   ImageOptimizationOptions,
   ImageLoadingMode,
-  getBestSupportedFormat
+  getBestSupportedFormat,
+  preloadImage
 } from '@/lib/image-optimization';
+import { useInView } from '@/hooks/use-in-view';
+import { useReducedMotion } from '@/hooks/animations/useReducedMotion';
 
 export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   /**
@@ -92,12 +95,36 @@ export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageEl
    * Additional image options
    */
   imageOptions?: Partial<ImageOptimizationOptions>;
+
+  /**
+   * Threshold for intersection observer (0-1)
+   * @default 0.1
+   */
+  threshold?: number;
+
+  /**
+   * Root margin for intersection observer
+   * @default "200px"
+   */
+  rootMargin?: string;
+
+  /**
+   * Disable animation for blur-up effect
+   * @default false
+   */
+  disableAnimation?: boolean;
+
+  /**
+   * Enable native lazy loading
+   * @default true
+   */
+  nativeLazyLoading?: boolean;
 }
 
 /**
  * A responsive, optimized image component with blur-up loading effect
  */
-export const OptimizedImage = React.forwardRef<HTMLImageElement, OptimizedImageProps>(
+const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImageProps>(
   ({
     src,
     alt,
@@ -117,13 +144,27 @@ export const OptimizedImage = React.forwardRef<HTMLImageElement, OptimizedImageP
     imageOptions = {},
     style,
     sizes,
+    threshold = 0.1,
+    rootMargin = "200px",
+    disableAnimation = false,
+    nativeLazyLoading = true,
     ...props
   }, ref) => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [error, setError] = useState(false);
+    const imageRef = useRef<HTMLImageElement>(null);
+    const combinedRef = useCombinedRefs(ref, imageRef);
+    const prefersReducedMotion = useReducedMotion();
+    
+    // Use intersection observer for better lazy loading
+    const { inView, ref: inViewRef } = useInView({
+      threshold,
+      rootMargin,
+      triggerOnce: true,
+    });
     
     // Override loading mode if priority is set
-    const loading = priority ? 'eager' : initialLoading;
+    const loading = priority ? 'eager' : (nativeLazyLoading ? initialLoading : undefined);
     const fetchPriority = priority ? 'high' : undefined;
         
     // Get best supported image format if enabled
@@ -148,7 +189,7 @@ export const OptimizedImage = React.forwardRef<HTMLImageElement, OptimizedImageP
     // Generate srcset for responsive images
     const srcSet = width ? getResponsiveSrcSet(
       src,
-      responsiveWidths.filter(w => w <= width * 2), // Only include widths up to 2x the displayed size
+      responsiveWidths.filter(w => w <= (width * 2)), // Only include widths up to 2x the displayed size
       { ...options, width: undefined }
     ) : undefined;
     
@@ -172,6 +213,25 @@ export const OptimizedImage = React.forwardRef<HTMLImageElement, OptimizedImageP
     useEffect(() => {
       setError(false);
     }, [src]);
+
+    // Preload priority images
+    useEffect(() => {
+      if (priority && src) {
+        preloadImage(src, options).catch(() => {
+          // Silently catch errors for preloading
+        });
+      }
+    }, [priority, src, options]);
+
+    // Start loading the image when it comes into view
+    useEffect(() => {
+      if (inView && imageRef.current && !nativeLazyLoading) {
+        imageRef.current.src = optimizedSrc;
+        if (srcSet) {
+          imageRef.current.srcset = srcSet;
+        }
+      }
+    }, [inView, optimizedSrc, srcSet, nativeLazyLoading]);
     
     // If there's an error loading the image, show a placeholder
     if (error) {
@@ -187,23 +247,28 @@ export const OptimizedImage = React.forwardRef<HTMLImageElement, OptimizedImageP
         </div>
       );
     }
+
+    // Determine blur animation duration based on reduced motion preference
+    const blurAnimationDuration = disableAnimation || prefersReducedMotion ? 0 : 300;
     
     // Determine if we need a container
     if (fill || containerClassName) {
       return (
         <div 
+          ref={inViewRef as React.RefObject<HTMLDivElement>}
           className={cn(
             'relative overflow-hidden',
             containerClassName
           )}
           style={aspectRatioStyle}
+          data-testid="optimized-image-container"
         >
           {blurUp && !isLoaded && (
             <img
               src={placeholderSrc}
               alt={alt}
               className={cn(
-                'transition-opacity duration-300 w-full h-full',
+                'transition-opacity w-full h-full',
                 className
               )}
               style={{
@@ -212,15 +277,16 @@ export const OptimizedImage = React.forwardRef<HTMLImageElement, OptimizedImageP
                 objectFit,
                 opacity: isLoaded ? 0 : 1,
                 position: 'absolute',
-                inset: 0
+                inset: 0,
+                transitionDuration: `${blurAnimationDuration}ms`
               }}
               aria-hidden="true"
             />
           )}
           
           <img
-            ref={ref}
-            src={optimizedSrc}
+            ref={combinedRef}
+            src={nativeLazyLoading ? optimizedSrc : (priority ? optimizedSrc : undefined)}
             alt={alt}
             width={width}
             height={height}
@@ -228,14 +294,18 @@ export const OptimizedImage = React.forwardRef<HTMLImageElement, OptimizedImageP
             onLoad={() => setIsLoaded(true)}
             onError={() => setError(true)}
             className={cn(
-              'transition-opacity duration-500',
+              'transition-opacity',
               !isLoaded && blurUp && 'opacity-0',
               className
             )}
-            style={combinedStyles}
+            style={{
+              ...combinedStyles,
+              transitionDuration: `${blurAnimationDuration}ms`
+            }}
             sizes={sizes}
-            srcSet={srcSet}
+            srcSet={nativeLazyLoading ? srcSet : undefined}
             fetchPriority={fetchPriority}
+            decoding={priority ? 'sync' : 'async'}
             {...props}
           />
         </div>
@@ -250,22 +320,22 @@ export const OptimizedImage = React.forwardRef<HTMLImageElement, OptimizedImageP
             src={placeholderSrc}
             alt={alt}
             className={cn(
-              'transition-opacity duration-300',
+              'transition-opacity absolute',
               className
             )}
             style={{
               ...combinedStyles,
               filter: 'blur(15px)',
-              position: 'absolute',
               opacity: isLoaded ? 0 : 1,
+              transitionDuration: `${blurAnimationDuration}ms`
             }}
             aria-hidden="true"
           />
         )}
         
         <img
-          ref={ref}
-          src={optimizedSrc}
+          ref={combinedRef}
+          src={nativeLazyLoading ? optimizedSrc : (priority || inView ? optimizedSrc : undefined)}
           alt={alt}
           width={width}
           height={height}
@@ -273,14 +343,18 @@ export const OptimizedImage = React.forwardRef<HTMLImageElement, OptimizedImageP
           onLoad={() => setIsLoaded(true)}
           onError={() => setError(true)}
           className={cn(
-            'transition-opacity duration-500',
+            'transition-opacity',
             !isLoaded && blurUp && 'opacity-0',
             className
           )}
-          style={combinedStyles}
+          style={{
+            ...combinedStyles,
+            transitionDuration: `${blurAnimationDuration}ms`
+          }}
           sizes={sizes}
-          srcSet={srcSet}
+          srcSet={nativeLazyLoading ? srcSet : undefined}
           fetchPriority={fetchPriority}
+          decoding={priority ? 'sync' : 'async'}
           {...props}
         />
       </>
@@ -288,4 +362,84 @@ export const OptimizedImage = React.forwardRef<HTMLImageElement, OptimizedImageP
   }
 );
 
-OptimizedImage.displayName = 'OptimizedImage'; 
+OptimizedImageComponent.displayName = 'OptimizedImage';
+
+// Helper to combine refs
+function useCombinedRefs<T>(
+  ...refs: Array<React.ForwardedRef<T> | React.RefObject<T> | null | undefined>
+): React.RefCallback<T> {
+  return React.useCallback((element: T | null) => {
+    refs.forEach((ref) => {
+      if (!ref) return;
+      
+      if (typeof ref === 'function') {
+        ref(element);
+      } else {
+        (ref as React.MutableRefObject<T | null>).current = element;
+      }
+    });
+  }, [refs]);
+}
+
+// Memoize the component to prevent unnecessary re-renders
+export const OptimizedImage = memo(OptimizedImageComponent);
+
+/**
+ * Preload multiple images in advance
+ * @param images Array of image URLs or objects with src and options
+ */
+export function preloadImages(
+  images: Array<string | { src: string; options?: Partial<ImageOptimizationOptions> }>
+): void {
+  images.forEach(image => {
+    const src = typeof image === 'string' ? image : image.src;
+    const options = typeof image === 'string' ? undefined : image.options;
+    
+    preloadImage(src, options).catch(() => {
+      // Silently catch errors for preloading
+    });
+  });
+}
+
+/**
+ * Background image component that uses optimized images
+ */
+export const OptimizedBackgroundImage = React.forwardRef<
+  HTMLDivElement, 
+  Omit<OptimizedImageProps, 'alt'> & { children?: React.ReactNode }
+>(({ 
+  src, 
+  children, 
+  className, 
+  style,
+  useModernFormat = true,
+  quality = 80,
+  imageOptions = {},
+  ...props 
+}, ref) => {
+  const format = useModernFormat ? getBestSupportedFormat() : 'original';
+  
+  const options: Partial<ImageOptimizationOptions> = {
+    ...imageOptions,
+    quality,
+    format
+  };
+  
+  const optimizedSrc = getOptimizedImageUrl(src, options);
+  
+  return (
+    <div
+      ref={ref}
+      className={cn('bg-no-repeat bg-cover bg-center', className)}
+      style={{
+        backgroundImage: `url(${optimizedSrc})`,
+        ...style
+      }}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+});
+
+OptimizedBackgroundImage.displayName = 'OptimizedBackgroundImage'; 

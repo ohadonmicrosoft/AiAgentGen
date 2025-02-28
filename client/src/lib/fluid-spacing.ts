@@ -43,6 +43,20 @@ export function fluidSpace({
   maxWidth = 1200,
   unit = 'px'
 }: FluidSpacingOptions): string {
+  // Safety checks to prevent negative or invalid values
+  if (minSize < 0) minSize = 0;
+  if (maxSize < 0) maxSize = 0;
+  if (minWidth < 0) minWidth = 320;
+  if (maxWidth < 0) maxWidth = 1200;
+  if (maxWidth <= minWidth) maxWidth = minWidth + 100;
+
+  // Ensure minSize <= maxSize
+  if (minSize > maxSize) {
+    const temp = minSize;
+    minSize = maxSize;
+    maxSize = temp;
+  }
+  
   // Calculate the slope
   const slope = (maxSize - minSize) / (maxWidth - minWidth);
   
@@ -63,18 +77,25 @@ export function fluidSpace({
 
 /**
  * Predefined spacing scale for common spacing values
+ * This uses a more refined spacing scale with better progression
  */
 export const fluidSpaceScale = {
-  '3xs': fluidSpace({ minSize: 2, maxSize: 4 }),
-  '2xs': fluidSpace({ minSize: 4, maxSize: 8 }),
-  'xs': fluidSpace({ minSize: 8, maxSize: 12 }),
-  'sm': fluidSpace({ minSize: 12, maxSize: 16 }),
-  'md': fluidSpace({ minSize: 16, maxSize: 24 }),
-  'lg': fluidSpace({ minSize: 24, maxSize: 32 }),
-  'xl': fluidSpace({ minSize: 32, maxSize: 48 }),
-  '2xl': fluidSpace({ minSize: 48, maxSize: 64 }),
-  '3xl': fluidSpace({ minSize: 64, maxSize: 96 }),
-  '4xl': fluidSpace({ minSize: 96, maxSize: 128 }),
+  '3xs': fluidSpace({ minSize: 2, maxSize: 4 }),   // Tiny spaces (borders, thin lines)
+  '2xs': fluidSpace({ minSize: 4, maxSize: 8 }),   // Very small spaces
+  'xs': fluidSpace({ minSize: 8, maxSize: 12 }),   // Small spaces (compact UI elements)
+  'sm': fluidSpace({ minSize: 12, maxSize: 16 }),  // Medium-small spaces
+  'md': fluidSpace({ minSize: 16, maxSize: 24 }),  // Medium spaces (standard spacing)
+  'lg': fluidSpace({ minSize: 24, maxSize: 32 }),  // Large spaces
+  'xl': fluidSpace({ minSize: 32, maxSize: 48 }),  // Extra large spaces
+  '2xl': fluidSpace({ minSize: 48, maxSize: 64 }), // Double extra large spaces
+  '3xl': fluidSpace({ minSize: 64, maxSize: 96 }), // Triple extra large spaces
+  '4xl': fluidSpace({ minSize: 96, maxSize: 128 }), // Quadruple extra large spaces
+  
+  // Common UI-specific spacing values with better descriptive names
+  'form-gap': fluidSpace({ minSize: 16, maxSize: 24 }),        // Space between form elements
+  'card-padding': fluidSpace({ minSize: 16, maxSize: 24 }),    // Card internal padding
+  'section-gap': fluidSpace({ minSize: 32, maxSize: 64 }),     // Gap between sections
+  'container-padding': fluidSpace({ minSize: 16, maxSize: 32 }) // Container padding
 };
 
 /**
@@ -127,7 +148,7 @@ export function contentAwareSpace(
     ? minSpace
     : maxSpace - ((maxSpace - minSpace) * (contentLength / threshold));
   
-  return `${Math.max(minSpace, size)}px`;
+  return `${Math.max(minSpace, Math.min(maxSpace, size))}px`;
 }
 
 /**
@@ -180,4 +201,39 @@ export function contentMaxWidth(contentType: 'text' | 'ui' | 'full'): string {
     default:
       return fluidSpace({ minSize: 640, maxSize: 1200 });
   }
+}
+
+/**
+ * Get device-specific spacing that doesn't use fluid scaling
+ * Useful for consistent spacing values within specific breakpoints
+ */
+export function deviceSpecificSpace(
+  device: 'mobile' | 'tablet' | 'desktop',
+  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+): string {
+  const spacingValues = {
+    mobile: {
+      xs: '8px',
+      sm: '12px',
+      md: '16px',
+      lg: '24px',
+      xl: '32px',
+    },
+    tablet: {
+      xs: '8px',
+      sm: '12px',
+      md: '20px',
+      lg: '28px',
+      xl: '40px',
+    },
+    desktop: {
+      xs: '8px',
+      sm: '16px',
+      md: '24px',
+      lg: '32px',
+      xl: '48px',
+    }
+  };
+
+  return spacingValues[device][size];
 } 
