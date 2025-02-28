@@ -5,7 +5,7 @@ import { Backdrop } from "@/components/ui/backdrop";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Icons } from "@/components/ui/icons";
 import { PERMISSIONS } from "@/constants";
-import { usePreferences } from "@/context/preferences-context";
+import { usePreferences } from "@/contexts/preferences-context";
 import { useAuth } from "@/hooks/use-auth";
 import { useBreakpoint } from "@/hooks/use-breakpoint";
 import { useIsMobile } from "@/hooks/use-mobile";

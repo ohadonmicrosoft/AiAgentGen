@@ -7,8 +7,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useAuth as useAuthContext } from "@/context/auth-context";
-import { usePreferences } from "@/context/preferences-context";
+import { useAuth as useAuthContext } from "@/contexts/ServerAuthContext";
+import { usePreferences } from "@/contexts/preferences-context";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
