@@ -15,9 +15,14 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { ErrorFallback } from "@/components/ui/error-fallback";
 import { Logger } from "@/lib/logger";
 import { useReducedMotion } from "@/hooks/animations/useReducedMotion";
+import { initOfflineSupport } from "./lib/offline-plugin";
+import { OfflineIndicator } from "@/components/ui/offline-indicator";
 
 // Initialize logger
 const logger = new Logger('App');
+
+// Initialize offline support
+initOfflineSupport(queryClient);
 
 // Define route groups for code splitting
 const ROUTE_GROUPS = {
@@ -257,19 +262,20 @@ function App() {
       fallback={({ error, resetErrorBoundary }) => (
         <GlobalErrorFallback error={error!} resetErrorBoundary={resetErrorBoundary} />
       )}
-      name="AppRootErrorBoundary"
+      name="AppErrorBoundary"
     >
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+        <AuthProvider>
           <SidebarProvider>
             <DragProvider>
-              <AuthProvider>
+              <ThemeProvider>
                 <Router />
                 <Toaster />
-              </AuthProvider>
+                <OfflineIndicator />
+              </ThemeProvider>
             </DragProvider>
           </SidebarProvider>
-        </ThemeProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );
