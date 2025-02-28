@@ -6,8 +6,6 @@ A comprehensive platform for creating, testing, and managing AI agents with enha
 
 The AI Agent Generator is a full-stack application that provides a user-friendly interface for creating and managing AI agents. It features a modern React frontend with advanced UI/UX enhancements and a Node.js backend with OpenAI integration.
 
-![AI Agent Generator](./generated-icon.png)
-
 ## Features
 
 ### Core Functionality
@@ -27,13 +25,38 @@ The AI Agent Generator is a full-stack application that provides a user-friendly
 - **Micro-interactions**: Subtle animations that enhance user experience
 - **Performance Monitoring**: Tools to track and optimize application performance
 
+## Project Structure
+
+```
+├── client/                 # Frontend React application
+│   ├── public/             # Static assets
+│   ├── src/                # React source code
+│   └── index.html          # HTML entry point
+├── server/                 # Backend Node.js application
+│   ├── api/                # API endpoints
+│   ├── lib/                # Server utilities
+│   ├── __tests__/          # Server tests
+│   └── index.ts            # Server entry point
+├── shared/                 # Shared code between client and server
+├── config/                 # Configuration files
+│   ├── vite.config.ts      # Vite configuration
+│   ├── tailwind.config.ts  # Tailwind CSS configuration
+│   ├── jest.config.js      # Jest configuration
+│   └── ...                 # Other configuration files
+├── scripts/                # Utility scripts
+│   ├── maintain.ts         # Maintenance script
+│   ├── setup-db.ts         # Database setup script
+│   └── ...                 # Other utility scripts
+└── tests/                  # Integration and E2E tests
+```
+
 ## Quick Start
 
 1. Clone the repository
 
    ```bash
-   git clone https://github.com/ohadonmicrosoft/AiAgentGen.git
-   cd AiAgentGen
+   git clone https://github.com/yourusername/ai-agent-generator.git
+   cd ai-agent-generator
    ```
 
 2. Install dependencies
@@ -47,6 +70,9 @@ The AI Agent Generator is a full-stack application that provides a user-friendly
 
    ```
    OPENAI_API_KEY=your_openai_api_key
+   DATABASE_URL=sqlite:./dev.db
+   JWT_SECRET=your_jwt_secret
+   PORT=3000
    ```
 
 4. Set up the database
@@ -63,26 +89,50 @@ The AI Agent Generator is a full-stack application that provides a user-friendly
 
 6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Documentation
+## Development
 
-Comprehensive documentation is available in the `/doc` directory:
+### Available Scripts
 
-- [Project Structure](./doc/project-structure.md) - Complete map of the project's file structure
-- [UI/UX Enhancement Plan](./doc/ui-ux-enhancement-plan.md) - Overview of UI/UX improvements
-- Feature-specific documentation for all UI/UX enhancements
+- `npm run dev` - Start the development server
+- `npm run build` - Build the application for production
+- `npm run start` - Start the production server
+- `npm run test` - Run tests
+- `npm run lint` - Run linting
+- `npm run format` - Format code with Prettier
+- `npm run fix:all` - Run all code quality tools
+- `npm run maintain` - Run maintenance script to fix common issues
+
+### Code Quality Tools
+
+This project uses several tools to maintain code quality:
+
+- **ESLint**: For JavaScript/TypeScript linting
+- **Prettier**: For code formatting
+- **Biome**: For additional code checks
+- **Jest**: For testing
+- **TypeScript**: For type checking
+
+### Maintenance
+
+To fix common issues in the codebase, run:
+
+```bash
+npx tsx scripts/maintain.ts
+```
+
+This script will:
+
+- Fix React JSX imports
+- Fix broken import statements
+- Apply other common fixes
 
 ## Interactive Demos
 
 The application includes interactive demos for all UI/UX enhancements:
 
 - Color Palette Generator: `/palette-demo`
-- Color Contrast Checker: `/contrast-checker-demo`
-- Dynamic Spacing System: `/spacing-demo`
-- Drag and Drop Functionality: `/drag-drop-demo`
-- Infinite Scroll: `/infinite-scroll-demo`
-- Performance Dashboard: `/performance-dashboard`
-- Form Animations: `/form-demo`
 - Typography System: `/typography-demo`
+- And more...
 
 ## Technology Stack
 

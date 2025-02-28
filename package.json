@@ -27,13 +27,13 @@
     "db:setup:test": "node scripts/setup-test-db.js",
     "db:migrate:test": "node scripts/migrate-test-db.js",
     "analyze": "vite build --mode analyze",
-    "cleanup": "tsx scripts/cleanup.ts",
+    "cleanup": "tsx scripts/cleanup-project.ts",
     "prepare": "husky",
     "update:deps": "npx npm-check-updates -u && npm install",
     "security:check": "npm audit && npx snyk test",
     "format": "prettier --write .",
     "fix:all": "npm run format && npx @biomejs/biome check --apply .",
-    "maintain": "tsx scripts/maintain-code-quality.ts"
+    "maintain": "tsx scripts/maintain.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
