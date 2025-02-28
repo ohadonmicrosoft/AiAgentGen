@@ -1,10 +1,29 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
+import { ThemeProvider } from './providers/ThemeProvider';
 import App from './App';
-import './styles/globals.css';
+import './index.css';
+import {
+  registerServiceWorker,
+  setupServiceWorkerUpdateFlow,
+  handleAppInstalled,
+} from './service-worker-registration';
+import { setupOfflineListeners } from './lib/offline-forms';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+// Create root for React rendering
+createRoot(document.getElementById('root')!).render(
+  <ThemeProvider>
     <App />
-  </React.StrictMode>,
+  </ThemeProvider>,
 );
+
+// Register service worker for offline support
+registerServiceWorker();
+
+// Set up service worker update flow
+setupServiceWorkerUpdateFlow();
+
+// Handle app installation events
+handleAppInstalled();
+
+// Setup offline form submission listeners
+setupOfflineListeners();
