@@ -6,8 +6,15 @@ import { performanceMonitor, PerformanceMetric } from './performance-metrics';
 
 // Metric types
 export type CoreWebVitalMetric = 'LCP' | 'FID' | 'CLS' | 'TTFB' | 'FCP';
-export type NavigationMetric = 'navigationStart' | 'domComplete' | 'loadComplete';
-export type CustomMetric = 'jsHeapUsed' | 'jsHeapTotal' | 'domNodes' | 'firstContentfulRender';
+export type NavigationMetric =
+  | 'navigationStart'
+  | 'domComplete'
+  | 'loadComplete';
+export type CustomMetric =
+  | 'jsHeapUsed'
+  | 'jsHeapTotal'
+  | 'domNodes'
+  | 'firstContentfulRender';
 
 /**
  * All real user metrics types
@@ -161,7 +168,8 @@ class RealUserMetrics {
     };
 
     // Determine if this session should collect metrics based on sampling rate
-    this.isEnabled = this.config.enabled && Math.random() <= this.config.samplingRate;
+    this.isEnabled =
+      this.config.enabled && Math.random() <= this.config.samplingRate;
   }
 
   /**
@@ -204,7 +212,12 @@ class RealUserMetrics {
   /**
    * Manually track a metric
    */
-  trackMetric(name: string, value: number, unit: string, metadata?: Record<string, any>): void {
+  trackMetric(
+    name: string,
+    value: number,
+    unit: string,
+    metadata?: Record<string, any>,
+  ): void {
     if (!this.isEnabled) return;
 
     this.addMetricToQueue({
@@ -463,7 +476,8 @@ class RealUserMetrics {
         this.trackMetric('TTFB', ttfb, 'ms');
 
         // DOM Content Loaded
-        const domContentLoaded = timing.domContentLoadedEventEnd - timing.navigationStart;
+        const domContentLoaded =
+          timing.domContentLoadedEventEnd - timing.navigationStart;
         this.trackMetric('domContentLoaded', domContentLoaded, 'ms');
 
         // DOM Complete
@@ -556,7 +570,11 @@ class RealUserMetrics {
     if (ua.indexOf('Mac OS X') > -1) return 'macOS';
     if (ua.indexOf('Linux') > -1) return 'Linux';
     if (ua.indexOf('Android') > -1) return 'Android';
-    if (ua.indexOf('iOS') > -1 || ua.indexOf('iPhone') > -1 || ua.indexOf('iPad') > -1)
+    if (
+      ua.indexOf('iOS') > -1 ||
+      ua.indexOf('iPhone') > -1 ||
+      ua.indexOf('iPad') > -1
+    )
       return 'iOS';
     return 'Unknown';
   }

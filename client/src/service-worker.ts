@@ -42,7 +42,9 @@ self.addEventListener('activate', (event) => {
     caches
       .keys()
       .then((cacheNames) => {
-        return cacheNames.filter((cacheName) => !currentCaches.includes(cacheName));
+        return cacheNames.filter(
+          (cacheName) => !currentCaches.includes(cacheName),
+        );
       })
       .then((cachesToDelete) => {
         return Promise.all(
@@ -93,7 +95,9 @@ self.addEventListener('fetch', (event) => {
   }
 
   // For other resources, use a cache-first strategy for matching patterns
-  if (RUNTIME_CACHE_PATTERNS.some((pattern) => pattern.test(event.request.url))) {
+  if (
+    RUNTIME_CACHE_PATTERNS.some((pattern) => pattern.test(event.request.url))
+  ) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
         if (cachedResponse) {
@@ -175,7 +179,10 @@ async function openDB() {
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains('offline-forms')) {
-        db.createObjectStore('offline-forms', { keyPath: 'id', autoIncrement: true });
+        db.createObjectStore('offline-forms', {
+          keyPath: 'id',
+          autoIncrement: true,
+        });
       }
     };
 

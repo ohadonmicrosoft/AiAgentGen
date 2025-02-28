@@ -32,7 +32,8 @@ export default function StatsCard({
     gray: 'bg-gray-500 text-white',
   };
 
-  const bgColorClass = colorMap[color as keyof typeof colorMap] || colorMap.primary;
+  const bgColorClass =
+    colorMap[color as keyof typeof colorMap] || colorMap.primary;
 
   // Animation for counting up the number
   const countVariants = {

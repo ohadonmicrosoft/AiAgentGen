@@ -301,7 +301,9 @@ export function TouchTabBar({
             {isActive && (
               <motion.div
                 className="absolute inset-0 bg-background rounded-full shadow-sm"
-                layoutId={shouldReduceMotion ? undefined : 'activeTabBackground'}
+                layoutId={
+                  shouldReduceMotion ? undefined : 'activeTabBackground'
+                }
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
               />
             )}
@@ -313,11 +315,19 @@ export function TouchTabBar({
               transition={{ duration: 0.2 }}
             >
               {item.icon && (
-                <span className={isActive ? 'text-primary' : 'text-muted-foreground'}>
+                <span
+                  className={
+                    isActive ? 'text-primary' : 'text-muted-foreground'
+                  }
+                >
                   {item.icon}
                 </span>
               )}
-              <span className={isActive ? 'text-foreground' : 'text-muted-foreground'}>
+              <span
+                className={
+                  isActive ? 'text-foreground' : 'text-muted-foreground'
+                }
+              >
                 {item.label}
               </span>
             </motion.div>

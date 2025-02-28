@@ -183,7 +183,10 @@ export function offlinePlugin(options: OfflinePluginOptions = {}) {
           const cached = await storage.getItem(key);
 
           if (cached && typeof cached === 'object' && cached !== null) {
-            const { data, expiry } = cached as { data: unknown; expiry: number };
+            const { data, expiry } = cached as {
+              data: unknown;
+              expiry: number;
+            };
 
             // Only restore if not expired
             if (expiry > Date.now()) {
@@ -210,7 +213,12 @@ export function isOffline(): boolean {
 export function initOfflineSupport(queryClient: QueryClient): void {
   const plugin = offlinePlugin({
     defaultTTL: 24 * 60 * 60 * 1000, // 24 hours
-    persistQueries: [/^\/api\/user/, /^\/api\/agents/, /^\/api\/prompts/, /^\/api\/conversations/],
+    persistQueries: [
+      /^\/api\/user/,
+      /^\/api\/agents/,
+      /^\/api\/prompts/,
+      /^\/api\/conversations/,
+    ],
   });
 
   plugin.register(queryClient);

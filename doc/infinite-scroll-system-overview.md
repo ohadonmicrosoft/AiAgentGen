@@ -5,6 +5,7 @@ This document provides an overview of the infinite scroll system implemented in 
 ## Features
 
 ### Core Functionality
+
 - **Seamless Content Loading**: Automatically loads more content as the user scrolls to the bottom of the page
 - **Loading Indicators**: Visual feedback when new content is being loaded
 - **Error Handling**: Graceful error recovery with retry capabilities
@@ -12,6 +13,7 @@ This document provides an overview of the infinite scroll system implemented in 
 - **Reduced Motion Support**: Adjusts behavior for users who prefer reduced motion
 
 ### Performance Optimizations
+
 - **Intersection Observer API**: Uses modern browser APIs for efficient scroll detection
 - **Debounced Loading**: Prevents multiple simultaneous loading requests
 - **Memory Management**: Proper cleanup of observers to prevent memory leaks
@@ -21,6 +23,7 @@ This document provides an overview of the infinite scroll system implemented in 
 ### Core Components
 
 #### 1. `useInfiniteScroll` Hook
+
 The primary React hook that implements infinite scrolling functionality:
 
 ```tsx
@@ -35,6 +38,7 @@ const { sentinelRef, isLoading, error, loadMore } = useInfiniteScroll({
 ```
 
 #### 2. Loading Indicators
+
 - `LoadingIndicator`: A general-purpose loading indicator component
 - `InfiniteScrollLoader`: A specialized loading indicator for infinite scroll
 
@@ -43,6 +47,7 @@ const { sentinelRef, isLoading, error, loadMore } = useInfiniteScroll({
 The infinite scroll system uses the Intersection Observer API to efficiently detect when a user has scrolled to a certain threshold near the bottom of the content. This approach is more performant than traditional scroll event listeners as it doesn't fire on every scroll event.
 
 Key technical aspects:
+
 - **Sentinel Element**: A DOM element placed at the end of the content that triggers loading when it becomes visible
 - **Dynamic Observer Configuration**: Adjusts based on user preferences and device capabilities
 - **Async Loading Management**: Handles loading states and errors for asynchronous data fetching
@@ -57,21 +62,23 @@ import { InfiniteScrollLoader } from '@/components/ui/loading-indicator';
 
 function MyList() {
   const [items, setItems] = useState([]);
-  
+
   const fetchMoreItems = async () => {
     const newItems = await api.getItems(items.length, 10);
-    setItems(prev => [...prev, ...newItems]);
+    setItems((prev) => [...prev, ...newItems]);
   };
-  
+
   const { sentinelRef, isLoading, error } = useInfiniteScroll({
     hasMore: items.length < totalItems,
-    onLoadMore: fetchMoreItems
+    onLoadMore: fetchMoreItems,
   });
-  
+
   return (
     <div>
-      {items.map(item => <ItemComponent key={item.id} item={item} />)}
-      
+      {items.map((item) => (
+        <ItemComponent key={item.id} item={item} />
+      ))}
+
       <div ref={sentinelRef}>
         {isLoading && <InfiniteScrollLoader />}
         {error && <ErrorMessage error={error} />}
@@ -91,15 +98,13 @@ const containerRef = useRef(null);
 const { sentinelRef, isLoading } = useInfiniteScroll({
   hasMore: hasMoreItems,
   onLoadMore: loadMoreItems,
-  scrollContainer: containerRef
+  scrollContainer: containerRef,
 });
 
 return (
   <div ref={containerRef} style={{ height: '500px', overflow: 'auto' }}>
     {/* List items */}
-    <div ref={sentinelRef}>
-      {isLoading && <InfiniteScrollLoader />}
-    </div>
+    <div ref={sentinelRef}>{isLoading && <InfiniteScrollLoader />}</div>
   </div>
 );
 ```
@@ -130,8 +135,9 @@ The infinite scroll system integrates with:
 ## Demo
 
 A comprehensive demo is available at `/infinite-scroll-demo` that showcases:
+
 - Window-based scrolling
 - Container-based scrolling
 - Error handling and recovery
 - Loading indicators
-- Configuration options 
+- Configuration options

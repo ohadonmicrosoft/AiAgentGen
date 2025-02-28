@@ -66,7 +66,9 @@ export function AnimatedFormField<
               <FormLabel>
                 {label}
                 {/* Required indicator */}
-                {props.rules?.required && <span className="text-destructive ml-1">*</span>}
+                {props.rules?.required && (
+                  <span className="text-destructive ml-1">*</span>
+                )}
               </FormLabel>
             )}
 
@@ -106,14 +108,22 @@ export function AnimatedFormField<
                     )}
                     initial={false}
                     animate={{
-                      y: hasValue || field.name === document.activeElement?.id ? 4 : 10,
-                      scale: hasValue || field.name === document.activeElement?.id ? 0.8 : 1,
+                      y:
+                        hasValue || field.name === document.activeElement?.id
+                          ? 4
+                          : 10,
+                      scale:
+                        hasValue || field.name === document.activeElement?.id
+                          ? 0.8
+                          : 1,
                       x: 0,
                     }}
                     transition={getTransition()}
                   >
                     {label}
-                    {props.rules?.required && <span className="text-destructive ml-1">*</span>}
+                    {props.rules?.required && (
+                      <span className="text-destructive ml-1">*</span>
+                    )}
                   </motion.span>
                 )}
 

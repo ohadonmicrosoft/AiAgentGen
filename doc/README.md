@@ -45,4 +45,4 @@ Each system overview document follows a common structure:
 4. **Usage Examples** - Code examples showing how to use the system
 5. **Integration with Other Systems** - How the system interacts with other parts of the application
 6. **Accessibility Considerations** - How the system addresses accessibility needs
-7. **Performance Considerations** - Performance implications and optimizations 
+7. **Performance Considerations** - Performance implications and optimizations

@@ -16,7 +16,10 @@ export interface FluidTypographyOptions {
 /**
  * Converts a pixel value to the specified unit
  */
-export function convertToUnit(value: number, unit: 'px' | 'rem' | 'em' = 'px'): string {
+export function convertToUnit(
+  value: number,
+  unit: 'px' | 'rem' | 'em' = 'px',
+): string {
   if (unit === 'px') return `${value}px`;
   if (unit === 'rem') return `${value / 16}rem`;
   if (unit === 'em') return `${value / 16}em`;
@@ -40,7 +43,9 @@ export function fluidTypography({
   const minSizeValue = convertToUnit(minSize, unit);
   const maxSizeValue = convertToUnit(maxSize, unit);
   const interceptValue =
-    unit === 'px' ? `${intercept.toFixed(4)}px` : `${(intercept / 16).toFixed(4)}${unit}`;
+    unit === 'px'
+      ? `${intercept.toFixed(4)}px`
+      : `${(intercept / 16).toFixed(4)}${unit}`;
 
   return `clamp(${minSizeValue}, ${interceptValue} + ${slopeVw.toFixed(4)}vw, ${maxSizeValue})`;
 }

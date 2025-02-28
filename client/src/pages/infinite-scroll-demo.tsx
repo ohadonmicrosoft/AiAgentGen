@@ -2,7 +2,10 @@ import React, { useState, useCallback, useRef } from 'react';
 import { MainLayout } from '@/components/layouts/MainLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { InfiniteScrollLoader, LoadingIndicator } from '@/components/ui/loading-indicator';
+import {
+  InfiniteScrollLoader,
+  LoadingIndicator,
+} from '@/components/ui/loading-indicator';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { Input } from '@/components/ui/input';
 import { motion } from 'framer-motion';
@@ -44,7 +47,9 @@ const InfiniteScrollDemo: React.FC = () => {
   const [totalItems, setTotalItems] = useState(100);
   const [delayMs, setDelayMs] = useState(1000);
   const [shouldError, setShouldError] = useState(false);
-  const [scrollType, setScrollType] = useState<'window' | 'container'>('window');
+  const [scrollType, setScrollType] = useState<'window' | 'container'>(
+    'window',
+  );
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +66,9 @@ const InfiniteScrollDemo: React.FC = () => {
     // Add more items
     setItems((prev) => [
       ...prev,
-      ...Array.from({ length: 10 }, (_, i) => generateRandomItem(prev.length + i + 1)),
+      ...Array.from({ length: 10 }, (_, i) =>
+        generateRandomItem(prev.length + i + 1),
+      ),
     ]);
   }, [delayMs, shouldError]);
 
@@ -88,14 +95,18 @@ const InfiniteScrollDemo: React.FC = () => {
         >
           <h1 className="text-3xl font-bold mb-2">Infinite Scroll Demo</h1>
           <p className="text-muted-foreground mb-6">
-            Demonstrating smooth infinite scrolling with loading indicators and error handling
+            Demonstrating smooth infinite scrolling with loading indicators and
+            error handling
           </p>
 
           <Card className="p-4 mb-6">
             <h2 className="text-xl font-semibold mb-4">Configuration</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
-                <label htmlFor="delay" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="delay"
+                  className="block text-sm font-medium mb-1"
+                >
                   Loading Delay (ms)
                 </label>
                 <Input
@@ -108,7 +119,10 @@ const InfiniteScrollDemo: React.FC = () => {
                 />
               </div>
               <div>
-                <label htmlFor="totalItems" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="totalItems"
+                  className="block text-sm font-medium mb-1"
+                >
                   Total Items
                 </label>
                 <Input
@@ -121,7 +135,11 @@ const InfiniteScrollDemo: React.FC = () => {
                 />
               </div>
               <div className="flex items-end">
-                <Button variant="outline" onClick={handleReset} className="mr-2">
+                <Button
+                  variant="outline"
+                  onClick={handleReset}
+                  className="mr-2"
+                >
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Reset
                 </Button>
@@ -135,7 +153,9 @@ const InfiniteScrollDemo: React.FC = () => {
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Scroll Type</label>
+              <label className="block text-sm font-medium mb-1">
+                Scroll Type
+              </label>
               <div className="flex gap-2">
                 <Button
                   variant={scrollType === 'window' ? 'default' : 'outline'}
@@ -159,7 +179,12 @@ const InfiniteScrollDemo: React.FC = () => {
               <AlertTitle>Error loading items</AlertTitle>
               <AlertDescription>
                 {error.message}
-                <Button variant="outline" size="sm" className="ml-2" onClick={() => loadMore()}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-2"
+                  onClick={() => loadMore()}
+                >
                   Retry
                 </Button>
               </AlertDescription>

@@ -88,7 +88,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Register mutation
   const registerMutation = useMutation({
-    mutationFn: async (userData: { username: string; email: string; password: string }) => {
+    mutationFn: async (userData: {
+      username: string;
+      email: string;
+      password: string;
+    }) => {
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -145,5 +149,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   // Provide the context to children
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 }

@@ -16,7 +16,10 @@ interface FluidSpacingOptions {
 /**
  * Convert pixel value to specified unit
  */
-export function convertToUnit(value: number, unit: 'px' | 'rem' | 'em' | 'vh' | 'vw'): string {
+export function convertToUnit(
+  value: number,
+  unit: 'px' | 'rem' | 'em' | 'vh' | 'vw',
+): string {
   switch (unit) {
     case 'rem':
       return `${value / 16}rem`;
@@ -159,7 +162,9 @@ export function contentAwareSpace(
 /**
  * Calculate optimal spacing between related elements based on hierarchy
  */
-export function hierarchicalSpacing(importance: 'primary' | 'secondary' | 'tertiary'): string {
+export function hierarchicalSpacing(
+  importance: 'primary' | 'secondary' | 'tertiary',
+): string {
   switch (importance) {
     case 'primary':
       return fluidSpace({ minSize: 24, maxSize: 48 });

@@ -31,7 +31,9 @@ describe('Authentication API', () => {
     });
 
     it('should return 400 if password is missing', async () => {
-      const response = await request(app).post('/api/auth/register').send({ username: 'testuser' });
+      const response = await request(app)
+        .post('/api/auth/register')
+        .send({ username: 'testuser' });
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty('error');

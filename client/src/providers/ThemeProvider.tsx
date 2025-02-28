@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react';
 
 // Define the available theme options
 type Theme = 'dark' | 'light' | 'system';
@@ -42,7 +48,9 @@ export function ThemeProvider({
         const storedTheme = window.localStorage.getItem(storageKey);
         if (
           storedTheme &&
-          (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'system')
+          (storedTheme === 'dark' ||
+            storedTheme === 'light' ||
+            storedTheme === 'system')
         ) {
           return storedTheme;
         }
@@ -84,7 +92,8 @@ export function ThemeProvider({
     // Apply initial theme
     if (theme === 'system') {
       // Check system preference
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+        .matches
         ? 'dark'
         : 'light';
       applyTheme(systemTheme);

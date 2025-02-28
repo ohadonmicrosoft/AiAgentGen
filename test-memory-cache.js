@@ -70,7 +70,9 @@ async function runTests() {
       console.log('✅ Test 4 passed: Clear all values');
       passedTests++;
     } else {
-      console.log(`❌ Test 4 failed: Expected size 0, got ${cache.getStats().size}`);
+      console.log(
+        `❌ Test 4 failed: Expected size 0, got ${cache.getStats().size}`,
+      );
       failedTests++;
     }
   } catch (error) {
@@ -83,11 +85,17 @@ async function runTests() {
     cache.set('user:2', 'user 2 data');
     cache.set('post:1', 'post 1 data');
     const count = cache.deletePattern(/^user:/);
-    if (count === 2 && cache.get('user:1') === undefined && cache.get('post:1') !== undefined) {
+    if (
+      count === 2 &&
+      cache.get('user:1') === undefined &&
+      cache.get('post:1') !== undefined
+    ) {
       console.log('✅ Test 5 passed: Delete values matching a pattern');
       passedTests++;
     } else {
-      console.log(`❌ Test 5 failed: Expected count 2, user:1 undefined, post:1 defined`);
+      console.log(
+        `❌ Test 5 failed: Expected count 2, user:1 undefined, post:1 defined`,
+      );
       failedTests++;
     }
   } catch (error) {

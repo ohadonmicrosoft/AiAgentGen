@@ -91,7 +91,10 @@ export class MemoryCache {
       // Estimate the size of the new value
       const size = this.estimateSize(value);
       // Enforce cache size limit
-      if (this.cache.size >= this.maxSize || this.currentMemorySize + size > this.maxMemorySize) {
+      if (
+        this.cache.size >= this.maxSize ||
+        this.currentMemorySize + size > this.maxMemorySize
+      ) {
         this.evictEntries(size);
       }
       const expires = Date.now() + (ttl || this.defaultTTL);
@@ -274,7 +277,8 @@ export class MemoryCache {
     for (const entry of entries) {
       if (
         this.cache.size <= this.maxSize * 0.9 &&
-        this.currentMemorySize + sizeNeeded - freedSize <= this.maxMemorySize * 0.9
+        this.currentMemorySize + sizeNeeded - freedSize <=
+          this.maxMemorySize * 0.9
       ) {
         break;
       }
@@ -285,7 +289,9 @@ export class MemoryCache {
       this.evictions++;
     }
     if (evictedCount > 0) {
-      logger.debug(`Cache evicted ${evictedCount} LRU entries, freed ${freedSize} bytes`);
+      logger.debug(
+        `Cache evicted ${evictedCount} LRU entries, freed ${freedSize} bytes`,
+      );
     }
   }
   /**

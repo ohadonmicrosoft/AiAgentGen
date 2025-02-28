@@ -24,7 +24,10 @@ describe('OfflineIndicator Component', () => {
     // Default to online with no pending forms
     (offlineForms.isOnline as jest.Mock).mockReturnValue(true);
     (offlineForms.getPendingForms as jest.Mock).mockResolvedValue([]);
-    (offlineForms.syncOfflineForms as jest.Mock).mockResolvedValue({ success: 0, failed: 0 });
+    (offlineForms.syncOfflineForms as jest.Mock).mockResolvedValue({
+      success: 0,
+      failed: 0,
+    });
 
     // Mock the toast hook
     (useToast as jest.Mock).mockReturnValue({
@@ -133,7 +136,10 @@ describe('OfflineIndicator Component', () => {
         retries: 0,
       },
     ]);
-    (offlineForms.syncOfflineForms as jest.Mock).mockResolvedValue({ success: 1, failed: 0 });
+    (offlineForms.syncOfflineForms as jest.Mock).mockResolvedValue({
+      success: 1,
+      failed: 0,
+    });
 
     const mockToast = jest.fn();
     (useToast as jest.Mock).mockReturnValue({
@@ -180,7 +186,9 @@ describe('OfflineIndicator Component', () => {
     ]);
 
     // Mock sync failure
-    (offlineForms.syncOfflineForms as jest.Mock).mockRejectedValue(new Error('Sync failed'));
+    (offlineForms.syncOfflineForms as jest.Mock).mockRejectedValue(
+      new Error('Sync failed'),
+    );
 
     const mockToast = jest.fn();
     (useToast as jest.Mock).mockReturnValue({

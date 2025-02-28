@@ -37,7 +37,8 @@ export interface TouchListItemAction {
   color?: string;
 }
 
-export interface TouchListItemProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TouchListItemProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Unique identifier for the item
    */
@@ -196,7 +197,10 @@ const TouchListItem = React.forwardRef<HTMLDivElement, TouchListItemProps>(
     }
 
     // Render the action buttons
-    const renderActionButtons = (actions: TouchListItemAction[], position: 'left' | 'right') => {
+    const renderActionButtons = (
+      actions: TouchListItemAction[],
+      position: 'left' | 'right',
+    ) => {
       return (
         <div
           className={cn(
@@ -299,7 +303,11 @@ export interface TouchListProps extends React.HTMLAttributes<HTMLDivElement> {
 const TouchListBase = React.forwardRef<HTMLDivElement, TouchListProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('border rounded-md overflow-hidden', className)} {...props}>
+      <div
+        ref={ref}
+        className={cn('border rounded-md overflow-hidden', className)}
+        {...props}
+      >
         {children}
       </div>
     );
@@ -316,4 +324,7 @@ const TouchListItemWithBoundary = withErrorBoundary(TouchListItem);
 TouchListItemWithBoundary.displayName = 'TouchListItem';
 
 // Export the components
-export { TouchListWithBoundary as TouchList, TouchListItemWithBoundary as TouchListItem };
+export {
+  TouchListWithBoundary as TouchList,
+  TouchListItemWithBoundary as TouchListItem,
+};

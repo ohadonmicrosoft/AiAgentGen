@@ -8,7 +8,10 @@ interface AsyncBoundaryProps {
   loadingFallback?: ReactNode;
   errorFallback?:
     | ReactNode
-    | ((props: { error: Error; resetErrorBoundary: () => void }) => React.ReactNode);
+    | ((props: {
+        error: Error;
+        resetErrorBoundary: () => void;
+      }) => React.ReactNode);
   onError?: (error: Error, info: React.ErrorInfo) => void;
   onReset?: () => void;
   suspense?: boolean;

@@ -5,6 +5,7 @@ This document provides an overview of the performance monitoring system implemen
 ## Features
 
 ### Core Functionality
+
 - **Real-time Metric Collection**: Automatically collects performance data as the application runs
 - **Comprehensive Metrics**: Tracks FPS, memory usage, component render times, and custom operations
 - **Visualization Dashboard**: Interactive charts and tables for analyzing performance data
@@ -12,6 +13,7 @@ This document provides an overview of the performance monitoring system implemen
 - **Export Capabilities**: Export performance data for offline analysis or reporting
 
 ### Metric Types
+
 - **FPS (Frames Per Second)**: Measures UI smoothness and animation performance
 - **Memory Usage**: Tracks JavaScript heap memory consumption
 - **Component Render Times**: Measures how long React components take to render
@@ -24,6 +26,7 @@ This document provides an overview of the performance monitoring system implemen
 ### Core Components
 
 #### 1. Performance Monitor
+
 The central utility that collects and manages performance metrics:
 
 ```typescript
@@ -41,6 +44,7 @@ performanceMonitor.measureFunction('data-processing', () => {
 ```
 
 #### 2. React Hooks
+
 React hooks for integrating performance monitoring into components:
 
 ```typescript
@@ -48,7 +52,7 @@ React hooks for integrating performance monitoring into components:
 const { metrics, trackOperation } = usePerformance({
   name: 'MyComponent',
   trackRenders: true,
-  trackFPS: true
+  trackFPS: true,
 });
 
 // Measure specific operations
@@ -73,7 +77,8 @@ The performance monitoring system uses a combination of browser APIs and custom 
 // Initialize monitoring for the entire application
 import { initializePerformanceMonitoring } from '@/hooks/use-performance';
 
-const { stopMonitoring, getMetrics, clearMetrics } = initializePerformanceMonitoring();
+const { stopMonitoring, getMetrics, clearMetrics } =
+  initializePerformanceMonitoring();
 ```
 
 ### Component Performance Tracking
@@ -86,14 +91,14 @@ function MyComponent() {
     name: 'MyComponent',
     trackRenders: true
   });
-  
+
   const handleClick = () => {
     trackOperation('buttonClick', () => {
       // Operation to measure
       processData();
     });
   };
-  
+
   return <button onClick={handleClick}>Process Data</button>;
 }
 ```
@@ -105,7 +110,7 @@ import { usePerformance } from '@/hooks/use-performance';
 
 function DataList() {
   const { trackAsyncOperation } = usePerformance({ name: 'DataList' });
-  
+
   const fetchData = async () => {
     return trackAsyncOperation('fetchData', async () => {
       const response = await fetch('/api/data');
@@ -148,4 +153,4 @@ A comprehensive dashboard is available at `/performance-dashboard` that provides
 - Historical data visualization
 - Metric filtering and grouping
 - Component-level performance analysis
-- Raw data export for further analysis 
+- Raw data export for further analysis

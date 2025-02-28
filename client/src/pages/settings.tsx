@@ -15,7 +15,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -34,10 +40,13 @@ const profileFormSchema = z
       .or(z.literal('')),
     confirmPassword: z.string().optional().or(z.literal('')),
   })
-  .refine((data) => !data.newPassword || data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  });
+  .refine(
+    (data) => !data.newPassword || data.newPassword === data.confirmPassword,
+    {
+      message: "Passwords don't match",
+      path: ['confirmPassword'],
+    },
+  );
 
 const apiKeySchema = z.object({
   apiKey: z.string().min(1, 'API Key is required'),
@@ -182,7 +191,9 @@ export default function Settings() {
       setProfileSuccess(true);
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      setProfileError(error.message || 'An error occurred while updating your profile');
+      setProfileError(
+        error.message || 'An error occurred while updating your profile',
+      );
     } finally {
       setProfileSubmitting(false);
       setPasswordSubmitting(false);
@@ -214,7 +225,9 @@ export default function Settings() {
       setApiKeySuccess(true);
     } catch (error: any) {
       console.error('Error saving API key:', error);
-      setApiKeyError(error.message || 'An error occurred while saving your API key');
+      setApiKeyError(
+        error.message || 'An error occurred while saving your API key',
+      );
     } finally {
       setApiKeySubmitting(false);
     }
@@ -235,11 +248,16 @@ export default function Settings() {
             <Card>
               <CardHeader>
                 <CardTitle>Profile Settings</CardTitle>
-                <CardDescription>Manage your account details and security settings</CardDescription>
+                <CardDescription>
+                  Manage your account details and security settings
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Form {...profileForm}>
-                  <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
+                  <form
+                    onSubmit={profileForm.handleSubmit(onProfileSubmit)}
+                    className="space-y-6"
+                  >
                     <div className="space-y-4">
                       <FormField
                         control={profileForm.control}
@@ -271,7 +289,9 @@ export default function Settings() {
                     </div>
 
                     <div className="pt-4 border-t">
-                      <h3 className="text-lg font-medium mb-4">Change Password</h3>
+                      <h3 className="text-lg font-medium mb-4">
+                        Change Password
+                      </h3>
                       <div className="space-y-4">
                         <FormField
                           control={profileForm.control}
@@ -318,7 +338,9 @@ export default function Settings() {
                     </div>
 
                     {profileError && (
-                      <div className="text-sm text-destructive mt-2">Error: {profileError}</div>
+                      <div className="text-sm text-destructive mt-2">
+                        Error: {profileError}
+                      </div>
                     )}
 
                     {profileSuccess && (
@@ -346,7 +368,9 @@ export default function Settings() {
             <Card>
               <CardHeader>
                 <CardTitle>Appearance</CardTitle>
-                <CardDescription>Customize the look and feel of the application</CardDescription>
+                <CardDescription>
+                  Customize the look and feel of the application
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
@@ -368,7 +392,8 @@ export default function Settings() {
                             console.error('Failed to set light theme:', error);
                             toast({
                               title: 'Theme change failed',
-                              description: 'There was an error applying the theme',
+                              description:
+                                'There was an error applying the theme',
                               variant: 'destructive',
                             });
                           }
@@ -392,7 +417,8 @@ export default function Settings() {
                             console.error('Failed to set dark theme:', error);
                             toast({
                               title: 'Theme change failed',
-                              description: 'There was an error applying the theme',
+                              description:
+                                'There was an error applying the theme',
                               variant: 'destructive',
                             });
                           }
@@ -416,7 +442,8 @@ export default function Settings() {
                             console.error('Failed to set system theme:', error);
                             toast({
                               title: 'Theme change failed',
-                              description: 'There was an error applying the theme',
+                              description:
+                                'There was an error applying the theme',
                               variant: 'destructive',
                             });
                           }
@@ -436,13 +463,17 @@ export default function Settings() {
             <Card>
               <CardHeader>
                 <CardTitle>Notification Settings</CardTitle>
-                <CardDescription>Configure how and when you receive notifications</CardDescription>
+                <CardDescription>
+                  Configure how and when you receive notifications
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <h3 className="text-base font-medium">Email Notifications</h3>
+                      <h3 className="text-base font-medium">
+                        Email Notifications
+                      </h3>
                       <p className="text-sm text-muted-foreground">
                         Receive notifications via email
                       </p>
@@ -457,7 +488,9 @@ export default function Settings() {
 
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <h3 className="text-base font-medium">Platform Notifications</h3>
+                      <h3 className="text-base font-medium">
+                        Platform Notifications
+                      </h3>
                       <p className="text-sm text-muted-foreground">
                         Receive notifications within the platform
                       </p>
@@ -465,14 +498,19 @@ export default function Settings() {
                     <Switch
                       checked={notifications.platform}
                       onCheckedChange={(checked) =>
-                        setNotifications({ ...notifications, platform: checked })
+                        setNotifications({
+                          ...notifications,
+                          platform: checked,
+                        })
                       }
                     />
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <h3 className="text-base font-medium">Marketing Notifications</h3>
+                      <h3 className="text-base font-medium">
+                        Marketing Notifications
+                      </h3>
                       <p className="text-sm text-muted-foreground">
                         Receive updates about new features and offers
                       </p>
@@ -480,7 +518,10 @@ export default function Settings() {
                     <Switch
                       checked={notifications.marketing}
                       onCheckedChange={(checked) =>
-                        setNotifications({ ...notifications, marketing: checked })
+                        setNotifications({
+                          ...notifications,
+                          marketing: checked,
+                        })
                       }
                     />
                   </div>
@@ -495,11 +536,16 @@ export default function Settings() {
             <Card>
               <CardHeader>
                 <CardTitle>API Settings</CardTitle>
-                <CardDescription>Configure API keys and integration options</CardDescription>
+                <CardDescription>
+                  Configure API keys and integration options
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Form {...apiKeyForm}>
-                  <form onSubmit={apiKeyForm.handleSubmit(onApiKeySubmit)} className="space-y-6">
+                  <form
+                    onSubmit={apiKeyForm.handleSubmit(onApiKeySubmit)}
+                    className="space-y-6"
+                  >
                     <div className="space-y-4">
                       <FormField
                         control={apiKeyForm.control}
@@ -511,12 +557,17 @@ export default function Settings() {
                               <FormControl>
                                 <Input type="password" {...field} />
                               </FormControl>
-                              <Button type="button" variant="outline" size="icon">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                              >
                                 <Info className="h-4 w-4" />
                               </Button>
                             </div>
                             <FormDescription>
-                              Your OpenAI API key is required for AI functionality. Get one from{' '}
+                              Your OpenAI API key is required for AI
+                              functionality. Get one from{' '}
                               <a
                                 href="https://platform.openai.com/account/api-keys"
                                 className="text-primary hover:underline"
@@ -534,7 +585,9 @@ export default function Settings() {
                     </div>
 
                     {apiKeyError && (
-                      <div className="text-sm text-destructive mt-2">Error: {apiKeyError}</div>
+                      <div className="text-sm text-destructive mt-2">
+                        Error: {apiKeyError}
+                      </div>
                     )}
 
                     {apiKeySuccess && (

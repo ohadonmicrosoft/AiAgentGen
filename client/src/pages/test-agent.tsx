@@ -4,10 +4,24 @@ import { useParams, useLocation, Link } from 'wouter';
 import { getQueryFn } from '@/lib/queryClient';
 import MainLayout from '@/layouts/MainLayout';
 import AgentTester from '@/components/AgentTester';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, ArrowLeft, Save, Cog, Bot, Wand2, History } from 'lucide-react';
+import {
+  Loader2,
+  ArrowLeft,
+  Save,
+  Cog,
+  Bot,
+  Wand2,
+  History,
+} from 'lucide-react';
 import { Agent } from '@shared/schema';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -91,7 +105,11 @@ export default function TestAgentPage() {
               {id ? currentAgent?.name : 'Test Agent Configuration'}
             </h1>
             {currentAgent?.status && (
-              <Badge variant={currentAgent.status === 'active' ? 'default' : 'secondary'}>
+              <Badge
+                variant={
+                  currentAgent.status === 'active' ? 'default' : 'secondary'
+                }
+              >
                 {currentAgent.status === 'active' ? 'Active' : 'Draft'}
               </Badge>
             )}
@@ -115,7 +133,11 @@ export default function TestAgentPage() {
           )}
         </div>
 
-        <Tabs defaultValue="test" value={activeTab} onValueChange={setActiveTab}>
+        <Tabs
+          defaultValue="test"
+          value={activeTab}
+          onValueChange={setActiveTab}
+        >
           <TabsList className="grid w-full md:w-[600px] grid-cols-3">
             <TabsTrigger value="test">
               <Bot className="mr-2 h-4 w-4" />
@@ -142,23 +164,29 @@ export default function TestAgentPage() {
                   <History className="h-5 w-5 text-primary" />
                   Conversation History
                 </CardTitle>
-                <CardDescription>View past conversations with this agent</CardDescription>
+                <CardDescription>
+                  View past conversations with this agent
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {id ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-2">
-                      To manage conversation history, go to the Test Agent tab and use the History
-                      button.
+                      To manage conversation history, go to the Test Agent tab
+                      and use the History button.
                     </p>
-                    <Button variant="outline" onClick={() => setActiveTab('test')}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setActiveTab('test')}
+                    >
                       Go to Test Agent
                     </Button>
                   </div>
                 ) : (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-2">
-                      You need to save this agent before you can use conversation history.
+                      You need to save this agent before you can use
+                      conversation history.
                     </p>
                   </div>
                 )}
@@ -173,7 +201,9 @@ export default function TestAgentPage() {
                   <Wand2 className="h-5 w-5 text-primary" />
                   Agent Configuration
                 </CardTitle>
-                <CardDescription>These are the current settings for this agent</CardDescription>
+                <CardDescription>
+                  These are the current settings for this agent
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -184,7 +214,9 @@ export default function TestAgentPage() {
 
                   <div className="space-y-2">
                     <h3 className="font-medium">Temperature</h3>
-                    <p className="text-sm">{currentAgent?.temperature || 0.7}</p>
+                    <p className="text-sm">
+                      {currentAgent?.temperature || 0.7}
+                    </p>
                   </div>
 
                   <div className="space-y-2">

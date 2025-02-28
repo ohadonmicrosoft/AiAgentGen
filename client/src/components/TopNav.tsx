@@ -1,4 +1,11 @@
-import { Moon, Sun, Menu, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Moon,
+  Sun,
+  Menu,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/hooks/use-theme';
 import { useIsMobile } from '@/hooks/use-mobile';

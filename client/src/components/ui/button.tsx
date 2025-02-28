@@ -11,10 +11,12 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90 border border-transparent',
+        default:
+          'bg-primary text-primary-foreground hover:bg-primary/90 border border-transparent',
         destructive:
           'bg-background text-destructive border border-destructive hover:bg-destructive/10',
-        outline: 'border border-input bg-background hover:bg-accent/50 hover:border-accent',
+        outline:
+          'border border-input bg-background hover:bg-accent/50 hover:border-accent',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-transparent',
         ghost: 'hover:bg-accent/50',
@@ -94,7 +96,10 @@ const Button = withErrorBoundary(ButtonBase, {
   // Use a minimal fallback to avoid disrupting layouts
   fallback: (
     <button
-      className={cn(buttonVariants({ variant: 'outline' }), 'opacity-70 cursor-not-allowed')}
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'opacity-70 cursor-not-allowed',
+      )}
       disabled
     >
       Error

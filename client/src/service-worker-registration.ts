@@ -9,7 +9,10 @@ export function registerServiceWorker() {
       navigator.serviceWorker
         .register('/service-worker.js')
         .then((registration) => {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          console.log(
+            'ServiceWorker registration successful with scope: ',
+            registration.scope,
+          );
 
           // Check for updates when the page loads
           registration.update();
@@ -47,7 +50,10 @@ export function setupServiceWorkerUpdateFlow() {
 
         if (newWorker) {
           newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            if (
+              newWorker.state === 'installed' &&
+              navigator.serviceWorker.controller
+            ) {
               // New service worker is installed but waiting
               // Show notification to the user
               notifyUserOfUpdate();
@@ -94,9 +100,11 @@ function notifyUserOfUpdate() {
   });
 
   // Handle close action
-  document.getElementById('close-update-notification')?.addEventListener('click', () => {
-    notification.remove();
-  });
+  document
+    .getElementById('close-update-notification')
+    ?.addEventListener('click', () => {
+      notification.remove();
+    });
 
   // Handle later action
   document.getElementById('update-later')?.addEventListener('click', () => {

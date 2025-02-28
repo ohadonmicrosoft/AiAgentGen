@@ -22,7 +22,10 @@ export const SCALE_WHILE_DRAGGING = 1.04;
 /**
  * Calculate position delta between current position and original position
  */
-export function getPositionDelta(currentPosition: Position, originalPosition: Position): Position {
+export function getPositionDelta(
+  currentPosition: Position,
+  originalPosition: Position,
+): Position {
   return {
     x: currentPosition.x - originalPosition.x,
     y: currentPosition.y - originalPosition.y,
@@ -52,7 +55,10 @@ export function createDragConstraints(
 /**
  * Check if one element is overlapping another
  */
-export function isOverlapping(draggedElem: DOMRect, dropTargetElem: DOMRect): boolean {
+export function isOverlapping(
+  draggedElem: DOMRect,
+  dropTargetElem: DOMRect,
+): boolean {
   return !(
     draggedElem.right < dropTargetElem.left ||
     draggedElem.left > dropTargetElem.right ||
@@ -115,13 +121,15 @@ export function updateDragAnimation(
   if (isDragging) {
     controls.start({
       scale: SCALE_WHILE_DRAGGING,
-      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+      boxShadow:
+        '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
       transition: { duration: ANIMATION_DURATION },
     });
   } else {
     controls.start({
       scale: 1,
-      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+      boxShadow:
+        '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
       transition: { duration: ANIMATION_DURATION },
     });
   }
@@ -130,7 +138,11 @@ export function updateDragAnimation(
 /**
  * Generate drag ghost element (visible while dragging)
  */
-export function createDragGhost(element: HTMLElement, offsetX = 20, offsetY = 20): HTMLElement {
+export function createDragGhost(
+  element: HTMLElement,
+  offsetX = 20,
+  offsetY = 20,
+): HTMLElement {
   const rect = element.getBoundingClientRect();
   const ghost = element.cloneNode(true) as HTMLElement;
 
@@ -146,7 +158,8 @@ export function createDragGhost(element: HTMLElement, offsetX = 20, offsetY = 20
     zIndex: '9999',
     transition: 'transform 0.15s ease-out',
     transform: 'scale(0.95)',
-    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+    boxShadow:
+      '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
   });
 
   document.body.appendChild(ghost);
@@ -176,7 +189,11 @@ export function removeDragGhost(ghost: HTMLElement): void {
 /**
  * Reorder an array after drag and drop
  */
-export function reorderItems<T>(list: T[], startIndex: number, endIndex: number): T[] {
+export function reorderItems<T>(
+  list: T[],
+  startIndex: number,
+  endIndex: number,
+): T[] {
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);

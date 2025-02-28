@@ -88,7 +88,9 @@ async function saveFormForLater(formData: OfflineFormData): Promise<void> {
  * @param options Form submission options
  * @returns Promise that resolves with the response data
  */
-export async function submitForm<T = any>(options: SubmitFormOptions): Promise<T> {
+export async function submitForm<T = any>(
+  options: SubmitFormOptions,
+): Promise<T> {
   const { url, method, data, headers = {} } = options;
 
   // Default headers
@@ -124,7 +126,9 @@ export async function submitForm<T = any>(options: SubmitFormOptions): Promise<T
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
+        throw new Error(
+          `HTTP error ${response.status}: ${response.statusText}`,
+        );
       }
 
       return await response.json();
@@ -177,7 +181,10 @@ export async function getPendingForms(): Promise<OfflineFormData[]> {
 /**
  * Manually trigger synchronization of offline forms
  */
-export async function syncOfflineForms(): Promise<{ success: number; failed: number }> {
+export async function syncOfflineForms(): Promise<{
+  success: number;
+  failed: number;
+}> {
   try {
     const forms = await getPendingForms();
     let success = 0;

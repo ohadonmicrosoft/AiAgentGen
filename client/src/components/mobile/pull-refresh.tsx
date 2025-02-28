@@ -159,7 +159,10 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
             setIsPulling(true);
 
             // Apply resistance to the pull (gets harder as you pull further)
-            const resistedPull = Math.min(maxPullDistance, Math.pow(offset.y, 0.8));
+            const resistedPull = Math.min(
+              maxPullDistance,
+              Math.pow(offset.y, 0.8),
+            );
 
             setPullDistance(resistedPull);
             controls.set({ y: resistedPull });
@@ -201,7 +204,11 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
     return (
       <motion.div
         ref={ref}
-        className={cn('relative overflow-hidden', disabled && 'pointer-events-none', className)}
+        className={cn(
+          'relative overflow-hidden',
+          disabled && 'pointer-events-none',
+          className,
+        )}
         drag={isPullEnabled ? 'y' : false}
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={0.1}
@@ -222,7 +229,10 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
 
         {/* Content container */}
         <div
-          className={cn('min-h-full will-change-transform', isRefreshing && 'pointer-events-none')}
+          className={cn(
+            'min-h-full will-change-transform',
+            isRefreshing && 'pointer-events-none',
+          )}
         >
           {children}
         </div>

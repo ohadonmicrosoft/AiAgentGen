@@ -64,12 +64,9 @@ import { Draggable } from '@/components/ui/draggable';
 
 function DraggableCard() {
   const item = { id: 'card-1', type: 'card', title: 'Example Card' };
-  
+
   return (
-    <Draggable 
-      item={item}
-      containerId="container-1"
-    >
+    <Draggable item={item} containerId="container-1">
       <div className="p-4 border rounded-md">
         <h3>{item.title}</h3>
         <p>Drag me!</p>
@@ -89,7 +86,7 @@ function CardContainer() {
     console.log('Item dropped:', result.item);
     // Update your state here
   };
-  
+
   return (
     <Droppable
       id="card-container"
@@ -97,7 +94,7 @@ function CardContainer() {
       onDrop={handleDrop}
       className="p-4 border rounded-md min-h-[200px]"
     >
-      {cards.map(card => (
+      {cards.map((card) => (
         <DraggableCard key={card.id} card={card} />
       ))}
     </Droppable>
@@ -113,17 +110,14 @@ import { DragHandle } from '@/components/ui/drag-handle';
 
 function DraggableWithHandle() {
   const item = { id: 'item-1', type: 'item', content: 'Example' };
-  
+
   return (
     <Draggable
       item={item}
       containerId="container-1"
       dragHandleSelector="[data-drag-handle]"
       dragHandleRender={(dragHandleProps) => (
-        <DragHandle
-          variant="minimal"
-          dragHandleProps={dragHandleProps}
-        />
+        <DragHandle variant="minimal" dragHandleProps={dragHandleProps} />
       )}
     >
       <div className="relative p-4 border rounded-md">
@@ -171,4 +165,4 @@ To ensure smooth performance, even with many draggable elements:
 - Only active elements receive animation updates
 - React memo and useMemo are used to prevent unnecessary renders
 - Ghost elements use hardware-accelerated properties
-- Animation complexity is reduced on mobile devices 
+- Animation complexity is reduced on mobile devices

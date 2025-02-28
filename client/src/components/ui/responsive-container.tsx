@@ -1,7 +1,14 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useActiveBreakpoint, useIsMobile, useIsTablet } from '@/hooks/use-mobile';
-import { useFluidSpacing, fluidSpacingToClassName } from '@/hooks/use-fluid-spacing';
+import {
+  useActiveBreakpoint,
+  useIsMobile,
+  useIsTablet,
+} from '@/hooks/use-mobile';
+import {
+  useFluidSpacing,
+  fluidSpacingToClassName,
+} from '@/hooks/use-fluid-spacing';
 import { SpaceScaleKey } from '@/hooks/use-fluid-spacing';
 
 interface ResponsiveContainerProps {
@@ -70,7 +77,8 @@ export function ResponsiveContainer({
     ...(!fullWidth && !maxWidth ? {} : spacingStyle),
     ...(withTransition && isClient
       ? {
-          transition: 'padding 0.3s ease, margin 0.3s ease, max-width 0.3s ease',
+          transition:
+            'padding 0.3s ease, margin 0.3s ease, max-width 0.3s ease',
         }
       : {}),
   };

@@ -64,7 +64,11 @@ export const serverLogger = {
   /**
    * Log a message to the server console and file
    */
-  log(level: 'debug' | 'info' | 'warn' | 'error', message: string, metadata?: any): void {
+  log(
+    level: 'debug' | 'info' | 'warn' | 'error',
+    message: string,
+    metadata?: any,
+  ): void {
     const timestamp = new Date().toISOString();
     const logEntry = {
       level,
@@ -138,12 +142,15 @@ export const serverLogger = {
     };
 
     // Log to console with limited data
-    console.error(`[${timestamp}] [ERROR] [CLIENT] ${error.name}: ${error.message}`, {
-      url: error.url,
-      component: error.componentName,
-      ...(error.status && { status: error.status }),
-      ...(error.endpoint && { endpoint: error.endpoint }),
-    });
+    console.error(
+      `[${timestamp}] [ERROR] [CLIENT] ${error.name}: ${error.message}`,
+      {
+        url: error.url,
+        component: error.componentName,
+        ...(error.status && { status: error.status }),
+        ...(error.endpoint && { endpoint: error.endpoint }),
+      },
+    );
 
     // Write full details to error log
     this.writeToFile(errorEntry, true);
@@ -232,8 +239,12 @@ export function setupLogsRouter(): express.Router {
 
 // Direct server-side logging API
 export const logger = {
-  debug: (message: string, metadata?: any) => serverLogger.log('debug', message, metadata),
-  info: (message: string, metadata?: any) => serverLogger.log('info', message, metadata),
-  warn: (message: string, metadata?: any) => serverLogger.log('warn', message, metadata),
-  error: (message: string, metadata?: any) => serverLogger.log('error', message, metadata),
+  debug: (message: string, metadata?: any) =>
+    serverLogger.log('debug', message, metadata),
+  info: (message: string, metadata?: any) =>
+    serverLogger.log('info', message, metadata),
+  warn: (message: string, metadata?: any) =>
+    serverLogger.log('warn', message, metadata),
+  error: (message: string, metadata?: any) =>
+    serverLogger.log('error', message, metadata),
 };

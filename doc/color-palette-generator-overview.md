@@ -46,6 +46,7 @@ This module provides the foundational color manipulation functions:
 #### PaletteGenerator Component
 
 An interactive interface that allows users to:
+
 - Input a base color using a color picker or HEX value
 - Generate color harmonies and variations
 - Preview theme colors in a simulated UI environment
@@ -54,6 +55,7 @@ An interactive interface that allows users to:
 #### ColorSwatch Component
 
 A reusable component that:
+
 - Displays a color sample with proper text contrast
 - Shows accessibility compliance badges
 - Provides copy-to-clipboard functionality
@@ -62,6 +64,7 @@ A reusable component that:
 ### Theme Provider Enhancement
 
 The existing theme system was extended to support:
+
 - Custom theme option beyond just light/dark/system
 - Setting and persisting custom color variables
 - Determining appropriate base theme (light/dark) for custom colors
@@ -84,7 +87,8 @@ The existing theme system was extended to support:
 ## Accessibility Considerations
 
 The color palette generator was designed with accessibility in mind:
+
 - All generated color combinations are evaluated for contrast
 - Visual indicators show WCAG compliance level
 - Text colors automatically adjust based on background
-- Theme previews include real UI components to evaluate readability 
+- Theme previews include real UI components to evaluate readability

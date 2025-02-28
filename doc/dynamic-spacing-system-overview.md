@@ -50,7 +50,7 @@ React hooks that provide easy integration with components:
 
 A Tailwind CSS plugin that generates utility classes:
 
-- Creates fluid-* prefixed utility classes for all spacing values
+- Creates fluid-\* prefixed utility classes for all spacing values
 - Provides specialized container classes
 - Integrates with existing Tailwind workflow
 
@@ -64,9 +64,9 @@ const MyComponent = () => {
   const { style } = useFluidSpacing({
     padding: { x: 'lg', y: 'md' },
     margin: 'sm',
-    maxWidth: 'text'
+    maxWidth: 'text',
   });
-  
+
   return <div style={style}>Content</div>;
 };
 
@@ -140,4 +140,4 @@ The Dynamic Spacing System was designed with accessibility in mind:
 
 - Ensures sufficient spacing for interactive elements
 - Maintains readability by adapting spacing to content density
-- Preserves logical flow and visual hierarchy on all devices 
+- Preserves logical flow and visual hierarchy on all devices

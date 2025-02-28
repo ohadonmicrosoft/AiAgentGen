@@ -30,7 +30,12 @@ import { PERMISSIONS } from '@shared/schema';
 import { useSidebarState } from '@/hooks/use-sidebar-state';
 import { SidebarToggle } from '@/components/ui/sidebar-toggle';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { NavItem } from '@/types';
 import { usePreferences } from '@/context/preferences-context';
 import { useAuth as useAuthContext } from '@/context/auth-context';
@@ -43,7 +48,13 @@ interface SidebarProps {
   adminItems: NavItem[];
 }
 
-export default function Sidebar({ open, onClose, navItems, demoItems, adminItems }: SidebarProps) {
+export default function Sidebar({
+  open,
+  onClose,
+  navItems,
+  demoItems,
+  adminItems,
+}: SidebarProps) {
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
   const isMobile = useIsMobile();
@@ -69,7 +80,8 @@ export default function Sidebar({ open, onClose, navItems, demoItems, adminItems
   // Check if user has admin access
   const isAdmin =
     user?.role === 'admin' ||
-    (user?.customPermissions && user.customPermissions.includes(PERMISSIONS.MANAGE_USERS));
+    (user?.customPermissions &&
+      user.customPermissions.includes(PERMISSIONS.MANAGE_USERS));
 
   const sidebarVariants = {
     expanded: { width: '16rem' }, // 64 = 16rem
@@ -115,7 +127,9 @@ export default function Sidebar({ open, onClose, navItems, demoItems, adminItems
 
   // Animation transition based on reduced motion preference
   const getTransition = () => {
-    return prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 30 };
+    return prefersReducedMotion
+      ? { duration: 0 }
+      : { type: 'spring', stiffness: 400, damping: 30 };
   };
 
   // Renders nav item with appropriate animations
@@ -152,7 +166,10 @@ export default function Sidebar({ open, onClose, navItems, demoItems, adminItems
           {item.icon}
         </motion.span>
 
-        <motion.span variants={labelVariants} className="fluid-body fluid-leading-snug truncate">
+        <motion.span
+          variants={labelVariants}
+          className="fluid-body fluid-leading-snug truncate"
+        >
           {item.label}
         </motion.span>
 
@@ -183,7 +200,11 @@ export default function Sidebar({ open, onClose, navItems, demoItems, adminItems
               {itemContent}
             </Link>
           </TooltipTrigger>
-          <TooltipContent side="right" align="center" className="font-medium fluid-small">
+          <TooltipContent
+            side="right"
+            align="center"
+            className="font-medium fluid-small"
+          >
             {item.label}
           </TooltipContent>
         </Tooltip>
@@ -245,11 +266,18 @@ export default function Sidebar({ open, onClose, navItems, demoItems, adminItems
     >
       <div className="flex items-center justify-between flex-shrink-0 p-4 border-b">
         <div className="flex items-center" onClick={handleLinkClick}>
-          <Link href="/" className="flex items-center space-x-2" aria-label="Go to home page">
+          <Link
+            href="/"
+            className="flex items-center space-x-2"
+            aria-label="Go to home page"
+          >
             <div className="flex items-center justify-center w-8 h-8 rounded-md border">
               <Bot className="h-4 w-4" aria-hidden="true" />
             </div>
-            <motion.span className="text-base font-medium" variants={labelVariants}>
+            <motion.span
+              className="text-base font-medium"
+              variants={labelVariants}
+            >
               AI Agent Generator
             </motion.span>
           </Link>
@@ -323,12 +351,16 @@ export default function Sidebar({ open, onClose, navItems, demoItems, adminItems
               src={`https://avatar.vercel.sh/${user?.username || 'user'}`}
               alt={user?.username || 'User'}
             />
-            <AvatarFallback>{user?.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+            <AvatarFallback>
+              {user?.username?.charAt(0).toUpperCase() || 'U'}
+            </AvatarFallback>
           </Avatar>
 
           <motion.div className="ml-3 overflow-hidden" variants={labelVariants}>
             <div className="flex flex-col">
-              <span className="font-medium fluid-body">{user?.username || 'User'}</span>
+              <span className="font-medium fluid-body">
+                {user?.username || 'User'}
+              </span>
               <span className="fluid-xs text-muted-foreground">
                 {user?.email || 'user@example.com'}
               </span>

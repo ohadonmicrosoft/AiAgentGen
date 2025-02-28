@@ -6,7 +6,12 @@ module.exports = {
       /* Use desktop configuration */
       settings: {
         preset: 'desktop',
-        onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'],
+        onlyCategories: [
+          'performance',
+          'accessibility',
+          'best-practices',
+          'seo',
+        ],
         skipAudits: ['uses-http2'],
       },
       /* Number of times to run Lighthouse */

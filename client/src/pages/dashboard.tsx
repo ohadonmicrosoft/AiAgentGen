@@ -27,7 +27,13 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useScrollAnimation } from '@/hooks/animations';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { buttonVariants } from '@/components/ui/button';
 
@@ -80,14 +86,16 @@ export default function Dashboard() {
       {
         id: '1',
         name: 'Customer Support Bot',
-        description: 'Handles customer inquiries automatically with a formal response style.',
+        description:
+          'Handles customer inquiries automatically with a formal response style.',
         status: 'active',
         lastUpdated: 'Updated 2 days ago',
       },
       {
         id: '2',
         name: 'Product Recommendation',
-        description: 'Suggests products based on customer preferences and past purchases.',
+        description:
+          'Suggests products based on customer preferences and past purchases.',
         status: 'active',
         lastUpdated: 'Updated 5 days ago',
       },
@@ -111,7 +119,8 @@ export default function Dashboard() {
         >
           <h1 className="fluid-h2 font-bold mb-2">Dashboard</h1>
           <p className="fluid-body text-muted-foreground mb-6">
-            Welcome to the AI Agent Generator. Create, test, and manage your AI agents.
+            Welcome to the AI Agent Generator. Create, test, and manage your AI
+            agents.
           </p>
         </motion.div>
 
@@ -168,7 +177,8 @@ export default function Dashboard() {
               <CardContent>
                 <div className="space-y-4">
                   <p className="fluid-body text-muted-foreground">
-                    You haven't created any agents yet. Get started by creating your first agent.
+                    You haven't created any agents yet. Get started by creating
+                    your first agent.
                   </p>
                   <Link href="/create-agent">
                     <Button>
@@ -194,7 +204,8 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="fluid-body text-muted-foreground">
-                  Check out our UI enhancement demos to see the latest improvements.
+                  Check out our UI enhancement demos to see the latest
+                  improvements.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Link href="/form-demo">

@@ -19,43 +19,67 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
   const spacingScale = fluidSpaceScale;
 
   // Create padding utilities
-  const paddingUtilities = Object.entries(spacingScale).reduce((acc, [key, value]) => {
-    acc[`.${e(`fluid-p-${key}`)}`] = { padding: value };
-    acc[`.${e(`fluid-px-${key}`)}`] = { paddingLeft: value, paddingRight: value };
-    acc[`.${e(`fluid-py-${key}`)}`] = { paddingTop: value, paddingBottom: value };
-    acc[`.${e(`fluid-pt-${key}`)}`] = { paddingTop: value };
-    acc[`.${e(`fluid-pr-${key}`)}`] = { paddingRight: value };
-    acc[`.${e(`fluid-pb-${key}`)}`] = { paddingBottom: value };
-    acc[`.${e(`fluid-pl-${key}`)}`] = { paddingLeft: value };
-    return acc;
-  }, {});
+  const paddingUtilities = Object.entries(spacingScale).reduce(
+    (acc, [key, value]) => {
+      acc[`.${e(`fluid-p-${key}`)}`] = { padding: value };
+      acc[`.${e(`fluid-px-${key}`)}`] = {
+        paddingLeft: value,
+        paddingRight: value,
+      };
+      acc[`.${e(`fluid-py-${key}`)}`] = {
+        paddingTop: value,
+        paddingBottom: value,
+      };
+      acc[`.${e(`fluid-pt-${key}`)}`] = { paddingTop: value };
+      acc[`.${e(`fluid-pr-${key}`)}`] = { paddingRight: value };
+      acc[`.${e(`fluid-pb-${key}`)}`] = { paddingBottom: value };
+      acc[`.${e(`fluid-pl-${key}`)}`] = { paddingLeft: value };
+      return acc;
+    },
+    {},
+  );
 
   // Create margin utilities
-  const marginUtilities = Object.entries(spacingScale).reduce((acc, [key, value]) => {
-    acc[`.${e(`fluid-m-${key}`)}`] = { margin: value };
-    acc[`.${e(`fluid-mx-${key}`)}`] = { marginLeft: value, marginRight: value };
-    acc[`.${e(`fluid-my-${key}`)}`] = { marginTop: value, marginBottom: value };
-    acc[`.${e(`fluid-mt-${key}`)}`] = { marginTop: value };
-    acc[`.${e(`fluid-mr-${key}`)}`] = { marginRight: value };
-    acc[`.${e(`fluid-mb-${key}`)}`] = { marginBottom: value };
-    acc[`.${e(`fluid-ml-${key}`)}`] = { marginLeft: value };
-    return acc;
-  }, {});
+  const marginUtilities = Object.entries(spacingScale).reduce(
+    (acc, [key, value]) => {
+      acc[`.${e(`fluid-m-${key}`)}`] = { margin: value };
+      acc[`.${e(`fluid-mx-${key}`)}`] = {
+        marginLeft: value,
+        marginRight: value,
+      };
+      acc[`.${e(`fluid-my-${key}`)}`] = {
+        marginTop: value,
+        marginBottom: value,
+      };
+      acc[`.${e(`fluid-mt-${key}`)}`] = { marginTop: value };
+      acc[`.${e(`fluid-mr-${key}`)}`] = { marginRight: value };
+      acc[`.${e(`fluid-mb-${key}`)}`] = { marginBottom: value };
+      acc[`.${e(`fluid-ml-${key}`)}`] = { marginLeft: value };
+      return acc;
+    },
+    {},
+  );
 
   // Create gap utilities
-  const gapUtilities = Object.entries(spacingScale).reduce((acc, [key, value]) => {
-    acc[`.${e(`fluid-gap-${key}`)}`] = { gap: value };
-    acc[`.${e(`fluid-gap-x-${key}`)}`] = { columnGap: value };
-    acc[`.${e(`fluid-gap-y-${key}`)}`] = { rowGap: value };
-    return acc;
-  }, {});
+  const gapUtilities = Object.entries(spacingScale).reduce(
+    (acc, [key, value]) => {
+      acc[`.${e(`fluid-gap-${key}`)}`] = { gap: value };
+      acc[`.${e(`fluid-gap-x-${key}`)}`] = { columnGap: value };
+      acc[`.${e(`fluid-gap-y-${key}`)}`] = { rowGap: value };
+      return acc;
+    },
+    {},
+  );
 
   // Create space utilities
-  const spaceUtilities = Object.entries(spacingScale).reduce((acc, [key, value]) => {
-    acc[`.${e(`fluid-space-x-${key}`)} > * + *`] = { marginLeft: value };
-    acc[`.${e(`fluid-space-y-${key}`)} > * + *`] = { marginTop: value };
-    return acc;
-  }, {});
+  const spaceUtilities = Object.entries(spacingScale).reduce(
+    (acc, [key, value]) => {
+      acc[`.${e(`fluid-space-x-${key}`)} > * + *`] = { marginLeft: value };
+      acc[`.${e(`fluid-space-y-${key}`)} > * + *`] = { marginTop: value };
+      return acc;
+    },
+    {},
+  );
 
   // Define device-specific spacing values
   const deviceSpacing = {
@@ -93,8 +117,14 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
       ...sizeTypes.reduce((sizeAcc, size) => {
         const value = deviceSpacing[device][size];
         sizeAcc[`.${e(`${device}-p-${size}`)}`] = { padding: value };
-        sizeAcc[`.${e(`${device}-px-${size}`)}`] = { paddingLeft: value, paddingRight: value };
-        sizeAcc[`.${e(`${device}-py-${size}`)}`] = { paddingTop: value, paddingBottom: value };
+        sizeAcc[`.${e(`${device}-px-${size}`)}`] = {
+          paddingLeft: value,
+          paddingRight: value,
+        };
+        sizeAcc[`.${e(`${device}-py-${size}`)}`] = {
+          paddingTop: value,
+          paddingBottom: value,
+        };
         sizeAcc[`.${e(`${device}-pt-${size}`)}`] = { paddingTop: value };
         sizeAcc[`.${e(`${device}-pr-${size}`)}`] = { paddingRight: value };
         sizeAcc[`.${e(`${device}-pb-${size}`)}`] = { paddingBottom: value };
@@ -111,8 +141,14 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
       ...sizeTypes.reduce((sizeAcc, size) => {
         const value = deviceSpacing[device][size];
         sizeAcc[`.${e(`${device}-m-${size}`)}`] = { margin: value };
-        sizeAcc[`.${e(`${device}-mx-${size}`)}`] = { marginLeft: value, marginRight: value };
-        sizeAcc[`.${e(`${device}-my-${size}`)}`] = { marginTop: value, marginBottom: value };
+        sizeAcc[`.${e(`${device}-mx-${size}`)}`] = {
+          marginLeft: value,
+          marginRight: value,
+        };
+        sizeAcc[`.${e(`${device}-my-${size}`)}`] = {
+          marginTop: value,
+          marginBottom: value,
+        };
         sizeAcc[`.${e(`${device}-mt-${size}`)}`] = { marginTop: value };
         sizeAcc[`.${e(`${device}-mr-${size}`)}`] = { marginRight: value };
         sizeAcc[`.${e(`${device}-mb-${size}`)}`] = { marginBottom: value };
@@ -142,8 +178,12 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
       ...deviceAcc,
       ...sizeTypes.reduce((sizeAcc, size) => {
         const value = deviceSpacing[device][size];
-        sizeAcc[`.${e(`${device}-space-x-${size}`)} > * + *`] = { marginLeft: value };
-        sizeAcc[`.${e(`${device}-space-y-${size}`)} > * + *`] = { marginTop: value };
+        sizeAcc[`.${e(`${device}-space-x-${size}`)} > * + *`] = {
+          marginLeft: value,
+        };
+        sizeAcc[`.${e(`${device}-space-y-${size}`)} > * + *`] = {
+          marginTop: value,
+        };
         return sizeAcc;
       }, {}),
     };
@@ -215,7 +255,8 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
       padding: spacingScale.card_padding,
       borderRadius: '0.5rem',
       backgroundColor: 'var(--card-bg, white)',
-      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+      boxShadow:
+        '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
     },
     '.fluid-section-container': {
       width: '100%',

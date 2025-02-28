@@ -35,9 +35,21 @@ export function ThemeToggle() {
           <AnimatePresence mode="wait">
             <motion.div
               key={theme}
-              initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, rotate: -90 }}
-              animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, rotate: 0 }}
-              exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, rotate: 90 }}
+              initial={
+                prefersReducedMotion
+                  ? { opacity: 1 }
+                  : { opacity: 0, rotate: -90 }
+              }
+              animate={
+                prefersReducedMotion
+                  ? { opacity: 1 }
+                  : { opacity: 1, rotate: 0 }
+              }
+              exit={
+                prefersReducedMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, rotate: 90 }
+              }
               transition={{ duration: 0.2 }}
             >
               {getButtonIcon()}

@@ -62,15 +62,23 @@ describe('Offline Plugin', () => {
 
       plugin.register(mockQueryClient as any);
 
-      expect(addEventListener).toHaveBeenCalledWith('online', expect.any(Function));
-      expect(addEventListener).toHaveBeenCalledWith('offline', expect.any(Function));
+      expect(addEventListener).toHaveBeenCalledWith(
+        'online',
+        expect.any(Function),
+      );
+      expect(addEventListener).toHaveBeenCalledWith(
+        'offline',
+        expect.any(Function),
+      );
       expect(restoreSpy).toHaveBeenCalledWith(mockQueryClient);
     });
 
     it('subscribes to query cache events', () => {
       plugin.register(mockQueryClient as any);
 
-      expect(mockQueryClient.getQueryCache().subscribe).toHaveBeenCalledWith(expect.any(Function));
+      expect(mockQueryClient.getQueryCache().subscribe).toHaveBeenCalledWith(
+        expect.any(Function),
+      );
     });
   });
 
@@ -94,7 +102,9 @@ describe('Offline Plugin', () => {
       });
 
       expect(pluginWithWhitelist.shouldPersistQuery('/api/users')).toBe(true);
-      expect(pluginWithWhitelist.shouldPersistQuery('/api/users/123')).toBe(true);
+      expect(pluginWithWhitelist.shouldPersistQuery('/api/users/123')).toBe(
+        true,
+      );
       expect(pluginWithWhitelist.shouldPersistQuery('/api/other')).toBe(false);
     });
   });
@@ -154,7 +164,10 @@ describe('Offline Plugin', () => {
       await plugin.restoreFromStorage(mockQueryClient as any);
 
       // Should have restored the cached query
-      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(['/api/users'], { users: [] });
+      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
+        ['/api/users'],
+        { users: [] },
+      );
     });
 
     it('removes expired items from storage', async () => {

@@ -89,7 +89,10 @@ describe('TouchButton Component', () => {
     render(<TouchButton showRipple>Click Me</TouchButton>);
 
     // Trigger a click to create ripple
-    fireEvent.mouseDown(screen.getByRole('button'), { clientX: 50, clientY: 50 });
+    fireEvent.mouseDown(screen.getByRole('button'), {
+      clientX: 50,
+      clientY: 50,
+    });
 
     // Check for the presence of ripple container
     expect(screen.getByTestId('motion-div')).toBeInTheDocument();

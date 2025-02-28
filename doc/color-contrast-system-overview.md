@@ -5,6 +5,7 @@ This document provides an overview of the color contrast checking system impleme
 ## Features
 
 ### Core Functionality
+
 - **Contrast Ratio Calculation**: Accurately calculates the contrast ratio between foreground and background colors according to WCAG standards
 - **WCAG Compliance Checking**: Evaluates color combinations against WCAG 2.1 AA and AAA standards
 - **Color Suggestions**: Provides alternative color suggestions when contrast is insufficient
@@ -12,6 +13,7 @@ This document provides an overview of the color contrast checking system impleme
 - **Real-time Feedback**: Instantly updates contrast evaluations as colors are adjusted
 
 ### Accessibility Standards Support
+
 - **WCAG 2.1 AA**: 4.5:1 contrast ratio for normal text, 3:1 for large text
 - **WCAG 2.1 AAA**: 7:1 contrast ratio for normal text, 4.5:1 for large text
 - **UI Component Testing**: Tests contrast on common UI elements like buttons, inputs, and alerts
@@ -21,6 +23,7 @@ This document provides an overview of the color contrast checking system impleme
 ### Core Components
 
 #### 1. Color Contrast Utilities
+
 The primary utilities for calculating and checking color contrast:
 
 ```typescript
@@ -31,18 +34,23 @@ function getContrastRatio(foreground: string, background: string): number;
 function checkContrast(foreground: string, background: string): ContrastResult;
 
 // Get a suggested color with better contrast
-function suggestBetterContrast(foreground: string, background: string, targetRatio?: number): string;
+function suggestBetterContrast(
+  foreground: string,
+  background: string,
+  targetRatio?: number,
+): string;
 ```
 
 #### 2. ContrastResult Interface
+
 The result of a contrast check:
 
 ```typescript
 interface ContrastResult {
-  ratio: number;    // The contrast ratio (e.g., 4.5)
-  aa: boolean;      // Passes WCAG AA for normal text
+  ratio: number; // The contrast ratio (e.g., 4.5)
+  aa: boolean; // Passes WCAG AA for normal text
   aaLarge: boolean; // Passes WCAG AA for large text
-  aaa: boolean;     // Passes WCAG AAA for normal text
+  aaa: boolean; // Passes WCAG AAA for normal text
   aaaLarge: boolean; // Passes WCAG AAA for large text
 }
 ```
@@ -120,8 +128,9 @@ The color contrast system integrates with:
 ## Demo
 
 A comprehensive demo is available at `/contrast-checker-demo` that showcases:
+
 - Interactive color selection
 - Real-time contrast evaluation
 - Text and UI element previews
 - Color suggestions for improved accessibility
-- WCAG compliance indicators 
+- WCAG compliance indicators
