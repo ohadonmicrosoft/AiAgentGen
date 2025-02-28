@@ -1,28 +1,44 @@
-import { useEffect } from "react";
-import { useLocation } from "wouter";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useAuth } from "@/hooks/use-auth";
-import { insertUserSchema } from "@shared/schema";
-import { Bot } from "lucide-react";
+import { useEffect } from 'react';
+import { useLocation } from 'wouter';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { useAuth } from '@/hooks/use-auth';
+import { insertUserSchema } from '@shared/schema';
+import { Bot } from 'lucide-react';
 
 const loginSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
-const registerSchema = insertUserSchema.extend({
-  confirmPassword: z.string(),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const registerSchema = insertUserSchema
+  .extend({
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -34,24 +50,24 @@ export default function AuthPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate('/');
     }
   }, [user, navigate]);
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      username: '',
+      password: '',
     },
   });
 
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
-      password: "",
-      confirmPassword: "",
+      username: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
@@ -84,14 +100,12 @@ export default function AuthPage() {
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="login">
               <Card>
                 <CardHeader>
                   <CardTitle>Login</CardTitle>
-                  <CardDescription>
-                    Enter your credentials to access your account
-                  </CardDescription>
+                  <CardDescription>Enter your credentials to access your account</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Form {...loginForm}>
@@ -109,7 +123,7 @@ export default function AuthPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={loginForm.control}
                         name="password"
@@ -123,13 +137,9 @@ export default function AuthPage() {
                           </FormItem>
                         )}
                       />
-                      
-                      <Button 
-                        type="submit" 
-                        className="w-full" 
-                        disabled={loginMutation.isPending}
-                      >
-                        {loginMutation.isPending ? "Logging in..." : "Login"}
+
+                      <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+                        {loginMutation.isPending ? 'Logging in...' : 'Login'}
                       </Button>
                     </form>
                   </Form>
@@ -139,51 +149,54 @@ export default function AuthPage() {
                     Developer Quick Login
                   </div>
                   <div className="flex gap-2 w-full">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       className="flex-1 text-xs h-8"
                       onClick={() => {
-                        loginForm.setValue("username", "developer");
-                        loginForm.setValue("password", "developer123");
+                        loginForm.setValue('username', 'developer');
+                        loginForm.setValue('password', 'developer123');
                         loginForm.handleSubmit(onLoginSubmit)();
                       }}
                     >
                       Dev Login
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       className="flex-1 text-xs h-8"
                       onClick={() => {
-                        registerForm.setValue("username", "developer" + Math.floor(Math.random() * 1000));
-                        const password = "developer123";
-                        registerForm.setValue("password", password);
-                        registerForm.setValue("confirmPassword", password);
+                        registerForm.setValue(
+                          'username',
+                          'developer' + Math.floor(Math.random() * 1000),
+                        );
+                        const password = 'developer123';
+                        registerForm.setValue('password', password);
+                        registerForm.setValue('confirmPassword', password);
                         registerForm.handleSubmit(onRegisterSubmit)();
                       }}
                     >
                       Create Dev Account
                     </Button>
-                    <Button 
-                      variant="secondary" 
+                    <Button
+                      variant="secondary"
                       size="sm"
                       className="flex-1 text-xs h-8"
                       onClick={async () => {
                         try {
-                          const response = await fetch("/api/devlogin", {
-                            method: "POST",
+                          const response = await fetch('/api/devlogin', {
+                            method: 'POST',
                             headers: {
-                              "Content-Type": "application/json",
+                              'Content-Type': 'application/json',
                             },
-                            credentials: "include"
+                            credentials: 'include',
                           });
-                          
+
                           if (response.ok) {
-                            window.location.href = "/"; // Force reload to update auth state
+                            window.location.href = '/'; // Force reload to update auth state
                           }
                         } catch (error) {
-                          console.error("Dev quick login failed:", error);
+                          console.error('Dev quick login failed:', error);
                         }
                       }}
                     >
@@ -193,18 +206,19 @@ export default function AuthPage() {
                 </CardFooter>
               </Card>
             </TabsContent>
-            
+
             <TabsContent value="register">
               <Card>
                 <CardHeader>
                   <CardTitle>Create an account</CardTitle>
-                  <CardDescription>
-                    Enter your details to create a new account
-                  </CardDescription>
+                  <CardDescription>Enter your details to create a new account</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Form {...registerForm}>
-                    <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
+                    <form
+                      onSubmit={registerForm.handleSubmit(onRegisterSubmit)}
+                      className="space-y-4"
+                    >
                       <FormField
                         control={registerForm.control}
                         name="username"
@@ -218,7 +232,7 @@ export default function AuthPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={registerForm.control}
                         name="password"
@@ -232,7 +246,7 @@ export default function AuthPage() {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={registerForm.control}
                         name="confirmPassword"
@@ -240,19 +254,23 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>Confirm Password</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="Confirm your password" {...field} />
+                              <Input
+                                type="password"
+                                placeholder="Confirm your password"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      
-                      <Button 
-                        type="submit" 
-                        className="w-full" 
+
+                      <Button
+                        type="submit"
+                        className="w-full"
                         disabled={registerMutation.isPending}
                       >
-                        {registerMutation.isPending ? "Creating account..." : "Register"}
+                        {registerMutation.isPending ? 'Creating account...' : 'Register'}
                       </Button>
                     </form>
                   </Form>
@@ -262,16 +280,15 @@ export default function AuthPage() {
           </Tabs>
         </div>
       </div>
-      
+
       {/* Right side - Hero */}
       <div className="hidden md:flex flex-1 bg-primary/5 p-8 items-center justify-center">
         <div className="max-w-md">
-          <h2 className="text-3xl font-bold mb-4">
-            Build powerful AI agents with ease
-          </h2>
+          <h2 className="text-3xl font-bold mb-4">Build powerful AI agents with ease</h2>
           <p className="text-muted-foreground mb-6">
-            Create, manage, and deploy AI-powered agents through an intuitive step-by-step interface. 
-            Our platform offers real-time AI response previews, prompt engineering tools, and REST API integration for automation.
+            Create, manage, and deploy AI-powered agents through an intuitive step-by-step
+            interface. Our platform offers real-time AI response previews, prompt engineering tools,
+            and REST API integration for automation.
           </p>
           <ul className="space-y-2">
             <li className="flex items-center">

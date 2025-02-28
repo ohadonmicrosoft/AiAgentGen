@@ -6,19 +6,23 @@
 export function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(registration => {
+      navigator.serviceWorker
+        .register('/service-worker.js')
+        .then((registration) => {
           console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          
+
           // Check for updates when the page loads
           registration.update();
-          
+
           // Setup update checking
-          setInterval(() => {
-            registration.update();
-          }, 60 * 60 * 1000); // Check for updates every hour
+          setInterval(
+            () => {
+              registration.update();
+            },
+            60 * 60 * 1000,
+          ); // Check for updates every hour
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('ServiceWorker registration failed: ', error);
         });
     });
@@ -35,12 +39,12 @@ export function setupServiceWorkerUpdateFlow() {
       // When the service worker controlling this page changes, refresh the page
       window.location.reload();
     });
-    
+
     // Detect when a new service worker is installed but waiting
-    navigator.serviceWorker.ready.then(registration => {
+    navigator.serviceWorker.ready.then((registration) => {
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
-        
+
         if (newWorker) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
@@ -61,7 +65,8 @@ export function setupServiceWorkerUpdateFlow() {
 function notifyUserOfUpdate() {
   // Create a notification element
   const notification = document.createElement('div');
-  notification.className = 'fixed bottom-4 right-4 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg z-50 flex flex-col';
+  notification.className =
+    'fixed bottom-4 right-4 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg z-50 flex flex-col';
   notification.innerHTML = `
     <div class="flex items-center justify-between mb-2">
       <strong>Update Available</strong>
@@ -73,26 +78,26 @@ function notifyUserOfUpdate() {
       <button id="update-now" class="bg-primary-foreground/20 hover:bg-primary-foreground/30 text-sm px-3 py-1 rounded-md">Update Now</button>
     </div>
   `;
-  
+
   // Add the notification to the page
   document.body.appendChild(notification);
-  
+
   // Handle update action
   document.getElementById('update-now')?.addEventListener('click', () => {
     // Skip the waiting service worker
-    navigator.serviceWorker.ready.then(registration => {
+    navigator.serviceWorker.ready.then((registration) => {
       registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
     });
-    
+
     // Remove the notification
     notification.remove();
   });
-  
+
   // Handle close action
   document.getElementById('close-update-notification')?.addEventListener('click', () => {
     notification.remove();
   });
-  
+
   // Handle later action
   document.getElementById('update-later')?.addEventListener('click', () => {
     notification.remove();
@@ -117,4 +122,4 @@ declare global {
   interface Window {
     gtag?: (...args: any[]) => void;
   }
-} 
+}

@@ -12,16 +12,13 @@ interface PageTransitionProps {
  * PageTransition component that wraps route content with animated transitions
  * This creates smooth transitions between pages
  */
-export const PageTransition: React.FC<PageTransitionProps> = ({ 
-  children,
-  location
-}) => {
+export const PageTransition: React.FC<PageTransitionProps> = ({ children, location }) => {
   const [currentLocation] = useLocation();
   const { initial, animate, exit, transition } = usePageTransition();
-  
+
   // Use provided location or current location from wouter
   const currentPath = location || currentLocation;
-  
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -47,4 +44,4 @@ export function withPageTransition<T extends object>(Component: React.ComponentT
       <Component {...props} />
     </PageTransition>
   );
-} 
+}

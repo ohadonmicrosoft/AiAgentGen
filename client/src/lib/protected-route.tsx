@@ -1,7 +1,7 @@
-import { useAuth } from "@/hooks/use-auth";
-import { Loader2 } from "lucide-react";
-import { Redirect, Route } from "wouter";
-import MainLayout from "@/layouts/MainLayout";
+import { useAuth } from '@/hooks/use-auth';
+import { Loader2 } from 'lucide-react';
+import { Redirect, Route } from 'wouter';
+import MainLayout from '@/layouts/MainLayout';
 
 interface ProtectedRouteProps {
   path: string;

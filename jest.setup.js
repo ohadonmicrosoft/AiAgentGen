@@ -8,7 +8,7 @@ import { jest } from '@jest/globals';
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -55,4 +55,4 @@ global.console = {
   ...global.console,
   error: jest.fn(),
   warn: jest.fn(),
-}; 
+};

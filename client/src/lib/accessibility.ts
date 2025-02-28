@@ -13,12 +13,12 @@ export type AnnouncementType = 'polite' | 'assertive';
  */
 export function announce(message: string, type: AnnouncementType = 'polite') {
   const announcer = getAnnouncer(type);
-  
+
   // Update the content to trigger screen reader announcement
   if (announcer) {
     // Clear it first to ensure the announcement happens even if the same text is announced twice
     announcer.textContent = '';
-    
+
     // Use setTimeout to ensure the change is announced
     setTimeout(() => {
       announcer.textContent = message;
@@ -32,14 +32,14 @@ export function announce(message: string, type: AnnouncementType = 'polite') {
 function getAnnouncer(type: AnnouncementType): HTMLElement {
   const id = `sr-announcer-${type}`;
   let announcer = document.getElementById(id);
-  
+
   if (!announcer) {
     announcer = document.createElement('div');
     announcer.id = id;
     announcer.setAttribute('aria-live', type);
     announcer.setAttribute('role', 'status');
     announcer.setAttribute('aria-atomic', 'true');
-    
+
     // Hide it visually but keep it accessible to screen readers
     Object.assign(announcer.style, {
       position: 'absolute',
@@ -49,12 +49,12 @@ function getAnnouncer(type: AnnouncementType): HTMLElement {
       overflow: 'hidden',
       clip: 'rect(0, 0, 0, 0)',
       whiteSpace: 'nowrap',
-      border: '0'
+      border: '0',
     });
-    
+
     document.body.appendChild(announcer);
   }
-  
+
   return announcer;
 }
 
@@ -66,16 +66,16 @@ function getAnnouncer(type: AnnouncementType): HTMLElement {
  */
 export function useAnnouncer(initialMessage = '', type: AnnouncementType = 'polite') {
   const [message, setMessage] = useState(initialMessage);
-  
+
   useEffect(() => {
     if (message) {
       announce(message, type);
     }
   }, [message, type]);
-  
+
   return {
     message,
-    announce: setMessage
+    announce: setMessage,
   };
 }
 
@@ -88,14 +88,14 @@ export function useAnnouncer(initialMessage = '', type: AnnouncementType = 'poli
 export function useFocusTrap(active = true, onEscape?: () => void) {
   const ref = useRef<HTMLElement>(null);
   const previousFocusedElement = useRef<HTMLElement | null>(null);
-  
+
   // Store the previously focused element when the trap becomes active
   useEffect(() => {
     if (active && document.activeElement instanceof HTMLElement) {
       previousFocusedElement.current = document.activeElement;
     }
   }, [active]);
-  
+
   // Restore focus when the trap is deactivated
   useEffect(() => {
     return () => {
@@ -104,11 +104,11 @@ export function useFocusTrap(active = true, onEscape?: () => void) {
       }
     };
   }, []);
-  
+
   // Handle Tab and Escape key presses
   useEffect(() => {
     if (!active || !ref.current) return;
-    
+
     const handleKeyDown = (e: KeyboardEvent) => {
       // Handle Escape key
       if (e.key === 'Escape' && onEscape) {
@@ -116,16 +116,16 @@ export function useFocusTrap(active = true, onEscape?: () => void) {
         onEscape();
         return;
       }
-      
+
       // Only handle Tab key if active
       if (e.key !== 'Tab' || !active) return;
-      
+
       const focusableElements = getFocusableElements(ref.current);
       if (focusableElements.length === 0) return;
-      
+
       const firstElement = focusableElements[0];
       const lastElement = focusableElements[focusableElements.length - 1];
-      
+
       // Shift + Tab => backward
       if (e.shiftKey) {
         if (document.activeElement === firstElement) {
@@ -141,11 +141,11 @@ export function useFocusTrap(active = true, onEscape?: () => void) {
         }
       }
     };
-    
+
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [active, onEscape]);
-  
+
   // Set focus on the first focusable element when activated
   useEffect(() => {
     if (active && ref.current) {
@@ -158,7 +158,7 @@ export function useFocusTrap(active = true, onEscape?: () => void) {
       }
     }
   }, [active]);
-  
+
   return ref;
 }
 
@@ -167,7 +167,7 @@ export function useFocusTrap(active = true, onEscape?: () => void) {
  */
 export function getFocusableElements(container: HTMLElement | null): HTMLElement[] {
   if (!container) return [];
-  
+
   const selector = [
     'a[href]',
     'button:not([disabled])',
@@ -179,11 +179,11 @@ export function getFocusableElements(container: HTMLElement | null): HTMLElement
     'iframe',
     'object',
     'embed',
-    '[contenteditable="true"]'
+    '[contenteditable="true"]',
   ].join(',');
-  
+
   return Array.from(container.querySelectorAll(selector)).filter(
-    (el): el is HTMLElement => el instanceof HTMLElement && el.tabIndex !== -1
+    (el): el is HTMLElement => el instanceof HTMLElement && el.tabIndex !== -1,
   );
 }
 
@@ -195,20 +195,20 @@ export function getFocusableElements(container: HTMLElement | null): HTMLElement
 export function useFocusManagement(active = true) {
   const containerRef = useRef<HTMLElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
-  
+
   const saveFocus = useCallback(() => {
     if (document.activeElement instanceof HTMLElement) {
       previousFocusRef.current = document.activeElement;
     }
   }, []);
-  
+
   const restoreFocus = useCallback(() => {
     if (previousFocusRef.current) {
       previousFocusRef.current.focus();
       previousFocusRef.current = null;
     }
   }, []);
-  
+
   const focusFirst = useCallback(() => {
     if (containerRef.current) {
       const focusableElements = getFocusableElements(containerRef.current);
@@ -217,12 +217,12 @@ export function useFocusManagement(active = true) {
       }
     }
   }, []);
-  
+
   return {
     containerRef,
     saveFocus,
     restoreFocus,
-    focusFirst
+    focusFirst,
   };
 }
 
@@ -237,7 +237,7 @@ export function useKeyboardNavigation({
   initialIndex = 0,
   vertical = true,
   horizontal = false,
-  loop = true
+  loop = true,
 }: {
   itemCount: number;
   onSelect?: (index: number) => void;
@@ -247,68 +247,71 @@ export function useKeyboardNavigation({
   loop?: boolean;
 }) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-    let newIndex = currentIndex;
-    
-    // Vertical navigation
-    if (vertical) {
-      if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        newIndex = currentIndex - 1;
-      } else if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        newIndex = currentIndex + 1;
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      let newIndex = currentIndex;
+
+      // Vertical navigation
+      if (vertical) {
+        if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          newIndex = currentIndex - 1;
+        } else if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          newIndex = currentIndex + 1;
+        }
       }
-    }
-    
-    // Horizontal navigation
-    if (horizontal) {
-      if (event.key === 'ArrowLeft') {
-        event.preventDefault();
-        newIndex = currentIndex - 1;
-      } else if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        newIndex = currentIndex + 1;
+
+      // Horizontal navigation
+      if (horizontal) {
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          newIndex = currentIndex - 1;
+        } else if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          newIndex = currentIndex + 1;
+        }
       }
-    }
-    
-    // Home and End keys
-    if (event.key === 'Home') {
-      event.preventDefault();
-      newIndex = 0;
-    } else if (event.key === 'End') {
-      event.preventDefault();
-      newIndex = itemCount - 1;
-    }
-    
-    // Enter and Space to select
-    if ((event.key === 'Enter' || event.key === ' ') && onSelect) {
-      event.preventDefault();
-      onSelect(currentIndex);
-      return;
-    }
-    
-    // Handle looping or constrain within bounds
-    if (newIndex !== currentIndex) {
-      if (loop) {
-        // Loop around if out of bounds
-        if (newIndex < 0) newIndex = itemCount - 1;
-        if (newIndex >= itemCount) newIndex = 0;
-      } else {
-        // Constrain within bounds
-        if (newIndex < 0) newIndex = 0;
-        if (newIndex >= itemCount) newIndex = itemCount - 1;
+
+      // Home and End keys
+      if (event.key === 'Home') {
+        event.preventDefault();
+        newIndex = 0;
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        newIndex = itemCount - 1;
       }
-      
-      setCurrentIndex(newIndex);
-    }
-  }, [currentIndex, itemCount, onSelect, vertical, horizontal, loop]);
-  
+
+      // Enter and Space to select
+      if ((event.key === 'Enter' || event.key === ' ') && onSelect) {
+        event.preventDefault();
+        onSelect(currentIndex);
+        return;
+      }
+
+      // Handle looping or constrain within bounds
+      if (newIndex !== currentIndex) {
+        if (loop) {
+          // Loop around if out of bounds
+          if (newIndex < 0) newIndex = itemCount - 1;
+          if (newIndex >= itemCount) newIndex = 0;
+        } else {
+          // Constrain within bounds
+          if (newIndex < 0) newIndex = 0;
+          if (newIndex >= itemCount) newIndex = itemCount - 1;
+        }
+
+        setCurrentIndex(newIndex);
+      }
+    },
+    [currentIndex, itemCount, onSelect, vertical, horizontal, loop],
+  );
+
   return {
     currentIndex,
     setCurrentIndex,
-    handleKeyDown
+    handleKeyDown,
   };
 }
 
@@ -320,12 +323,12 @@ export interface SkipLinkProps {
    * The target element's id to skip to
    */
   targetId: string;
-  
+
   /**
    * The text to display on the skip link
    */
   children: React.ReactNode;
-  
+
   /**
    * Additional class names to apply to the skip link
    */
@@ -347,13 +350,13 @@ export function isA11yTestMode(): boolean {
  */
 export function useAccessibleAnimations() {
   const prefersReducedMotion = useReducedMotion();
-  
+
   return {
     enabled: !prefersReducedMotion,
     duration: prefersReducedMotion ? 0 : 0.3,
     transition: prefersReducedMotion ? { duration: 0 } : { duration: 0.3 },
     transform: prefersReducedMotion ? {} : { scale: 1.02 },
     opacity: prefersReducedMotion ? { opacity: 1 } : { opacity: [0, 1] },
-    slideIn: prefersReducedMotion ? { x: 0 } : { x: [-20, 0] }
+    slideIn: prefersReducedMotion ? { x: 0 } : { x: [-20, 0] },
   };
-} 
+}

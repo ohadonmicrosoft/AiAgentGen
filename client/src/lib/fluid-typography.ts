@@ -1,6 +1,6 @@
 /**
  * Fluid Typography Utilities
- * 
+ *
  * This module provides utilities for generating fluid typography values
  * that scale smoothly between minimum and maximum sizes based on viewport width.
  */
@@ -31,18 +31,17 @@ export function fluidTypography({
   maxSize,
   minWidth = 320,
   maxWidth = 1280,
-  unit = 'px'
+  unit = 'px',
 }: FluidTypographyOptions): string {
   const slope = (maxSize - minSize) / (maxWidth - minWidth);
   const slopeVw = slope * 100; // Convert to vw units
   const intercept = minSize - slope * minWidth;
-  
+
   const minSizeValue = convertToUnit(minSize, unit);
   const maxSizeValue = convertToUnit(maxSize, unit);
-  const interceptValue = unit === 'px' 
-    ? `${intercept.toFixed(4)}px` 
-    : `${(intercept / 16).toFixed(4)}${unit}`;
-  
+  const interceptValue =
+    unit === 'px' ? `${intercept.toFixed(4)}px` : `${(intercept / 16).toFixed(4)}${unit}`;
+
   return `clamp(${minSizeValue}, ${interceptValue} + ${slopeVw.toFixed(4)}vw, ${maxSizeValue})`;
 }
 
@@ -67,7 +66,10 @@ export const fluidTypeScale = {
  * @param unit The unit to use (px, rem, em)
  * @returns A fluid typography value using CSS clamp
  */
-export function getFluidType(key: keyof typeof fluidTypeScale, unit: 'px' | 'rem' | 'em' = 'px'): string {
+export function getFluidType(
+  key: keyof typeof fluidTypeScale,
+  unit: 'px' | 'rem' | 'em' = 'px',
+): string {
   const { minSize, maxSize } = fluidTypeScale[key];
   return fluidTypography({ minSize, maxSize, unit });
 }
@@ -84,7 +86,7 @@ export function fluidLineHeight(
   minLineHeight: number,
   maxLineHeight: number,
   minWidth: number = 320,
-  maxWidth: number = 1280
+  maxWidth: number = 1280,
 ): string {
   const slope = (maxLineHeight - minLineHeight) / (maxWidth - minWidth);
   const slopeVw = slope * 100;
@@ -100,9 +102,9 @@ export function fluidLineHeight(
  */
 export function calculateOptimalLineLength(
   fontSize: number,
-  charactersPerLine: number = 66
+  charactersPerLine: number = 66,
 ): string {
   // Using the approximation that 1em contains ~2 characters for average English text
   const emLength = charactersPerLine / 2;
   return `${emLength}em`;
-} 
+}

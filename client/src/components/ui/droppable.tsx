@@ -18,20 +18,23 @@ export interface DroppableProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Droppable = forwardRef<HTMLDivElement, DroppableProps>(
-  ({ 
-    id,
-    accepts,
-    disabled = false,
-    orientation = 'vertical',
-    onDragEnter,
-    onDragLeave,
-    onDrop,
-    children,
-    emptyPlaceholder,
-    highlightOnHover = true,
-    className,
-    ...props
-  }, ref) => {
+  (
+    {
+      id,
+      accepts,
+      disabled = false,
+      orientation = 'vertical',
+      onDragEnter,
+      onDragLeave,
+      onDrop,
+      children,
+      emptyPlaceholder,
+      highlightOnHover = true,
+      className,
+      ...props
+    },
+    ref,
+  ) => {
     const config: DroppableConfig = {
       id,
       accepts,
@@ -41,18 +44,13 @@ const Droppable = forwardRef<HTMLDivElement, DroppableProps>(
       onDragLeave,
       onDrop,
     };
-    
-    const { 
-      droppableProps, 
-      isOver, 
-      canAccept, 
-      animationControls 
-    } = useDroppable(config);
-    
+
+    const { droppableProps, isOver, canAccept, animationControls } = useDroppable(config);
+
     // Default placeholder if no children and an emptyPlaceholder is provided
     const hasChildren = React.Children.count(children) > 0;
     const shouldShowPlaceholder = !hasChildren && emptyPlaceholder;
-    
+
     return (
       <motion.div
         ref={ref}
@@ -61,7 +59,7 @@ const Droppable = forwardRef<HTMLDivElement, DroppableProps>(
           orientation === 'vertical' ? 'flex flex-col' : 'flex flex-row',
           highlightOnHover && isOver && canAccept && 'bg-primary/10 border-primary',
           highlightOnHover && !isOver && 'border-dashed',
-          className
+          className,
         )}
         animate={animationControls}
         initial={false}
@@ -69,10 +67,10 @@ const Droppable = forwardRef<HTMLDivElement, DroppableProps>(
         {...props}
       >
         {shouldShowPlaceholder ? emptyPlaceholder : children}
-        
+
         {/* Visual feedback for when item can be dropped */}
         {isOver && canAccept && highlightOnHover && (
-          <motion.div 
+          <motion.div
             className="absolute inset-0 bg-primary/5 border-2 border-primary/40 rounded-md pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -82,9 +80,9 @@ const Droppable = forwardRef<HTMLDivElement, DroppableProps>(
         )}
       </motion.div>
     );
-  }
+  },
 );
 
 Droppable.displayName = 'Droppable';
 
-export { Droppable }; 
+export { Droppable };

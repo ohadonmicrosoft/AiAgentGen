@@ -23,7 +23,7 @@ describe('Login Flow Integration', () => {
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
-    
+
     // Create a new QueryClient for each test
     queryClient = new QueryClient({
       defaultOptions: {
@@ -32,18 +32,18 @@ describe('Login Flow Integration', () => {
         },
       },
     });
-    
+
     // Mock successful login by default
-    api.login.mockResolvedValue({ 
+    api.login.mockResolvedValue({
       user: { id: 1, name: 'Test User', email: 'test@example.com' },
-      token: 'fake-token'
+      token: 'fake-token',
     });
-    
+
     // Mock current user
-    api.getCurrentUser.mockResolvedValue({ 
-      id: 1, 
-      name: 'Test User', 
-      email: 'test@example.com' 
+    api.getCurrentUser.mockResolvedValue({
+      id: 1,
+      name: 'Test User',
+      email: 'test@example.com',
     });
   });
 
@@ -61,13 +61,13 @@ describe('Login Flow Integration', () => {
             </AuthProvider>
           </ToastProvider>
         </MemoryRouter>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
   };
 
   it('should render the login form', () => {
     renderWithProviders();
-    
+
     // Check that the login form is rendered
     expect(screen.getByRole('heading', { name: /sign in/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
@@ -77,54 +77,54 @@ describe('Login Flow Integration', () => {
 
   it('should show validation errors for empty fields', async () => {
     renderWithProviders();
-    
+
     // Submit the form without filling in any fields
     const submitButton = screen.getByRole('button', { name: /sign in/i });
     fireEvent.click(submitButton);
-    
+
     // Check for validation errors
     await waitFor(() => {
       expect(screen.getByText(/email is required/i)).toBeInTheDocument();
       expect(screen.getByText(/password is required/i)).toBeInTheDocument();
     });
-    
+
     // API should not be called
     expect(api.login).not.toHaveBeenCalled();
   });
 
   it('should show validation error for invalid email', async () => {
     renderWithProviders();
-    
+
     // Fill in invalid email
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/password/i);
     const submitButton = screen.getByRole('button', { name: /sign in/i });
-    
+
     await userEvent.type(emailInput, 'invalid-email');
     await userEvent.type(passwordInput, 'password123');
     fireEvent.click(submitButton);
-    
+
     // Check for validation error
     await waitFor(() => {
       expect(screen.getByText(/invalid email address/i)).toBeInTheDocument();
     });
-    
+
     // API should not be called
     expect(api.login).not.toHaveBeenCalled();
   });
 
   it('should successfully log in with valid credentials', async () => {
     renderWithProviders();
-    
+
     // Fill in valid credentials
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/password/i);
     const submitButton = screen.getByRole('button', { name: /sign in/i });
-    
+
     await userEvent.type(emailInput, 'test@example.com');
     await userEvent.type(passwordInput, 'password123');
     fireEvent.click(submitButton);
-    
+
     // API should be called with correct credentials
     await waitFor(() => {
       expect(api.login).toHaveBeenCalledWith({
@@ -132,7 +132,7 @@ describe('Login Flow Integration', () => {
         password: 'password123',
       });
     });
-    
+
     // Should redirect to dashboard
     await waitFor(() => {
       expect(screen.getByText(/dashboard/i)).toBeInTheDocument();
@@ -145,23 +145,23 @@ describe('Login Flow Integration', () => {
       message: 'Invalid email or password',
       status: 401,
     });
-    
+
     renderWithProviders();
-    
+
     // Fill in credentials
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/password/i);
     const submitButton = screen.getByRole('button', { name: /sign in/i });
-    
+
     await userEvent.type(emailInput, 'test@example.com');
     await userEvent.type(passwordInput, 'wrongpassword');
     fireEvent.click(submitButton);
-    
+
     // Should show error message
     await waitFor(() => {
       expect(screen.getByText(/invalid email or password/i)).toBeInTheDocument();
     });
-    
+
     // Should not redirect
     expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
@@ -172,18 +172,18 @@ describe('Login Flow Integration', () => {
       message: 'Network Error',
       isNetworkError: true,
     });
-    
+
     renderWithProviders();
-    
+
     // Fill in credentials
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/password/i);
     const submitButton = screen.getByRole('button', { name: /sign in/i });
-    
+
     await userEvent.type(emailInput, 'test@example.com');
     await userEvent.type(passwordInput, 'password123');
     fireEvent.click(submitButton);
-    
+
     // Should show network error message
     await waitFor(() => {
       expect(screen.getByText(/network error/i)).toBeInTheDocument();
@@ -193,18 +193,18 @@ describe('Login Flow Integration', () => {
   it('should redirect to dashboard if already logged in', async () => {
     // Mock that user is already logged in
     localStorage.setItem('auth_token', 'existing-token');
-    
+
     renderWithProviders();
-    
+
     // Should redirect to dashboard without needing to log in
     await waitFor(() => {
       expect(screen.getByText(/dashboard/i)).toBeInTheDocument();
     });
-    
+
     // Login API should not be called
     expect(api.login).not.toHaveBeenCalled();
-    
+
     // Clean up
     localStorage.removeItem('auth_token');
   });
-}); 
+});

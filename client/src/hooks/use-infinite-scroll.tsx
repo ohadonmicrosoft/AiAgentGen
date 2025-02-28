@@ -6,27 +6,27 @@ export interface InfiniteScrollOptions {
    * Distance from the bottom of the container in pixels at which to trigger loading more
    */
   threshold?: number;
-  
+
   /**
    * Whether to disable infinite scroll
    */
   disabled?: boolean;
-  
+
   /**
    * Function to call when more items should be loaded
    */
   onLoadMore: () => Promise<any>;
-  
+
   /**
    * Whether there are more items to load
    */
   hasMore: boolean;
-  
+
   /**
    * Root margin for the intersection observer
    */
   rootMargin?: string;
-  
+
   /**
    * Element to use as the scroll container; defaults to window
    */
@@ -38,17 +38,17 @@ export interface InfiniteScrollResult {
    * Ref to attach to the element at the end of the list
    */
   sentinelRef: React.RefObject<HTMLDivElement>;
-  
+
   /**
    * Whether new items are currently being loaded
    */
   isLoading: boolean;
-  
+
   /**
    * Whether an error occurred while loading more items
    */
   error: Error | null;
-  
+
   /**
    * Manually trigger loading more items
    */
@@ -57,13 +57,13 @@ export interface InfiniteScrollResult {
 
 /**
  * Hook for implementing infinite scroll in a component
- * 
+ *
  * @example
  * const { sentinelRef, isLoading, error } = useInfiniteScroll({
  *   hasMore: items.length < totalItems,
  *   onLoadMore: () => fetchMoreItems()
  * });
- * 
+ *
  * // At the end of your list:
  * <div ref={sentinelRef}>
  *   {isLoading && <Spinner />}
@@ -86,10 +86,10 @@ export function useInfiniteScroll({
   // Function to load more items
   const loadMore = useCallback(async () => {
     if (isLoading || !hasMore || disabled) return;
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
       await onLoadMore();
     } catch (err) {
@@ -102,61 +102,54 @@ export function useInfiniteScroll({
   // Set up intersection observer
   useEffect(() => {
     if (!sentinelRef.current || disabled || !hasMore) return;
-    
+
     const options: IntersectionObserverInit = {
       rootMargin,
       threshold: 0.1,
     };
-    
+
     if (scrollContainer?.current) {
       options.root = scrollContainer.current;
     }
-    
+
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && hasMore && !isLoading) {
         loadMore();
       }
     }, options);
-    
+
     observer.observe(sentinelRef.current);
     observerRef.current = observer;
-    
+
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
     };
-  }, [
-    hasMore, 
-    isLoading, 
-    disabled, 
-    loadMore, 
-    rootMargin, 
-    scrollContainer
-  ]);
-  
+  }, [hasMore, isLoading, disabled, loadMore, rootMargin, scrollContainer]);
+
   // If reduced motion is preferred, we might want to adjust the threshold
   // to be more generous to avoid abrupt loading behavior
   useEffect(() => {
     if (prefersReducedMotion && observerRef.current && sentinelRef.current) {
       // Disconnect and reconnect with a more generous rootMargin
       observerRef.current.disconnect();
-      
+
       const options: IntersectionObserverInit = {
         rootMargin: rootMargin,
         threshold: 0.3, // Higher threshold for reduced motion
       };
-      
+
       if (scrollContainer?.current) {
         options.root = scrollContainer.current;
       }
-      
+
       const observer = new IntersectionObserver(([entry]) => {
         if (entry.isIntersecting && hasMore && !isLoading) {
           loadMore();
         }
       }, options);
-      
+
       observer.observe(sentinelRef.current);
       observerRef.current = observer;
     }

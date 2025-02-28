@@ -35,7 +35,7 @@ export function OfflineIndicator({ className }: OfflineIndicatorProps) {
     // Add event listeners
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
-    
+
     // Check pending forms every 30 seconds
     const interval = setInterval(checkPendingForms, 30000);
 
@@ -61,7 +61,7 @@ export function OfflineIndicator({ className }: OfflineIndicatorProps) {
     setSyncing(true);
     try {
       const result = await syncOfflineForms();
-      
+
       if (result.success > 0) {
         toast({
           title: 'Sync completed',
@@ -81,7 +81,7 @@ export function OfflineIndicator({ className }: OfflineIndicatorProps) {
           variant: 'default',
         });
       }
-      
+
       // Update pending count
       const forms = await getPendingForms();
       setPendingCount(forms.length);
@@ -105,27 +105,23 @@ export function OfflineIndicator({ className }: OfflineIndicatorProps) {
     <div
       className={cn(
         'fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-lg p-2 shadow-lg',
-        online ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100',
-        className
+        online
+          ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100'
+          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100',
+        className,
       )}
     >
-      {online ? (
-        <Wifi className="h-5 w-5" />
-      ) : (
-        <WifiOff className="h-5 w-5" />
-      )}
-      
+      {online ? <Wifi className="h-5 w-5" /> : <WifiOff className="h-5 w-5" />}
+
       <div className="flex flex-col">
-        <span className="text-sm font-medium">
-          {online ? 'Online' : 'Offline'}
-        </span>
+        <span className="text-sm font-medium">{online ? 'Online' : 'Offline'}</span>
         {pendingCount > 0 && (
           <span className="text-xs">
             {pendingCount} {pendingCount === 1 ? 'item' : 'items'} pending
           </span>
         )}
       </div>
-      
+
       {pendingCount > 0 && online && (
         <Button
           variant="ghost"
@@ -139,4 +135,4 @@ export function OfflineIndicator({ className }: OfflineIndicatorProps) {
       )}
     </div>
   );
-} 
+}

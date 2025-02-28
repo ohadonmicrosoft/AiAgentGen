@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Check, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Check, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useLocation } from 'wouter';
+import { useMutation } from '@tanstack/react-query';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 
 interface AgentReviewProps {
   formData: any;
@@ -16,8 +16,8 @@ interface AgentReviewProps {
 
 export default function AgentReview({ formData, onBack, preview = false }: AgentReviewProps) {
   const [isTestingAgent, setIsTestingAgent] = useState(false);
-  const [testMessage, setTestMessage] = useState("");
-  const [testResponse, setTestResponse] = useState("");
+  const [testMessage, setTestMessage] = useState('');
+  const [testResponse, setTestResponse] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
@@ -25,116 +25,116 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
 
   // Mutation for testing an agent
   const testAgentMutation = useMutation({
-    mutationFn: async ({ config, message }: { config: any, message: string }) => {
+    mutationFn: async ({ config, message }: { config: any; message: string }) => {
       console.log('Testing agent with config:', config, 'and message:', message);
-      const res = await apiRequest("POST", "/api/agents/test", {
+      const res = await apiRequest('POST', '/api/agents/test', {
         systemPrompt: config.systemPrompt,
         model: config.model,
         temperature: config.temperature,
         maxTokens: config.maxTokens,
-        message: message
+        message: message,
       });
       return res.json();
     },
     onSuccess: (data) => {
       setTestResponse(data.content);
       toast({
-        title: "Test completed",
-        description: "Your agent has been tested successfully.",
+        title: 'Test completed',
+        description: 'Your agent has been tested successfully.',
       });
       setIsTestingAgent(false);
     },
     onError: (error: Error) => {
       toast({
-        title: "Test failed",
+        title: 'Test failed',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
       setIsTestingAgent(false);
-    }
+    },
   });
 
   // Mutation for creating an agent
   const createAgentMutation = useMutation({
     mutationFn: async (agentData: any) => {
-      const res = await apiRequest("POST", "/api/agents", agentData);
+      const res = await apiRequest('POST', '/api/agents', agentData);
       return res.json();
     },
     onSuccess: () => {
       toast({
-        title: "Agent created successfully!",
-        description: "Your new AI agent is ready to use.",
+        title: 'Agent created successfully!',
+        description: 'Your new AI agent is ready to use.',
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/agents"] });
-      
+      queryClient.invalidateQueries({ queryKey: ['/api/agents'] });
+
       // Redirect after a short delay
       setTimeout(() => {
-        navigate("/agents");
+        navigate('/agents');
       }, 1500);
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to create agent",
+        title: 'Failed to create agent',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
-    }
+    },
   });
 
   const handleCreateAgent = async () => {
     if (preview) return;
-    
+
     // Prepare data for API
     const agentData = {
       name: formData.name,
       description: formData.description,
       type: formData.type,
-      model: formData.model || "gpt-4o",
-      temperature: formData.temperature?.toString() || "0.7",
+      model: formData.model || 'gpt-4o',
+      temperature: formData.temperature?.toString() || '0.7',
       maxTokens: formData.maxTokens || 2048,
-      responseStyle: formData.responseStyle || "formal",
+      responseStyle: formData.responseStyle || 'formal',
       systemPrompt: formData.systemPrompt,
-      status: "draft" // Default to draft status
+      status: 'draft', // Default to draft status
     };
-    
-    console.log("Creating agent with data:", agentData);
+
+    console.log('Creating agent with data:', agentData);
     setIsSubmitting(true);
     createAgentMutation.mutate(agentData);
   };
-  
+
   const handleTestAgent = () => {
     if (!testMessage.trim()) {
       toast({
-        title: "Test message required",
+        title: 'Test message required',
         description: "Please enter a test message to check your agent's response.",
       });
       return;
     }
-    
+
     // Ensure we have a system prompt
     if (!formData.systemPrompt?.trim()) {
       toast({
-        title: "System prompt required",
-        description: "Please go back and provide a system prompt for your agent.",
-        variant: "destructive"
+        title: 'System prompt required',
+        description: 'Please go back and provide a system prompt for your agent.',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     // Prepare agent config for testing
     const agentConfig = {
       systemPrompt: formData.systemPrompt,
-      model: formData.model || "gpt-4o",
+      model: formData.model || 'gpt-4o',
       temperature: formData.temperature || 0.7,
       maxTokens: formData.maxTokens || 2048,
-      responseStyle: formData.responseStyle || "formal"
+      responseStyle: formData.responseStyle || 'formal',
     };
-    
-    console.log("Testing agent with config:", agentConfig);
+
+    console.log('Testing agent with config:', agentConfig);
     setIsTestingAgent(true);
-    testAgentMutation.mutate({ 
-      config: agentConfig, 
-      message: testMessage
+    testAgentMutation.mutate({
+      config: agentConfig,
+      message: testMessage,
     });
   };
 
@@ -146,21 +146,21 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
           Please review the information below to ensure your agent is configured correctly.
         </p>
       </div>
-      
+
       <div className="space-y-4">
         <Card>
           <CardContent className="p-4">
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1">
                 <p className="text-sm font-medium">Agent Name</p>
-                <p className="text-sm">{formData.name || "Unnamed Agent"}</p>
+                <p className="text-sm">{formData.name || 'Unnamed Agent'}</p>
               </div>
-              
+
               <div className="space-y-1">
                 <p className="text-sm font-medium">Agent Type</p>
-                <p className="text-sm capitalize">{formData.type || "Custom"}</p>
+                <p className="text-sm capitalize">{formData.type || 'Custom'}</p>
               </div>
-              
+
               <div className="space-y-1">
                 <p className="text-sm font-medium">Status</p>
                 <Badge variant="outline">Draft</Badge>
@@ -173,7 +173,7 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
           <CardContent className="p-4">
             <div className="space-y-3">
               <p className="text-sm font-medium">Description</p>
-              <p className="text-sm">{formData.description || "No description provided"}</p>
+              <p className="text-sm">{formData.description || 'No description provided'}</p>
             </div>
           </CardContent>
         </Card>
@@ -183,22 +183,22 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <p className="text-sm font-medium">AI Model</p>
-                <p className="text-sm">{formData.model || "GPT-4o"}</p>
+                <p className="text-sm">{formData.model || 'GPT-4o'}</p>
               </div>
-              
+
               <div className="space-y-1">
                 <p className="text-sm font-medium">Temperature</p>
                 <p className="text-sm">{formData.temperature || 0.7}</p>
               </div>
-              
+
               <div className="space-y-1">
                 <p className="text-sm font-medium">Max Tokens</p>
                 <p className="text-sm">{formData.maxTokens || 2048}</p>
               </div>
-              
+
               <div className="space-y-1">
                 <p className="text-sm font-medium">Response Style</p>
-                <p className="text-sm capitalize">{formData.responseStyle || "Formal"}</p>
+                <p className="text-sm capitalize">{formData.responseStyle || 'Formal'}</p>
               </div>
             </div>
           </CardContent>
@@ -209,12 +209,14 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
             <div className="space-y-3">
               <p className="text-sm font-medium">System Prompt</p>
               <div className="bg-muted p-3 rounded-md overflow-auto max-h-32">
-                <pre className="text-xs whitespace-pre-wrap">{formData.systemPrompt || "No system prompt provided"}</pre>
+                <pre className="text-xs whitespace-pre-wrap">
+                  {formData.systemPrompt || 'No system prompt provided'}
+                </pre>
               </div>
             </div>
           </CardContent>
         </Card>
-        
+
         {/* Test Agent Section */}
         <Card>
           <CardContent className="p-4">
@@ -222,19 +224,24 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
               <div className="flex items-center justify-between">
                 <h4 className="font-medium">Test Your Agent</h4>
                 {!preview && (
-                  <Button size="sm" variant="outline" onClick={handleTestAgent} disabled={isTestingAgent || !testMessage.trim()}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleTestAgent}
+                    disabled={isTestingAgent || !testMessage.trim()}
+                  >
                     {isTestingAgent ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Testing...
                       </>
                     ) : (
-                      "Test Agent"
+                      'Test Agent'
                     )}
                   </Button>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <textarea
                   className="w-full p-2 min-h-[80px] text-sm rounded-md border border-border bg-background"
@@ -243,7 +250,7 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
                   onChange={(e) => setTestMessage(e.target.value)}
                   disabled={isTestingAgent || preview}
                 />
-                
+
                 {testResponse && (
                   <div className="mt-4 space-y-2">
                     <p className="text-sm font-medium">Agent Response:</p>
@@ -257,13 +264,18 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
           </CardContent>
         </Card>
       </div>
-      
+
       <div className="flex justify-between mt-6">
-        <Button type="button" variant="outline" onClick={onBack} disabled={isSubmitting || isSuccess || preview}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+          disabled={isSubmitting || isSuccess || preview}
+        >
           Back
         </Button>
-        <Button 
-          onClick={handleCreateAgent} 
+        <Button
+          onClick={handleCreateAgent}
           disabled={isSubmitting || isSuccess || preview}
           className="min-w-[120px]"
         >
@@ -278,7 +290,7 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
               Created!
             </>
           ) : (
-            "Create Agent"
+            'Create Agent'
           )}
         </Button>
       </div>

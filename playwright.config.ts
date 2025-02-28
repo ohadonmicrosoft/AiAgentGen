@@ -14,25 +14,22 @@ export default defineConfig({
   /* Opt out of parallel tests on CI */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use */
-  reporter: [
-    ['html'],
-    ['list']
-  ],
+  reporter: [['html'], ['list']],
   /* Shared settings for all the projects below */
   use: {
     /* Base URL to use in actions like `await page.goto('/')` */
     baseURL: process.env.E2E_BASE_URL || 'http://localhost:3000',
-    
+
     /* Collect trace when retrying the failed test */
     trace: 'on-first-retry',
-    
+
     /* Take screenshot on failure */
     screenshot: 'only-on-failure',
-    
+
     /* Record video on failure */
     video: 'on-first-retry',
   },
-  
+
   /* Configure projects for major browsers */
   projects: [
     {
@@ -57,7 +54,7 @@ export default defineConfig({
       use: { ...devices['iPhone 12'] },
     },
   ],
-  
+
   /* Run local dev server before starting the tests */
   webServer: {
     command: 'npm run dev',
@@ -66,4 +63,4 @@ export default defineConfig({
     stdout: 'pipe',
     stderr: 'pipe',
   },
-}); 
+});

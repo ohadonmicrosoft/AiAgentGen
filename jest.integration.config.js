@@ -7,9 +7,12 @@ const config = {
     '^@server/(.*)$': '<rootDir>/server/$1',
   },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: 'tsconfig.json',
-    }],
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.json',
+      },
+    ],
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testMatch: [
@@ -37,4 +40,4 @@ const config = {
   },
 };
 
-module.exports = config; 
+module.exports = config;

@@ -43,33 +43,37 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Update state with error info
     this.setState({
-      errorInfo
+      errorInfo,
     });
-    
+
     // Log the error using the logger
     const componentName = this.props.name || 'UnnamedComponent';
     logger.error(`Error in component ${componentName}:`, {
       error: error.message,
       stack: error.stack,
       componentStack: errorInfo.componentStack,
-      name: error.name
+      name: error.name,
     });
-    
+
     // Call onError callback if provided
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
-    
+
     // Send error to server for tracking if in production
     if (process.env.NODE_ENV === 'production') {
       this.reportErrorToServer(error, errorInfo, componentName);
     }
   }
-  
+
   /**
    * Send error data to server for tracking and analysis
    */
-  private reportErrorToServer = (error: Error, errorInfo: ErrorInfo, componentName: string): void => {
+  private reportErrorToServer = (
+    error: Error,
+    errorInfo: ErrorInfo,
+    componentName: string,
+  ): void => {
     try {
       fetch('/api/logs/client-error', {
         method: 'POST',
@@ -87,7 +91,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         }),
         // Use keepalive to ensure the request completes even if the page is unloading
         keepalive: true,
-      }).catch(err => {
+      }).catch((err) => {
         // Log silently if reporting fails
         console.error('Failed to report error to server:', err);
       });
@@ -109,7 +113,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (this.props.onReset) {
       this.props.onReset();
     }
-    
+
     // Log the reset action
     logger.info('Error boundary reset by user');
   };
@@ -120,7 +124,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       if (this.props.fallback) {
         return this.props.fallback;
       }
-      
+
       // Otherwise, render the default error UI
       return (
         <div className="p-4 w-full">
@@ -131,9 +135,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               {this.state.error?.message || 'An unexpected error occurred'}
             </AlertDescription>
           </Alert>
-          
+
           <div className="flex justify-center mt-4">
-            <Button 
+            <Button
               onClick={this.resetErrorBoundary}
               variant="outline"
               className="flex items-center gap-2"
@@ -155,23 +159,23 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
  */
 export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
+  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>,
 ): React.FC<P> {
   const displayName = Component.displayName || Component.name || 'Component';
-  
+
   // Include the component name in the error boundary props
   const mergedProps = {
     ...errorBoundaryProps,
     name: displayName,
   };
-  
+
   const WrappedComponent: React.FC<P> = (props) => (
     <ErrorBoundary {...mergedProps}>
       <Component {...props} />
     </ErrorBoundary>
   );
-  
+
   WrappedComponent.displayName = `withErrorBoundary(${displayName})`;
-  
+
   return WrappedComponent;
-} 
+}

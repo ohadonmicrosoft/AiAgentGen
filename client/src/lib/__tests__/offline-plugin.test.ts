@@ -59,9 +59,9 @@ describe('Offline Plugin', () => {
     it('registers event listeners and restores from storage', () => {
       const addEventListener = jest.spyOn(window, 'addEventListener');
       const restoreSpy = jest.spyOn(plugin, 'restoreFromStorage');
-      
+
       plugin.register(mockQueryClient as any);
-      
+
       expect(addEventListener).toHaveBeenCalledWith('online', expect.any(Function));
       expect(addEventListener).toHaveBeenCalledWith('offline', expect.any(Function));
       expect(restoreSpy).toHaveBeenCalledWith(mockQueryClient);
@@ -69,7 +69,7 @@ describe('Offline Plugin', () => {
 
     it('subscribes to query cache events', () => {
       plugin.register(mockQueryClient as any);
-      
+
       expect(mockQueryClient.getQueryCache().subscribe).toHaveBeenCalledWith(expect.any(Function));
     });
   });
@@ -83,7 +83,7 @@ describe('Offline Plugin', () => {
       const pluginWithWhitelist = offlinePlugin({
         persistQueries: ['/api/users', '/api/posts'],
       });
-      
+
       expect(pluginWithWhitelist.shouldPersistQuery('/api/users')).toBe(true);
       expect(pluginWithWhitelist.shouldPersistQuery('/api/other')).toBe(false);
     });
@@ -92,7 +92,7 @@ describe('Offline Plugin', () => {
       const pluginWithWhitelist = offlinePlugin({
         persistQueries: [/^\/api\/users/, /^\/api\/posts/],
       });
-      
+
       expect(pluginWithWhitelist.shouldPersistQuery('/api/users')).toBe(true);
       expect(pluginWithWhitelist.shouldPersistQuery('/api/users/123')).toBe(true);
       expect(pluginWithWhitelist.shouldPersistQuery('/api/other')).toBe(false);
@@ -103,17 +103,17 @@ describe('Offline Plugin', () => {
     it('saves query data to storage', async () => {
       const data = { id: 1, name: 'Test' };
       await plugin.persistQuery('/api/users', data);
-      
+
       // Check that localStorage.setItem was called with the right key and data
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'offline-cache:/api/users',
-        expect.stringContaining('"data":{"id":1,"name":"Test"}')
+        expect.stringContaining('"data":{"id":1,"name":"Test"}'),
       );
     });
 
     it('does not save undefined data', async () => {
       await plugin.persistQuery('/api/users', undefined);
-      
+
       expect(localStorageMock.setItem).not.toHaveBeenCalled();
     });
   });
@@ -125,13 +125,13 @@ describe('Offline Plugin', () => {
         { queryKey: ['/api/users'], state: { data: { users: [] } } },
         { queryKey: ['/api/posts'], state: { data: { posts: [] } } },
       ];
-      
+
       mockQueryClient.getQueryCache().findAll.mockReturnValue(queries);
-      
+
       const persistSpy = jest.spyOn(plugin, 'persistQuery');
-      
+
       await plugin.saveToStorage(mockQueryClient as any);
-      
+
       // Should have tried to persist both queries
       expect(persistSpy).toHaveBeenCalledTimes(2);
       expect(persistSpy).toHaveBeenCalledWith('/api/users', { users: [] });
@@ -143,39 +143,36 @@ describe('Offline Plugin', () => {
     it('restores valid cached data to query client', async () => {
       // Setup mock cached queries
       localStorageMock.setItem(
-        'offline-cache:/api/users', 
-        JSON.stringify({ 
-          data: { users: [] }, 
-          timestamp: Date.now(), 
-          expiry: Date.now() + 60000 // One minute in the future
-        })
+        'offline-cache:/api/users',
+        JSON.stringify({
+          data: { users: [] },
+          timestamp: Date.now(),
+          expiry: Date.now() + 60000, // One minute in the future
+        }),
       );
-      
+
       await plugin.restoreFromStorage(mockQueryClient as any);
-      
+
       // Should have restored the cached query
-      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
-        ['/api/users'],
-        { users: [] }
-      );
+      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(['/api/users'], { users: [] });
     });
 
     it('removes expired items from storage', async () => {
       // Setup expired cached query
       localStorageMock.setItem(
-        'offline-cache:/api/expired', 
-        JSON.stringify({ 
-          data: { value: 'old' }, 
+        'offline-cache:/api/expired',
+        JSON.stringify({
+          data: { value: 'old' },
           timestamp: Date.now() - 60000, // One minute in the past
-          expiry: Date.now() - 1000 // Expired
-        })
+          expiry: Date.now() - 1000, // Expired
+        }),
       );
-      
+
       await plugin.restoreFromStorage(mockQueryClient as any);
-      
+
       // Should not have restored expired data
       expect(mockQueryClient.setQueryData).not.toHaveBeenCalled();
-      
+
       // Should have removed the expired item
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('/api/expired');
     });
@@ -184,25 +181,25 @@ describe('Offline Plugin', () => {
   describe('online/offline event handlers', () => {
     it('refetches queries when coming back online', async () => {
       plugin.register(mockQueryClient as any);
-      
+
       // Simulate coming back online
       window.dispatchEvent(createEvent('online'));
-      
+
       // Should have triggered a refetch of all stale queries
-      expect(mockQueryClient.refetchQueries).toHaveBeenCalledWith({ 
-        type: 'all', 
-        stale: true 
+      expect(mockQueryClient.refetchQueries).toHaveBeenCalledWith({
+        type: 'all',
+        stale: true,
       });
     });
 
     it('saves cache state when going offline', async () => {
       const saveToStorageSpy = jest.spyOn(plugin, 'saveToStorage');
-      
+
       plugin.register(mockQueryClient as any);
-      
+
       // Simulate going offline
       window.dispatchEvent(createEvent('offline'));
-      
+
       // Should have saved cache state
       expect(saveToStorageSpy).toHaveBeenCalledWith(mockQueryClient);
     });
@@ -214,7 +211,7 @@ describe('Offline Plugin', () => {
         configurable: true,
         value: true,
       });
-      
+
       expect(isOffline()).toBe(false);
     });
 
@@ -223,8 +220,8 @@ describe('Offline Plugin', () => {
         configurable: true,
         value: false,
       });
-      
+
       expect(isOffline()).toBe(true);
     });
   });
-}); 
+});

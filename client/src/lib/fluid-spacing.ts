@@ -1,6 +1,6 @@
 /**
  * Fluid Spacing System
- * 
+ *
  * This utility creates responsive spacing values based on viewport width,
  * allowing for dynamic margins, padding, and layout spacing.
  */
@@ -41,7 +41,7 @@ export function fluidSpace({
   maxSize,
   minWidth = 320,
   maxWidth = 1200,
-  unit = 'px'
+  unit = 'px',
 }: FluidSpacingOptions): string {
   // Safety checks to prevent negative or invalid values
   if (minSize < 0) minSize = 0;
@@ -56,21 +56,21 @@ export function fluidSpace({
     minSize = maxSize;
     maxSize = temp;
   }
-  
+
   // Calculate the slope
   const slope = (maxSize - minSize) / (maxWidth - minWidth);
-  
+
   // Calculate the intersection with y-axis (b in y = mx + b)
   const intersection = -minWidth * slope + minSize;
-  
+
   // Convert to appropriate units
   const minSizeValue = convertToUnit(minSize, unit);
   const maxSizeValue = convertToUnit(maxSize, unit);
-  
+
   // Calculate the preferred value using the slope formula
   // For preferred value, we use vw (viewport width) unit with calculated slope
   const preferredValue = `${slope * 100}vw + ${convertToUnit(intersection, unit)}`;
-  
+
   // Build the CSS clamp function
   return `clamp(${minSizeValue}, ${preferredValue}, ${maxSizeValue})`;
 }
@@ -80,22 +80,22 @@ export function fluidSpace({
  * This uses a more refined spacing scale with better progression
  */
 export const fluidSpaceScale = {
-  '3xs': fluidSpace({ minSize: 2, maxSize: 4 }),   // Tiny spaces (borders, thin lines)
-  '2xs': fluidSpace({ minSize: 4, maxSize: 8 }),   // Very small spaces
-  'xs': fluidSpace({ minSize: 8, maxSize: 12 }),   // Small spaces (compact UI elements)
-  'sm': fluidSpace({ minSize: 12, maxSize: 16 }),  // Medium-small spaces
-  'md': fluidSpace({ minSize: 16, maxSize: 24 }),  // Medium spaces (standard spacing)
-  'lg': fluidSpace({ minSize: 24, maxSize: 32 }),  // Large spaces
-  'xl': fluidSpace({ minSize: 32, maxSize: 48 }),  // Extra large spaces
+  '3xs': fluidSpace({ minSize: 2, maxSize: 4 }), // Tiny spaces (borders, thin lines)
+  '2xs': fluidSpace({ minSize: 4, maxSize: 8 }), // Very small spaces
+  xs: fluidSpace({ minSize: 8, maxSize: 12 }), // Small spaces (compact UI elements)
+  sm: fluidSpace({ minSize: 12, maxSize: 16 }), // Medium-small spaces
+  md: fluidSpace({ minSize: 16, maxSize: 24 }), // Medium spaces (standard spacing)
+  lg: fluidSpace({ minSize: 24, maxSize: 32 }), // Large spaces
+  xl: fluidSpace({ minSize: 32, maxSize: 48 }), // Extra large spaces
   '2xl': fluidSpace({ minSize: 48, maxSize: 64 }), // Double extra large spaces
   '3xl': fluidSpace({ minSize: 64, maxSize: 96 }), // Triple extra large spaces
   '4xl': fluidSpace({ minSize: 96, maxSize: 128 }), // Quadruple extra large spaces
-  
+
   // Common UI-specific spacing values with better descriptive names
-  'form-gap': fluidSpace({ minSize: 16, maxSize: 24 }),        // Space between form elements
-  'card-padding': fluidSpace({ minSize: 16, maxSize: 24 }),    // Card internal padding
-  'section-gap': fluidSpace({ minSize: 32, maxSize: 64 }),     // Gap between sections
-  'container-padding': fluidSpace({ minSize: 16, maxSize: 32 }) // Container padding
+  'form-gap': fluidSpace({ minSize: 16, maxSize: 24 }), // Space between form elements
+  'card-padding': fluidSpace({ minSize: 16, maxSize: 24 }), // Card internal padding
+  'section-gap': fluidSpace({ minSize: 32, maxSize: 64 }), // Gap between sections
+  'container-padding': fluidSpace({ minSize: 16, maxSize: 32 }), // Container padding
 };
 
 /**
@@ -106,14 +106,14 @@ export function containerPadding({
   maxPadding = 40,
   minWidth = 320,
   maxWidth = 1200,
-  unit = 'px'
+  unit = 'px',
 }: Partial<FluidSpacingOptions>): string {
   return fluidSpace({
     minSize: minPadding,
     maxSize: maxPadding,
     minWidth,
     maxWidth,
-    unit
+    unit,
   });
 }
 
@@ -125,14 +125,14 @@ export function responsiveGap({
   maxGap = 40,
   minWidth = 320,
   maxWidth = 1200,
-  unit = 'px'
+  unit = 'px',
 }: Partial<FluidSpacingOptions>): string {
   return fluidSpace({
     minSize: minGap,
     maxSize: maxGap,
     minWidth,
     maxWidth,
-    unit
+    unit,
   });
 }
 
@@ -141,13 +141,18 @@ export function responsiveGap({
  */
 export function contentAwareSpace(
   contentLength: number,
-  { minSpace = 16, maxSpace = 40, threshold = 100 }: { minSpace?: number; maxSpace?: number; threshold?: number }
+  {
+    minSpace = 16,
+    maxSpace = 40,
+    threshold = 100,
+  }: { minSpace?: number; maxSpace?: number; threshold?: number },
 ): string {
   // For longer content, use smaller spacing to conserve space
-  const size = contentLength > threshold
-    ? minSpace
-    : maxSpace - ((maxSpace - minSpace) * (contentLength / threshold));
-  
+  const size =
+    contentLength > threshold
+      ? minSpace
+      : maxSpace - (maxSpace - minSpace) * (contentLength / threshold);
+
   return `${Math.max(minSpace, Math.min(maxSpace, size))}px`;
 }
 
@@ -170,7 +175,7 @@ export function hierarchicalSpacing(importance: 'primary' | 'secondary' | 'terti
 /**
  * Generate equal spacing on both sides (margin or padding) that is fluid
  */
-export function fluidSymmetricSpace(size: keyof typeof fluidSpaceScale): { 
+export function fluidSymmetricSpace(size: keyof typeof fluidSpaceScale): {
   paddingX: string;
   paddingY: string;
   marginX: string;
@@ -209,7 +214,7 @@ export function contentMaxWidth(contentType: 'text' | 'ui' | 'full'): string {
  */
 export function deviceSpecificSpace(
   device: 'mobile' | 'tablet' | 'desktop',
-  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl',
 ): string {
   const spacingValues = {
     mobile: {
@@ -232,8 +237,8 @@ export function deviceSpecificSpace(
       md: '24px',
       lg: '32px',
       xl: '48px',
-    }
+    },
   };
 
   return spacingValues[device][size];
-} 
+}

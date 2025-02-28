@@ -23,54 +23,54 @@ export interface RUMConfig {
    * @default true in production, false otherwise
    */
   enabled: boolean;
-  
+
   /**
    * Sampling rate (0-1) to determine what percentage of users to collect data from
    * @default 0.1 (10%)
    */
   samplingRate: number;
-  
+
   /**
    * Endpoint to send metrics to
    * @default '/api/metrics'
    */
   endpoint: string;
-  
+
   /**
    * Batch size for sending metrics
    * @default 10
    */
   batchSize: number;
-  
+
   /**
    * Maximum time to wait before sending metrics (in ms)
    * @default 30000 (30 seconds)
    */
   maxWaitTime: number;
-  
+
   /**
    * Additional data to include with metrics
    */
   metadata?: Record<string, any>;
-  
+
   /**
    * Include route information in metrics
    * @default true
    */
   includeRouteInfo: boolean;
-  
+
   /**
    * Include user agent information in metrics
    * @default true
    */
   includeUserAgent: boolean;
-  
+
   /**
    * Include connection information in metrics
    * @default true
    */
   includeConnectionInfo: boolean;
-  
+
   /**
    * Include device information in metrics
    * @default true
@@ -101,12 +101,12 @@ interface UserSession {
    * Session ID
    */
   id: string;
-  
+
   /**
    * Session start time
    */
   startTime: number;
-  
+
   /**
    * User agent information
    */
@@ -116,7 +116,7 @@ interface UserSession {
     os: string;
     mobile: boolean;
   };
-  
+
   /**
    * Connection information
    */
@@ -125,7 +125,7 @@ interface UserSession {
     downlink: number;
     rtt: number;
   };
-  
+
   /**
    * Device information
    */
@@ -146,82 +146,82 @@ class RealUserMetrics {
   private flushTimeout: number | null = null;
   private isInitialized = false;
   private isEnabled = false;
-  
+
   /**
    * Constructor
    */
   constructor(config: Partial<RUMConfig> = {}) {
     // Merge config with defaults
     this.config = { ...defaultConfig, ...config };
-    
+
     // Create user session
     this.session = {
       id: this.generateSessionId(),
       startTime: Date.now(),
     };
-    
+
     // Determine if this session should collect metrics based on sampling rate
     this.isEnabled = this.config.enabled && Math.random() <= this.config.samplingRate;
   }
-  
+
   /**
    * Initialize RUM
    */
   initialize(): void {
     if (this.isInitialized || !this.isEnabled) return;
-    
+
     // Collect device/browser information if enabled
     this.collectEnvironmentInfo();
-    
+
     // Set up performance observer for core web vitals
     this.setupPerformanceObservers();
-    
+
     // Collect navigation timing metrics
     this.collectNavigationTiming();
-    
+
     // Listen for metrics from the performance monitor
     this.listenToPerformanceMonitor();
-    
+
     // Set up visibility change listener to flush metrics when page is hidden
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         this.flush(true);
       }
     });
-    
+
     // Set up page unload listener to flush metrics
     window.addEventListener('beforeunload', () => {
       this.flush(true);
     });
-    
+
     // Mark as initialized
     this.isInitialized = true;
-    
+
     // Log initialization
     console.log('Real User Metrics initialized');
   }
-  
+
   /**
    * Manually track a metric
    */
   trackMetric(name: string, value: number, unit: string, metadata?: Record<string, any>): void {
     if (!this.isEnabled) return;
-    
+
     this.addMetricToQueue({
       name,
       value,
       unit,
       timestamp: Date.now(),
-      metadata
+      metadata,
     });
   }
-  
+
   /**
    * Manually track an error
    */
   trackError(error: Error, metadata?: Record<string, any>): void {
     if (!this.isEnabled) return;
-    
+
     this.addMetricToQueue({
       name: 'error',
       value: 1,
@@ -231,27 +231,27 @@ class RealUserMetrics {
         ...metadata,
         message: error.message,
         stack: error.stack,
-        name: error.name
-      }
+        name: error.name,
+      },
     });
-    
+
     // Force flush errors immediately
     this.flush();
   }
-  
+
   /**
    * Add a metric to the queue and schedule a flush if needed
    */
   private addMetricToQueue(metric: PerformanceMetric): void {
     // Add the metric to the queue
     this.metricsQueue.push(metric);
-    
+
     // If we've reached the batch size, flush immediately
     if (this.metricsQueue.length >= this.config.batchSize) {
       this.flush();
       return;
     }
-    
+
     // Otherwise, set a timeout to flush after maxWaitTime if not already set
     if (this.flushTimeout === null) {
       this.flushTimeout = window.setTimeout(() => {
@@ -260,19 +260,19 @@ class RealUserMetrics {
       }, this.config.maxWaitTime);
     }
   }
-  
+
   /**
    * Flush metrics to the server
    */
   private flush(isUnloading: boolean = false): void {
     if (!this.isEnabled || this.metricsQueue.length === 0) return;
-    
+
     // Clear any pending flush timeout
     if (this.flushTimeout !== null) {
       clearTimeout(this.flushTimeout);
       this.flushTimeout = null;
     }
-    
+
     // Prepare the metrics payload
     const payload = {
       session: this.session,
@@ -281,43 +281,40 @@ class RealUserMetrics {
         url: window.location.href,
         path: window.location.pathname,
         referrer: document.referrer,
-        ...this.config.metadata
-      }
+        ...this.config.metadata,
+      },
     };
-    
+
     // Clear the queue
     this.metricsQueue = [];
-    
+
     // If the page is unloading, use sendBeacon for better reliability
     if (isUnloading && navigator.sendBeacon) {
-      navigator.sendBeacon(
-        this.config.endpoint,
-        JSON.stringify(payload)
-      );
+      navigator.sendBeacon(this.config.endpoint, JSON.stringify(payload));
       return;
     }
-    
+
     // Otherwise use fetch
     fetch(this.config.endpoint, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
       // Use keepalive to ensure the request completes even if the page changes
-      keepalive: true
-    }).catch(error => {
+      keepalive: true,
+    }).catch((error) => {
       console.error('Failed to send metrics:', error);
     });
   }
-  
+
   /**
    * Generate a unique session ID
    */
   private generateSessionId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
-  
+
   /**
    * Collect environment information
    */
@@ -329,41 +326,41 @@ class RealUserMetrics {
         browser: this.getBrowserName(ua),
         version: this.getBrowserVersion(ua),
         os: this.getOS(ua),
-        mobile: /Mobi|Android/i.test(ua)
+        mobile: /Mobi|Android/i.test(ua),
       };
-      
+
       this.session.userAgent = uaParseResult;
     }
-    
+
     // Collect connection information
     if (this.config.includeConnectionInfo && 'connection' in navigator) {
       const connection = (navigator as any).connection;
-      
+
       if (connection) {
         this.session.connection = {
           effectiveType: connection.effectiveType || 'unknown',
           downlink: connection.downlink || 0,
-          rtt: connection.rtt || 0
+          rtt: connection.rtt || 0,
         };
       }
     }
-    
+
     // Collect device information
     if (this.config.includeDeviceInfo) {
       this.session.device = {
         screenWidth: window.screen.width,
         screenHeight: window.screen.height,
-        pixelRatio: window.devicePixelRatio || 1
+        pixelRatio: window.devicePixelRatio || 1,
       };
     }
   }
-  
+
   /**
    * Set up performance observers for core web vitals
    */
   private setupPerformanceObservers(): void {
     if (!window.PerformanceObserver) return;
-    
+
     try {
       // First Contentful Paint (FCP)
       const fcpObserver = new PerformanceObserver((entryList) => {
@@ -374,7 +371,7 @@ class RealUserMetrics {
         }
       });
       fcpObserver.observe({ type: 'paint', buffered: true });
-      
+
       // Largest Contentful Paint (LCP)
       const lcpObserver = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
@@ -382,12 +379,12 @@ class RealUserMetrics {
         if (entries.length > 0) {
           const lcp = entries[entries.length - 1] as PerformanceEntry;
           this.trackMetric('LCP', lcp.startTime, 'ms', {
-            element: (lcp as any).element ? (lcp as any).element.tagName : null
+            element: (lcp as any).element ? (lcp as any).element.tagName : null,
           });
         }
       });
       lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-      
+
       // First Input Delay (FID)
       const fidObserver = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
@@ -397,7 +394,7 @@ class RealUserMetrics {
         }
       });
       fidObserver.observe({ type: 'first-input', buffered: true });
-      
+
       // Layout Shift (CLS)
       let cumulativeLayoutShift = 0;
       const clsObserver = new PerformanceObserver((entryList) => {
@@ -410,32 +407,36 @@ class RealUserMetrics {
         }
       });
       clsObserver.observe({ type: 'layout-shift', buffered: true });
-      
+
       // Long Tasks
       const longTaskObserver = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
         for (const entry of entries) {
           this.trackMetric('longTask', entry.duration, 'ms', {
             url: document.URL,
-            taskName: entry.name
+            taskName: entry.name,
           });
         }
       });
       longTaskObserver.observe({ type: 'longtask', buffered: true });
-      
+
       // Resource Timing
       const resourceObserver = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
         for (const entry of entries) {
           // Only track key resources (CSS, JS, fonts, images)
           const url = entry.name;
-          if (url.includes(window.location.origin) && 
-              (url.endsWith('.js') || url.endsWith('.css') || 
-               url.includes('fonts') || url.match(/\.(png|jpg|jpeg|gif|svg)$/))) {
+          if (
+            url.includes(window.location.origin) &&
+            (url.endsWith('.js') ||
+              url.endsWith('.css') ||
+              url.includes('fonts') ||
+              url.match(/\.(png|jpg|jpeg|gif|svg)$/))
+          ) {
             this.trackMetric('resourceLoad', entry.duration, 'ms', {
               url: entry.name,
               initiatorType: (entry as PerformanceResourceTiming).initiatorType,
-              size: (entry as PerformanceResourceTiming).transferSize || 0
+              size: (entry as PerformanceResourceTiming).transferSize || 0,
             });
           }
         }
@@ -445,7 +446,7 @@ class RealUserMetrics {
       console.error('Error setting up performance observers:', error);
     }
   }
-  
+
   /**
    * Collect navigation timing metrics
    */
@@ -454,43 +455,45 @@ class RealUserMetrics {
     window.addEventListener('load', () => {
       setTimeout(() => {
         if (!window.performance || !window.performance.timing) return;
-        
+
         const timing = window.performance.timing;
-        
+
         // Time to First Byte (TTFB)
         const ttfb = timing.responseStart - timing.navigationStart;
         this.trackMetric('TTFB', ttfb, 'ms');
-        
+
         // DOM Content Loaded
         const domContentLoaded = timing.domContentLoadedEventEnd - timing.navigationStart;
         this.trackMetric('domContentLoaded', domContentLoaded, 'ms');
-        
+
         // DOM Complete
         const domComplete = timing.domComplete - timing.navigationStart;
         this.trackMetric('domComplete', domComplete, 'ms');
-        
+
         // Load Complete
         const loadComplete = timing.loadEventEnd - timing.navigationStart;
         this.trackMetric('loadComplete', loadComplete, 'ms');
       }, 0);
     });
   }
-  
+
   /**
    * Listen to metrics from the performance monitor
    */
   private listenToPerformanceMonitor(): void {
     performanceMonitor.addListener((metric) => {
       // Only track certain metrics to avoid too much data
-      if (metric.name.startsWith('component:') || 
-          metric.name.startsWith('api:') ||
-          metric.name.startsWith('render:') ||
-          metric.name.startsWith('navigation:')) {
+      if (
+        metric.name.startsWith('component:') ||
+        metric.name.startsWith('api:') ||
+        metric.name.startsWith('render:') ||
+        metric.name.startsWith('navigation:')
+      ) {
         this.addMetricToQueue(metric);
       }
     });
   }
-  
+
   /**
    * Get browser name from user agent
    */
@@ -504,14 +507,14 @@ class RealUserMetrics {
     if (ua.indexOf('Safari') > -1) return 'Safari';
     return 'Unknown';
   }
-  
+
   /**
    * Get browser version from user agent
    */
   private getBrowserVersion(ua: string): string {
     const browser = this.getBrowserName(ua);
     let match;
-    
+
     switch (browser) {
       case 'Firefox':
         match = ua.match(/Firefox\/([0-9.]+)/);
@@ -537,10 +540,10 @@ class RealUserMetrics {
       default:
         return 'Unknown';
     }
-    
+
     return match ? match[1] : 'Unknown';
   }
-  
+
   /**
    * Get operating system from user agent
    */
@@ -553,7 +556,8 @@ class RealUserMetrics {
     if (ua.indexOf('Mac OS X') > -1) return 'macOS';
     if (ua.indexOf('Linux') > -1) return 'Linux';
     if (ua.indexOf('Android') > -1) return 'Android';
-    if (ua.indexOf('iOS') > -1 || ua.indexOf('iPhone') > -1 || ua.indexOf('iPad') > -1) return 'iOS';
+    if (ua.indexOf('iOS') > -1 || ua.indexOf('iPhone') > -1 || ua.indexOf('iPad') > -1)
+      return 'iOS';
     return 'Unknown';
   }
 }
@@ -574,4 +578,4 @@ if (typeof window !== 'undefined') {
 }
 
 // Export the RealUserMetrics class for testing and custom instances
-export { RealUserMetrics }; 
+export { RealUserMetrics };

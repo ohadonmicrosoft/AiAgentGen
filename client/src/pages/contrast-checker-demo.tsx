@@ -7,11 +7,11 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion } from 'framer-motion';
-import { 
-  checkContrast, 
-  getContrastLevel, 
+import {
+  checkContrast,
+  getContrastLevel,
   suggestBetterContrast,
-  getRecommendedTextColor
+  getRecommendedTextColor,
 } from '@/lib/color-contrast';
 import { hexToRgb, rgbToHex } from '@/lib/color-utils';
 import { AlertCircle, Check, Copy, RefreshCw } from 'lucide-react';
@@ -39,7 +39,7 @@ const ContrastCheckerDemo: React.FC = () => {
     try {
       const result = checkContrast(foreground, background);
       setContrastResult(result);
-      
+
       // Only suggest a new color if contrast is insufficient
       if (!result.aa) {
         const suggested = suggestBetterContrast(foreground, background);
@@ -109,16 +109,14 @@ const ContrastCheckerDemo: React.FC = () => {
             <Card className="lg:col-span-1">
               <CardHeader>
                 <CardTitle>Colors</CardTitle>
-                <CardDescription>
-                  Select foreground and background colors
-                </CardDescription>
+                <CardDescription>Select foreground and background colors</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="foreground">Foreground (Text) Color</Label>
                   <div className="flex gap-2">
-                    <div 
-                      className="w-10 h-10 rounded border" 
+                    <div
+                      className="w-10 h-10 rounded border"
                       style={{ backgroundColor: foreground }}
                     />
                     <Input
@@ -139,8 +137,8 @@ const ContrastCheckerDemo: React.FC = () => {
                 <div className="space-y-2">
                   <Label htmlFor="background">Background Color</Label>
                   <div className="flex gap-2">
-                    <div 
-                      className="w-10 h-10 rounded border" 
+                    <div
+                      className="w-10 h-10 rounded border"
                       style={{ backgroundColor: background }}
                     />
                     <Input
@@ -159,20 +157,12 @@ const ContrastCheckerDemo: React.FC = () => {
                 </div>
 
                 <div className="pt-2 space-y-2">
-                  <Button 
-                    variant="outline" 
-                    onClick={swapColors}
-                    className="w-full"
-                  >
+                  <Button variant="outline" onClick={swapColors} className="w-full">
                     <RefreshCw className="mr-2 h-4 w-4" />
                     Swap Colors
                   </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    onClick={getAutoTextColor}
-                    className="w-full"
-                  >
+
+                  <Button variant="outline" onClick={getAutoTextColor} className="w-full">
                     Auto Text Color
                   </Button>
                 </div>
@@ -183,9 +173,7 @@ const ContrastCheckerDemo: React.FC = () => {
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle>Preview</CardTitle>
-                <CardDescription>
-                  See how your colors look together
-                </CardDescription>
+                <CardDescription>See how your colors look together</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -193,42 +181,43 @@ const ContrastCheckerDemo: React.FC = () => {
                     <TabsTrigger value="text">Text</TabsTrigger>
                     <TabsTrigger value="ui">UI Elements</TabsTrigger>
                   </TabsList>
-                  
+
                   <TabsContent value="text" className="space-y-4">
-                    <div 
+                    <div
                       className="p-8 rounded-md transition-colors"
-                      style={{ 
+                      style={{
                         backgroundColor: background,
-                        color: foreground
+                        color: foreground,
                       }}
                     >
                       <div className="space-y-4">
                         <div>
-                          <p 
-                            style={{ 
+                          <p
+                            style={{
                               fontSize: `${fontSize}px`,
-                              fontWeight
+                              fontWeight,
                             }}
                           >
                             {sampleText}
                           </p>
                         </div>
-                        
+
                         <div className="space-y-2">
                           <p style={{ fontSize: '24px', fontWeight: 'bold' }}>
                             Large Bold Text (24px)
                           </p>
                           <p style={{ fontSize: '18px' }}>
-                            Regular paragraph text (18px) that might appear in your application. 
+                            Regular paragraph text (18px) that might appear in your application.
                             This demonstrates how body copy would look with your selected colors.
                           </p>
                           <p style={{ fontSize: '14px' }}>
-                            Small text (14px) like captions or footnotes that still needs to be readable.
+                            Small text (14px) like captions or footnotes that still needs to be
+                            readable.
                           </p>
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="sampleText">Sample Text</Label>
@@ -238,7 +227,7 @@ const ContrastCheckerDemo: React.FC = () => {
                           onChange={(e) => setSampleText(e.target.value)}
                         />
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="fontSize">Font Size: {fontSize}px</Label>
                         <Slider
@@ -250,7 +239,7 @@ const ContrastCheckerDemo: React.FC = () => {
                           onValueChange={(value) => setFontSize(value[0])}
                         />
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="fontWeight">Font Weight</Label>
                         <div className="flex gap-2">
@@ -272,58 +261,58 @@ const ContrastCheckerDemo: React.FC = () => {
                       </div>
                     </div>
                   </TabsContent>
-                  
+
                   <TabsContent value="ui" className="space-y-4">
-                    <div 
+                    <div
                       className="p-8 rounded-md transition-colors"
-                      style={{ 
+                      style={{
                         backgroundColor: background,
-                        color: foreground
+                        color: foreground,
                       }}
                     >
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <div 
+                          <div
                             className="p-3 rounded-md border"
-                            style={{ 
+                            style={{
                               borderColor: foreground,
-                              backgroundColor: 'transparent'
+                              backgroundColor: 'transparent',
                             }}
                           >
                             Input field
                           </div>
-                          
-                          <div 
+
+                          <div
                             className="p-3 rounded-md flex items-center justify-center"
-                            style={{ 
+                            style={{
                               backgroundColor: foreground,
-                              color: background
+                              color: background,
                             }}
                           >
                             Button
                           </div>
-                          
-                          <div 
+
+                          <div
                             className="p-3 rounded-md border"
-                            style={{ 
+                            style={{
                               borderColor: foreground,
-                              backgroundColor: 'transparent'
+                              backgroundColor: 'transparent',
                             }}
                           >
                             <div className="flex items-center">
-                              <div 
+                              <div
                                 className="w-4 h-4 rounded-sm mr-2 border"
                                 style={{ borderColor: foreground }}
                               />
                               <span>Checkbox</span>
                             </div>
                           </div>
-                          
-                          <div 
+
+                          <div
                             className="p-3 rounded-md"
-                            style={{ 
+                            style={{
                               backgroundColor: `${foreground}33`,
-                              color: foreground
+                              color: foreground,
                             }}
                           >
                             Alert / Notice
@@ -340,9 +329,7 @@ const ContrastCheckerDemo: React.FC = () => {
             <Card className="lg:col-span-3">
               <CardHeader>
                 <CardTitle>Contrast Results</CardTitle>
-                <CardDescription>
-                  WCAG accessibility guidelines for color contrast
-                </CardDescription>
+                <CardDescription>WCAG accessibility guidelines for color contrast</CardDescription>
               </CardHeader>
               <CardContent>
                 {contrastResult && (
@@ -352,11 +339,9 @@ const ContrastCheckerDemo: React.FC = () => {
                         <div className="text-3xl font-bold mb-1">
                           {contrastResult.ratio.toFixed(2)}:1
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          Contrast Ratio
-                        </div>
+                        <div className="text-sm text-muted-foreground">Contrast Ratio</div>
                       </div>
-                      
+
                       <div className="bg-muted p-4 rounded-md text-center">
                         <div className="text-3xl font-bold mb-1">
                           {contrastResult.aa ? (
@@ -365,11 +350,9 @@ const ContrastCheckerDemo: React.FC = () => {
                             <span className="text-red-500">Fail</span>
                           )}
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          WCAG AA (4.5:1)
-                        </div>
+                        <div className="text-sm text-muted-foreground">WCAG AA (4.5:1)</div>
                       </div>
-                      
+
                       <div className="bg-muted p-4 rounded-md text-center">
                         <div className="text-3xl font-bold mb-1">
                           {contrastResult.aaa ? (
@@ -378,17 +361,17 @@ const ContrastCheckerDemo: React.FC = () => {
                             <span className="text-red-500">Fail</span>
                           )}
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          WCAG AAA (7:1)
-                        </div>
+                        <div className="text-sm text-muted-foreground">WCAG AAA (7:1)</div>
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <h3 className="text-lg font-medium">Normal Text</h3>
                         <div className="flex items-center">
-                          <div className={`p-1 rounded-full mr-2 ${contrastResult.aa ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                          <div
+                            className={`p-1 rounded-full mr-2 ${contrastResult.aa ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}
+                          >
                             {contrastResult.aa ? (
                               <Check className="h-4 w-4" />
                             ) : (
@@ -400,7 +383,9 @@ const ContrastCheckerDemo: React.FC = () => {
                           </span>
                         </div>
                         <div className="flex items-center">
-                          <div className={`p-1 rounded-full mr-2 ${contrastResult.aaa ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                          <div
+                            className={`p-1 rounded-full mr-2 ${contrastResult.aaa ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}
+                          >
                             {contrastResult.aaa ? (
                               <Check className="h-4 w-4" />
                             ) : (
@@ -412,11 +397,13 @@ const ContrastCheckerDemo: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <h3 className="text-lg font-medium">Large Text (18pt+ or 14pt+ bold)</h3>
                         <div className="flex items-center">
-                          <div className={`p-1 rounded-full mr-2 ${contrastResult.aaLarge ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                          <div
+                            className={`p-1 rounded-full mr-2 ${contrastResult.aaLarge ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}
+                          >
                             {contrastResult.aaLarge ? (
                               <Check className="h-4 w-4" />
                             ) : (
@@ -428,7 +415,9 @@ const ContrastCheckerDemo: React.FC = () => {
                           </span>
                         </div>
                         <div className="flex items-center">
-                          <div className={`p-1 rounded-full mr-2 ${contrastResult.aaaLarge ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                          <div
+                            className={`p-1 rounded-full mr-2 ${contrastResult.aaaLarge ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}
+                          >
                             {contrastResult.aaaLarge ? (
                               <Check className="h-4 w-4" />
                             ) : (
@@ -441,28 +430,22 @@ const ContrastCheckerDemo: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     {suggestedColor && (
                       <Alert>
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Contrast could be improved</AlertTitle>
                         <AlertDescription className="flex flex-col gap-2">
                           <div>
-                            Try using <span className="font-mono">{suggestedColor}</span> instead for better contrast.
+                            Try using <span className="font-mono">{suggestedColor}</span> instead
+                            for better contrast.
                           </div>
                           <div className="flex gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={copySuggestedColor}
-                            >
+                            <Button variant="outline" size="sm" onClick={copySuggestedColor}>
                               <Copy className="mr-2 h-4 w-4" />
                               {copied ? 'Copied!' : 'Copy'}
                             </Button>
-                            <Button 
-                              size="sm" 
-                              onClick={applySuggestedColor}
-                            >
+                            <Button size="sm" onClick={applySuggestedColor}>
                               Apply Suggested Color
                             </Button>
                           </div>
@@ -480,4 +463,4 @@ const ContrastCheckerDemo: React.FC = () => {
   );
 };
 
-export default ContrastCheckerDemo; 
+export default ContrastCheckerDemo;

@@ -47,8 +47,18 @@ export default function DragDropDemo() {
       title: 'To Do',
       tasks: [
         { id: 't1', type: 'task', content: 'Research drag and drop libraries', priority: 'high' },
-        { id: 't2', type: 'task', content: 'Create UI components for draggable items', priority: 'medium' },
-        { id: 't3', type: 'task', content: 'Design drop zones with visual feedback', priority: 'medium' },
+        {
+          id: 't2',
+          type: 'task',
+          content: 'Create UI components for draggable items',
+          priority: 'medium',
+        },
+        {
+          id: 't3',
+          type: 'task',
+          content: 'Design drop zones with visual feedback',
+          priority: 'medium',
+        },
       ],
     },
     inProgress: {
@@ -77,15 +87,39 @@ export default function DragDropDemo() {
     documents: {
       title: 'Documents',
       files: [
-        { id: 'f1', type: 'file', name: 'Project Plan.pdf', size: '2.4 MB', icon: <FileText className="h-4 w-4" /> },
-        { id: 'f2', type: 'file', name: 'Meeting Notes.docx', size: '1.2 MB', icon: <FileText className="h-4 w-4" /> },
+        {
+          id: 'f1',
+          type: 'file',
+          name: 'Project Plan.pdf',
+          size: '2.4 MB',
+          icon: <FileText className="h-4 w-4" />,
+        },
+        {
+          id: 'f2',
+          type: 'file',
+          name: 'Meeting Notes.docx',
+          size: '1.2 MB',
+          icon: <FileText className="h-4 w-4" />,
+        },
       ],
     },
     images: {
       title: 'Images',
       files: [
-        { id: 'f3', type: 'image', name: 'Screenshot.png', size: '3.1 MB', icon: <ImageIcon className="h-4 w-4" /> },
-        { id: 'f4', type: 'image', name: 'Profile Picture.jpg', size: '1.8 MB', icon: <ImageIcon className="h-4 w-4" /> },
+        {
+          id: 'f3',
+          type: 'image',
+          name: 'Screenshot.png',
+          size: '3.1 MB',
+          icon: <ImageIcon className="h-4 w-4" />,
+        },
+        {
+          id: 'f4',
+          type: 'image',
+          name: 'Profile Picture.jpg',
+          size: '1.8 MB',
+          icon: <ImageIcon className="h-4 w-4" />,
+        },
       ],
     },
     trash: {
@@ -106,7 +140,7 @@ export default function DragDropDemo() {
       const newTasks = reorderItems(
         columns[sourceId].tasks,
         result.source.index,
-        result.destination.index
+        result.destination.index,
       );
 
       setColumns({
@@ -116,14 +150,14 @@ export default function DragDropDemo() {
           tasks: newTasks,
         },
       });
-    } 
+    }
     // If moving between columns
     else {
       const result = moveItemBetweenLists(
         columns[sourceId].tasks,
         columns[destId].tasks,
         result.source.index,
-        result.destination.index
+        result.destination.index,
       );
 
       setColumns({
@@ -152,7 +186,7 @@ export default function DragDropDemo() {
       const newFiles = reorderItems(
         folders[sourceId].files,
         result.source.index,
-        result.destination.index
+        result.destination.index,
       );
 
       setFolders({
@@ -162,14 +196,14 @@ export default function DragDropDemo() {
           files: newFiles,
         },
       });
-    } 
+    }
     // If moving between folders
     else {
       const result = moveItemBetweenLists(
         folders[sourceId].files,
         folders[destId].files,
         result.source.index,
-        result.destination.index
+        result.destination.index,
       );
 
       setFolders({
@@ -198,7 +232,7 @@ export default function DragDropDemo() {
           <div>
             <h1 className="fluid-h1 font-bold">Drag and Drop System</h1>
             <p className="fluid-body text-muted-foreground mt-2 max-w-3xl">
-              Explore the highly interactive drag and drop system with physics-based animations, 
+              Explore the highly interactive drag and drop system with physics-based animations,
               visual feedback, and touch support.
             </p>
           </div>
@@ -258,12 +292,13 @@ export default function DragDropDemo() {
                                       task.priority === 'high'
                                         ? 'bg-red-500'
                                         : task.priority === 'medium'
-                                        ? 'bg-yellow-500'
-                                        : 'bg-green-500'
+                                          ? 'bg-yellow-500'
+                                          : 'bg-green-500'
                                     }`}
                                   />
                                   <span className="text-xs text-muted-foreground">
-                                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+                                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}{' '}
+                                    Priority
                                   </span>
                                 </div>
                               </div>
@@ -302,9 +337,7 @@ export default function DragDropDemo() {
                         className="min-h-[200px] p-3"
                         emptyPlaceholder={
                           <div className="flex items-center justify-center h-full py-6 border-t">
-                            <p className="text-sm text-muted-foreground">
-                              Drop files here
-                            </p>
+                            <p className="text-sm text-muted-foreground">Drop files here</p>
                           </div>
                         }
                       >
@@ -324,9 +357,7 @@ export default function DragDropDemo() {
                                 transition={{ duration: 0.2 }}
                                 className="flex items-center p-2 hover:bg-muted/50 rounded-md cursor-grab"
                               >
-                                <div className="mr-3 text-muted-foreground">
-                                  {file.icon}
-                                </div>
+                                <div className="mr-3 text-muted-foreground">{file.icon}</div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm truncate">{file.name}</p>
                                   <p className="text-xs text-muted-foreground">{file.size}</p>
@@ -371,4 +402,4 @@ export default function DragDropDemo() {
       </DragProvider>
     </MainLayout>
   );
-} 
+}

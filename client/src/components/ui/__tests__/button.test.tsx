@@ -30,7 +30,7 @@ describe('Button Component', () => {
   it('calls onClick handler when clicked', () => {
     const handleClick = jest.fn();
     render(<Button onClick={handleClick}>Click Me</Button>);
-    
+
     fireEvent.click(screen.getByRole('button'));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -49,11 +49,11 @@ describe('Button Component', () => {
     render(
       <Button asChild>
         <a href="https://example.com">Link Button</a>
-      </Button>
+      </Button>,
     );
-    
+
     const linkButton = screen.getByText('Link Button');
     expect(linkButton.tagName).toBe('A');
     expect(linkButton).toHaveAttribute('href', 'https://example.com');
   });
-}); 
+});

@@ -18,7 +18,7 @@ describe('Fluid Spacing Utilities', () => {
         maxSize: 24,
         minWidth: 320,
         maxWidth: 1200,
-        unit: 'px'
+        unit: 'px',
       });
 
       // Should produce something like 'clamp(16px, calc(16px + 8 * (100vw - 320px) / 880), 24px)'
@@ -33,7 +33,7 @@ describe('Fluid Spacing Utilities', () => {
       const result = fluidSpace({
         minSize: 10,
         maxSize: 20,
-        unit: 'px'
+        unit: 'px',
       });
 
       expect(result).toContain('clamp(');
@@ -45,7 +45,7 @@ describe('Fluid Spacing Utilities', () => {
       const result = fluidSpace({
         minSize: 16,
         maxSize: 32,
-        unit: 'rem'
+        unit: 'rem',
       });
 
       expect(result).toContain('1rem');
@@ -68,9 +68,9 @@ describe('Fluid Spacing Utilities', () => {
     });
 
     it('should have values that are CSS clamp functions', () => {
-      Object.values(fluidSpaceScale).forEach(value => {
+      Object.values(fluidSpaceScale).forEach((value) => {
         expect(value).toContain('clamp(');
       });
     });
   });
-}); 
+});

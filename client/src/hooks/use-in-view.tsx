@@ -6,31 +6,31 @@ export interface UseInViewOptions {
    * @default null (browser viewport)
    */
   root?: Element | null;
-  
+
   /**
    * Margin around the root element
    * @default "0px"
    */
   rootMargin?: string;
-  
+
   /**
    * Threshold(s) at which to trigger the callback
    * @default 0
    */
   threshold?: number | number[];
-  
+
   /**
    * Whether to trigger only once
    * @default false
    */
   triggerOnce?: boolean;
-  
+
   /**
    * Skip creating the IntersectionObserver
    * @default false
    */
   skip?: boolean;
-  
+
   /**
    * Initial value for inView
    * @default false
@@ -43,12 +43,12 @@ export interface UseInViewResult<T extends Element = Element> {
    * Whether the element is in view
    */
   inView: boolean;
-  
+
   /**
    * Reference to attach to the element
    */
   ref: MutableRefObject<T | null>;
-  
+
   /**
    * The IntersectionObserverEntry
    */
@@ -70,7 +70,7 @@ export function useInView<T extends Element = Element>({
   const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
   const ref = useRef<T | null>(null);
   const frozen = useRef<boolean>(false);
-  
+
   useEffect(() => {
     // Don't observe if:
     // - No element ref
@@ -79,19 +79,19 @@ export function useInView<T extends Element = Element>({
     if (!ref.current || skip || (triggerOnce && frozen.current)) {
       return;
     }
-    
+
     const node = ref.current;
-    
+
     // Create the observer instance
     const observer = new IntersectionObserver(
       ([entry]) => {
         // Update state with new entry
         setEntry(entry);
-        
+
         // Update inView state
         const isInView = entry.isIntersecting;
         setInView(isInView);
-        
+
         // If it's in view and we only want to trigger once, freeze it
         if (isInView && triggerOnce) {
           frozen.current = true;
@@ -99,18 +99,18 @@ export function useInView<T extends Element = Element>({
           observer.disconnect();
         }
       },
-      { root, rootMargin, threshold }
+      { root, rootMargin, threshold },
     );
-    
+
     // Start observing
     observer.observe(node);
-    
+
     // Clean up
     return () => {
       observer.disconnect();
     };
   }, [root, rootMargin, threshold, triggerOnce, skip]);
-  
+
   return { inView, ref, entry };
 }
 
@@ -123,24 +123,26 @@ export function InView<T extends Element = Element>({
   onChange,
   ...options
 }: UseInViewOptions & {
-  children: React.ReactNode | ((inView: boolean, entry: IntersectionObserverEntry | null) => React.ReactNode);
+  children:
+    | React.ReactNode
+    | ((inView: boolean, entry: IntersectionObserverEntry | null) => React.ReactNode);
   as?: React.ElementType;
   onChange?: (inView: boolean, entry: IntersectionObserverEntry | null) => void;
 }) {
   const { ref, inView, entry } = useInView<T>(options);
-  
+
   // Call onChange when inView changes
   useEffect(() => {
     if (onChange) {
       onChange(inView, entry);
     }
   }, [inView, entry, onChange]);
-  
+
   const Component = as;
-  
+
   return (
     <Component ref={ref}>
       {typeof children === 'function' ? children(inView, entry) : children}
     </Component>
   );
-} 
+}

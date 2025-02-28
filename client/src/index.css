@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,40 +9,39 @@
   }
 
   :root {
-    --font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
-                 Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", 
-                 "Segoe UI Symbol";
-    
+    --font-sans: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+      sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
-    
+
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
-    
+
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    
+
     --primary: 240 5.9% 10%;
     --primary-foreground: 0 0% 98%;
-    
+
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
-    
+
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
-    
+
     --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;
-    
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    
+
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 240 10% 3.9%;
-    
+
     --radius: 0.5rem;
-    
+
     /* Standardized spacing variables */
     --space-1: 0.25rem;
     --space-2: 0.5rem;
@@ -61,28 +60,28 @@
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
-    
+
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
-    
+
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    
+
     --primary: 0 0% 98%;
     --primary-foreground: 240 5.9% 10%;
-    
+
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
-    
+
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
-    
+
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
-    
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    
+
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
@@ -107,7 +106,12 @@
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight;
     margin-top: 0;
   }
@@ -126,15 +130,16 @@
     @apply text-xl md:text-2xl;
     margin-bottom: var(--space-4);
   }
-  
+
   /* Consistent spacing for paragraphs */
   p {
     margin-top: 0;
     margin-bottom: var(--space-4);
   }
-  
+
   /* Add consistent margins for lists */
-  ul, ol {
+  ul,
+  ol {
     margin-top: 0;
     margin-bottom: var(--space-4);
     padding-left: var(--space-6);
@@ -146,19 +151,19 @@
   .card {
     @apply rounded-lg border bg-card text-card-foreground shadow-sm;
   }
-  
+
   /* Button animations */
   .btn-animated {
     @apply relative overflow-hidden transition-all duration-200 
            active:translate-y-[1px] active:shadow-none;
   }
-  
+
   .btn-animated::before {
     content: "";
     @apply absolute inset-0 w-full h-full bg-white/10 transform scale-x-0 origin-right 
            transition-transform duration-300 ease-out;
   }
-  
+
   .btn-animated:hover::before {
     @apply origin-left scale-x-100;
   }
@@ -167,13 +172,13 @@
   .input-focus-ring {
     @apply transition-all duration-200 focus-within:ring-2 focus-within:ring-primary/20;
   }
-  
+
   /* Smooth transitions */
   .transition-fade {
     transition-property: opacity, transform;
     transition-duration: 500ms;
   }
-  
+
   /* Card hover effects */
   .card-hover {
     @apply transition-transform duration-200 hover:-translate-y-1;
@@ -183,43 +188,43 @@
   .shadow-soft {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   }
-  
+
   /* Glass effect backgrounds */
   .bg-glass {
     @apply bg-background/80 backdrop-blur-sm border-border/40;
   }
-  
+
   /* Standardized spacing utility classes */
   .space-standard {
     @apply space-y-6 md:space-y-8;
   }
-  
+
   .container-standard {
     @apply px-4 sm:px-6 md:px-8 py-6 md:py-8;
   }
-  
+
   .section-spacing {
     @apply py-8 md:py-12 lg:py-16;
   }
-  
+
   /* Flex layout utilities */
   .flex-center {
     @apply flex items-center justify-center;
   }
-  
+
   .flex-between {
     @apply flex items-center justify-between;
   }
-  
+
   .flex-column {
     @apply flex flex-col;
   }
-  
+
   /* Grid layout utilities */
   .grid-standard {
     @apply grid gap-4 sm:gap-6 md:gap-8;
   }
-  
+
   .grid-cards {
     @apply grid-standard grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
   }
@@ -227,9 +232,15 @@
 
 /* Custom animations */
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .animate-float {
@@ -237,7 +248,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -251,11 +263,11 @@
   .xs-only {
     @apply block;
   }
-  
+
   .mobile-padding {
     @apply px-3 py-2;
   }
-  
+
   .mobile-text {
     @apply text-sm;
   }
@@ -266,7 +278,7 @@
   .sm-only {
     @apply block;
   }
-  
+
   .mobile-optimized {
     @apply px-3 py-2 text-sm;
   }
@@ -277,7 +289,7 @@
   .md-only {
     @apply block;
   }
-  
+
   .tablet-optimized {
     @apply px-4 py-3;
   }
@@ -319,17 +331,17 @@
       opacity: 0;
     }
   }
-  
+
   .animate-ripple {
     animation: ripple 0.6s ease-out forwards;
   }
-  
+
   /* Touch-specific utility classes */
   .touch-manipulation {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
-  
+
   .touch-action-none {
     touch-action: none;
   }

@@ -42,7 +42,7 @@ export class MemoryCache<T = any> {
   private hits: number = 0;
   private misses: number = 0;
   private evictions: number = 0;
-  
+
   /**
    * Create a new memory cache
    * @param options Cache configuration options
@@ -55,17 +55,17 @@ export class MemoryCache<T = any> {
       cleanupInterval = defaultTTL / 2,
       useLRU = true,
     } = options;
-    
+
     this.defaultTTL = defaultTTL;
     this.maxSize = maxSize;
     this.maxMemorySize = maxMemorySize;
     this.cleanupInterval = cleanupInterval;
     this.useLRU = useLRU;
-    
+
     // Start periodic cleanup
     this.startCleanup();
   }
-  
+
   /**
    * Start the cleanup timer
    */
@@ -73,15 +73,15 @@ export class MemoryCache<T = any> {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer);
     }
-    
+
     this.cleanupTimer = setInterval(() => this.cleanup(), this.cleanupInterval);
-    
+
     // Ensure the timer doesn't prevent the process from exiting
     if (this.cleanupTimer.unref) {
       this.cleanupTimer.unref();
     }
   }
-  
+
   /**
    * Stop the cleanup timer
    */
@@ -91,7 +91,7 @@ export class MemoryCache<T = any> {
       this.cleanupTimer = null;
     }
   }
-  
+
   /**
    * Estimate the size of a value in bytes
    * @param value The value to measure
@@ -103,7 +103,7 @@ export class MemoryCache<T = any> {
       if (typeof value === 'string') {
         return value.length * 2; // UTF-16 characters are 2 bytes
       }
-      
+
       // For objects, use JSON stringification as an approximation
       const json = JSON.stringify(value);
       return json.length * 2; // UTF-16 characters are 2 bytes
@@ -113,7 +113,7 @@ export class MemoryCache<T = any> {
       return 1024; // 1KB default
     }
   }
-  
+
   /**
    * Set a value in the cache
    * @param key Cache key
@@ -126,21 +126,21 @@ export class MemoryCache<T = any> {
       if (value === null || value === undefined) {
         return;
       }
-      
+
       // Check if key already exists and update memory size
       if (this.cache.has(key)) {
         const oldEntry = this.cache.get(key)!;
         this.currentMemorySize -= oldEntry.size;
       }
-      
+
       // Estimate the size of the new value
       const size = this.estimateSize(value);
-      
+
       // Enforce cache size limit
       if (this.cache.size >= this.maxSize || this.currentMemorySize + size > this.maxMemorySize) {
         this.evictEntries(size);
       }
-      
+
       const expires = Date.now() + (ttl || this.defaultTTL);
       const entry: CacheEntry<T> = {
         value,
@@ -149,16 +149,18 @@ export class MemoryCache<T = any> {
         size,
         lastAccessed: Date.now(),
       };
-      
+
       this.cache.set(key, entry);
       this.currentMemorySize += size;
-      
-      logger.debug(`Cache set: ${key}, size: ${size} bytes, expires: ${new Date(expires).toISOString()}`);
+
+      logger.debug(
+        `Cache set: ${key}, size: ${size} bytes, expires: ${new Date(expires).toISOString()}`,
+      );
     } catch (error) {
       logger.error(`Error setting cache key ${key}: ${error}`);
     }
   }
-  
+
   /**
    * Get a value from the cache
    * @param key Cache key
@@ -167,7 +169,7 @@ export class MemoryCache<T = any> {
   get(key: string): T | undefined {
     try {
       const entry = this.cache.get(key);
-      
+
       // Return undefined if not in cache or expired
       if (!entry || entry.expires < Date.now()) {
         if (entry) {
@@ -177,16 +179,16 @@ export class MemoryCache<T = any> {
         } else {
           logger.debug(`Cache miss (not found): ${key}`);
         }
-        
+
         this.misses++;
         return undefined;
       }
-      
+
       // Update last accessed time for LRU
       if (this.useLRU) {
         entry.lastAccessed = Date.now();
       }
-      
+
       this.hits++;
       logger.debug(`Cache hit: ${key}`);
       return entry.value;
@@ -195,7 +197,7 @@ export class MemoryCache<T = any> {
       return undefined;
     }
   }
-  
+
   /**
    * Check if a key exists in the cache and is not expired
    * @param key Cache key
@@ -205,7 +207,7 @@ export class MemoryCache<T = any> {
     const entry = this.cache.get(key);
     return !!entry && entry.expires > Date.now();
   }
-  
+
   /**
    * Delete a value from the cache
    * @param key Cache key
@@ -222,7 +224,7 @@ export class MemoryCache<T = any> {
       logger.error(`Error deleting cache key ${key}: ${error}`);
     }
   }
-  
+
   /**
    * Delete all values from the cache
    */
@@ -238,7 +240,7 @@ export class MemoryCache<T = any> {
       logger.error(`Error clearing cache: ${error}`);
     }
   }
-  
+
   /**
    * Delete all values with keys matching a pattern
    * @param pattern Regular expression pattern to match keys
@@ -253,7 +255,7 @@ export class MemoryCache<T = any> {
           count++;
         }
       }
-      
+
       logger.debug(`Cache deleted ${count} keys matching pattern: ${pattern}`);
       return count;
     } catch (error) {
@@ -261,7 +263,7 @@ export class MemoryCache<T = any> {
       return 0;
     }
   }
-  
+
   /**
    * Get cache statistics
    */
@@ -277,7 +279,7 @@ export class MemoryCache<T = any> {
   } {
     const total = this.hits + this.misses;
     const hitRate = total > 0 ? this.hits / total : 0;
-    
+
     return {
       size: this.cache.size,
       memorySize: this.currentMemorySize,
@@ -289,7 +291,7 @@ export class MemoryCache<T = any> {
       hitRate,
     };
   }
-  
+
   /**
    * Clean up expired entries
    */
@@ -297,7 +299,7 @@ export class MemoryCache<T = any> {
     try {
       const now = Date.now();
       let expiredCount = 0;
-      
+
       for (const [key, entry] of this.cache.entries()) {
         if (entry.expires <= now) {
           this.currentMemorySize -= entry.size;
@@ -305,7 +307,7 @@ export class MemoryCache<T = any> {
           expiredCount++;
         }
       }
-      
+
       if (expiredCount > 0) {
         logger.debug(`Cache cleanup removed ${expiredCount} expired entries`);
       }
@@ -313,7 +315,7 @@ export class MemoryCache<T = any> {
       logger.error(`Error during cache cleanup: ${error}`);
     }
   }
-  
+
   /**
    * Evict entries to make room for new entries
    * @param sizeNeeded Size needed for the new entry
@@ -331,7 +333,7 @@ export class MemoryCache<T = any> {
       logger.error(`Error evicting cache entries: ${error}`);
     }
   }
-  
+
   /**
    * Evict the least recently used entries
    * @param sizeNeeded Size needed for the new entry
@@ -341,29 +343,31 @@ export class MemoryCache<T = any> {
     const entries = Array.from(this.cache.entries())
       .map(([key, entry]) => entry)
       .sort((a, b) => a.lastAccessed - b.lastAccessed);
-    
+
     let freedSize = 0;
     let evictedCount = 0;
-    
+
     // Evict entries until we have enough space
     for (const entry of entries) {
-      if (this.cache.size <= this.maxSize * 0.9 && 
-          this.currentMemorySize + sizeNeeded - freedSize <= this.maxMemorySize * 0.9) {
+      if (
+        this.cache.size <= this.maxSize * 0.9 &&
+        this.currentMemorySize + sizeNeeded - freedSize <= this.maxMemorySize * 0.9
+      ) {
         break;
       }
-      
+
       this.cache.delete(entry.key);
       freedSize += entry.size;
       this.currentMemorySize -= entry.size;
       evictedCount++;
       this.evictions++;
     }
-    
+
     if (evictedCount > 0) {
       logger.debug(`Cache evicted ${evictedCount} LRU entries, freed ${freedSize} bytes`);
     }
   }
-  
+
   /**
    * Evict the oldest entry to make room for new entries
    */
@@ -371,14 +375,14 @@ export class MemoryCache<T = any> {
     // Find the key with the earliest expiration time
     let oldestKey: string | undefined;
     let oldestExpires = Infinity;
-    
+
     for (const [key, entry] of this.cache.entries()) {
       if (entry.expires < oldestExpires) {
         oldestKey = key;
         oldestExpires = entry.expires;
       }
     }
-    
+
     // Delete the oldest entry
     if (oldestKey) {
       const entry = this.cache.get(oldestKey)!;
@@ -402,7 +406,7 @@ export async function getOrCompute<T>(
   cache: MemoryCache<T>,
   key: string,
   fn: () => Promise<T>,
-  ttl?: number
+  ttl?: number,
 ): Promise<T> {
   try {
     // Check cache first
@@ -410,13 +414,13 @@ export async function getOrCompute<T>(
     if (cachedValue !== undefined) {
       return cachedValue;
     }
-    
+
     // Compute value
     const value = await fn();
-    
+
     // Cache result
     cache.set(key, value, ttl);
-    
+
     return value;
   } catch (error) {
     logger.error(`Error in getOrCompute for key ${key}: ${error}`);
@@ -436,7 +440,7 @@ export function memoize<T, Args extends any[]>(
   fn: (...args: Args) => Promise<T>,
   keyFn: (...args: Args) => string,
   cache: MemoryCache<T>,
-  ttl?: number
+  ttl?: number,
 ): (...args: Args) => Promise<T> {
   return async (...args: Args): Promise<T> => {
     const key = keyFn(...args);
@@ -446,32 +450,32 @@ export function memoize<T, Args extends any[]>(
 
 // Export singleton cache instances for different data types
 export const userCache = new MemoryCache<any>({
-  defaultTTL: 5 * 60 * 1000,  // 5 minutes
+  defaultTTL: 5 * 60 * 1000, // 5 minutes
   maxSize: 1000,
   useLRU: true,
 });
 
 export const agentCache = new MemoryCache<any>({
-  defaultTTL: 2 * 60 * 1000,  // 2 minutes
+  defaultTTL: 2 * 60 * 1000, // 2 minutes
   maxSize: 500,
   useLRU: true,
 });
 
 export const promptCache = new MemoryCache<any>({
-  defaultTTL: 3 * 60 * 1000,  // 3 minutes
+  defaultTTL: 3 * 60 * 1000, // 3 minutes
   maxSize: 200,
   useLRU: true,
 });
 
 export const conversationCache = new MemoryCache<any>({
-  defaultTTL: 1 * 60 * 1000,  // 1 minute
+  defaultTTL: 1 * 60 * 1000, // 1 minute
   maxSize: 100,
   useLRU: true,
 });
 
 // Cache for static assets and other rarely changing data
 export const staticCache = new MemoryCache<any>({
-  defaultTTL: 60 * 60 * 1000,  // 1 hour
+  defaultTTL: 60 * 60 * 1000, // 1 hour
   maxSize: 200,
-  useLRU: false,  // TTL-based eviction for static content
-}); 
+  useLRU: false, // TTL-based eviction for static content
+});

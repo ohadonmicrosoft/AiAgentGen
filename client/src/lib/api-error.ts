@@ -12,7 +12,7 @@ export enum ErrorCategory {
   NOT_FOUND = 'not_found',
   SERVER = 'server',
   TIMEOUT = 'timeout',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 /**
@@ -33,7 +33,7 @@ export class ApiError extends Error {
     statusText: string,
     endpoint: string,
     data?: any,
-    requestId?: string
+    requestId?: string,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -140,7 +140,7 @@ export class ApiError extends Error {
     }
 
     if (this.isForbiddenError()) {
-      return 'You don\'t have permission to access this resource.';
+      return "You don't have permission to access this resource.";
     }
 
     if (this.isNotFoundError()) {
@@ -188,13 +188,10 @@ export class ApiError extends Error {
 /**
  * Factory function to create an ApiError from a Response object
  */
-export async function createApiError(
-  response: Response,
-  endpoint: string
-): Promise<ApiError> {
+export async function createApiError(response: Response, endpoint: string): Promise<ApiError> {
   let data;
   let errorMessage;
-  let requestId = response.headers.get('x-request-id') || undefined;
+  const requestId = response.headers.get('x-request-id') || undefined;
 
   try {
     // Try to parse the response as JSON
@@ -211,7 +208,7 @@ export async function createApiError(
     response.statusText,
     endpoint,
     data,
-    requestId
+    requestId,
   );
 
   // Log the error if it's not a standard client error
@@ -227,22 +224,19 @@ export async function createApiError(
 /**
  * Creates a network error when fetch fails
  */
-export function createNetworkError(
-  error: Error,
-  endpoint: string
-): ApiError {
+export function createNetworkError(error: Error, endpoint: string): ApiError {
   const apiError = new ApiError(
     error.message || 'Network error',
     0, // No status code for network errors
     'Network Error',
-    endpoint
+    endpoint,
   );
-  
+
   // Override category for network errors
   apiError.category = ErrorCategory.NETWORK;
-  
+
   logger.error(`Network Error: ${error.message}`, apiError.toLog());
-  
+
   return apiError;
 }
 
@@ -293,4 +287,4 @@ export function getFriendlyErrorMessage(error: unknown): string {
   }
 
   return 'An unexpected error occurred.';
-} 
+}

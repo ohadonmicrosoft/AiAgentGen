@@ -28,35 +28,35 @@ export interface ImageOptimizationOptions {
    * @default 'original'
    */
   size?: ImageSize;
-  
+
   /**
    * Format of the image
    * @default 'original'
    */
   format?: ImageFormat;
-  
+
   /**
    * Quality of the image (1-100)
    * @default 80
    */
   quality?: number;
-  
+
   /**
    * Whether to enable blur-up effect for lazy loading
    * @default true
    */
   blurUp?: boolean;
-  
+
   /**
    * Width of the image in pixels
    */
   width?: number;
-  
+
   /**
    * Height of the image in pixels
    */
   height?: number;
-  
+
   /**
    * Loading mode for the image
    * @default 'lazy'
@@ -72,7 +72,7 @@ const defaultOptions: ImageOptimizationOptions = {
   format: 'original',
   quality: 80,
   blurUp: true,
-  loading: 'lazy'
+  loading: 'lazy',
 };
 
 /**
@@ -83,7 +83,7 @@ const sizeDimensions: Record<ImageSize, { width: number; height?: number }> = {
   small: { width: 300 },
   medium: { width: 600 },
   large: { width: 1200 },
-  original: { width: 0 } // Original size
+  original: { width: 0 }, // Original size
 };
 
 /**
@@ -91,7 +91,7 @@ const sizeDimensions: Record<ImageSize, { width: number; height?: number }> = {
  */
 export function supportsImageFormat(format: ImageFormat): boolean {
   if (typeof document === 'undefined') return false;
-  
+
   if (format === 'webp') {
     const canvas = document.createElement('canvas');
     if (canvas.getContext && canvas.getContext('2d')) {
@@ -99,13 +99,11 @@ export function supportsImageFormat(format: ImageFormat): boolean {
     }
     return false;
   }
-  
+
   if (format === 'avif') {
-    return document.createElement('canvas')
-      .toDataURL('image/avif')
-      .startsWith('data:image/avif');
+    return document.createElement('canvas').toDataURL('image/avif').startsWith('data:image/avif');
   }
-  
+
   return true;
 }
 
@@ -123,57 +121,57 @@ export function getBestSupportedFormat(): ImageFormat {
  */
 export function getOptimizedImageUrl(
   src: string,
-  options: Partial<ImageOptimizationOptions> = {}
+  options: Partial<ImageOptimizationOptions> = {},
 ): string {
   // Merge options with defaults
   const opts = { ...defaultOptions, ...options };
-  
+
   // Handle data URLs, blobs, and relative URLs directly
   if (src.startsWith('data:') || src.startsWith('blob:') || src.startsWith('/')) {
     return src;
   }
-  
+
   // Handle already optimized CDN URLs
   if (src.includes('?w=') || src.includes('?format=') || src.includes('?quality=')) {
     return src;
   }
-  
+
   // If we have a CDN URL, use it for optimization
   if (BASE_CDN_URL) {
     const url = new URL(`${BASE_CDN_URL}/image`);
-    
+
     // Add the source URL
     url.searchParams.append('url', src);
-    
+
     // Add width if specified or from size
-    const width = opts.width || 
-                 (opts.size !== 'original' ? sizeDimensions[opts.size!].width : undefined);
-    
+    const width =
+      opts.width || (opts.size !== 'original' ? sizeDimensions[opts.size!].width : undefined);
+
     if (width) {
       url.searchParams.append('w', width.toString());
     }
-    
+
     // Add height if specified
     if (opts.height) {
       url.searchParams.append('h', opts.height.toString());
     }
-    
+
     // Add format if specified
     if (opts.format !== 'original') {
       url.searchParams.append('format', opts.format!);
     }
-    
+
     // Add quality if specified
     if (opts.quality && opts.quality !== 80) {
       url.searchParams.append('q', opts.quality.toString());
     }
-    
+
     // Add fit parameter
     url.searchParams.append('fit', 'max');
-    
+
     return url.toString();
   }
-  
+
   // No CDN optimization available, return original URL
   return src;
 }
@@ -181,7 +179,10 @@ export function getOptimizedImageUrl(
 /**
  * Preload an image
  */
-export function preloadImage(src: string, options?: Partial<ImageOptimizationOptions>): Promise<HTMLImageElement> {
+export function preloadImage(
+  src: string,
+  options?: Partial<ImageOptimizationOptions>,
+): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = getOptimizedImageUrl(src, options);
@@ -193,25 +194,27 @@ export function preloadImage(src: string, options?: Partial<ImageOptimizationOpt
 /**
  * Create preload link tags for images
  */
-export function createImagePreloadLinks(images: Array<string | { src: string; options?: Partial<ImageOptimizationOptions> }>): void {
+export function createImagePreloadLinks(
+  images: Array<string | { src: string; options?: Partial<ImageOptimizationOptions> }>,
+): void {
   if (typeof document === 'undefined') return;
-  
-  images.forEach(image => {
+
+  images.forEach((image) => {
     const src = typeof image === 'string' ? image : image.src;
     const options = typeof image === 'string' ? undefined : image.options;
-    
+
     const optimizedUrl = getOptimizedImageUrl(src, options);
-    
+
     // Check if a preload link already exists
     const existingLink = document.querySelector(`link[rel="preload"][href="${optimizedUrl}"]`);
     if (existingLink) return;
-    
+
     // Create a preload link
     const link = document.createElement('link');
     link.rel = 'preload';
     link.href = optimizedUrl;
     link.as = 'image';
-    
+
     // Add the link to the head
     document.head.appendChild(link);
   });
@@ -227,10 +230,10 @@ export function getLowQualityImagePlaceholder(src: string): string {
     url.searchParams.append('w', '10');
     url.searchParams.append('q', '10');
     url.searchParams.append('blur', '10');
-    
+
     return url.toString();
   }
-  
+
   return src;
 }
 
@@ -250,12 +253,12 @@ export function getResponsiveSizeAttribute(breakpoints: Record<string, number>):
 export function getResponsiveSrcSet(
   src: string,
   widths: number[],
-  options: Partial<ImageOptimizationOptions> = {}
+  options: Partial<ImageOptimizationOptions> = {},
 ): string {
   return widths
-    .map(width => {
+    .map((width) => {
       const imageUrl = getOptimizedImageUrl(src, { ...options, width });
       return `${imageUrl} ${width}w`;
     })
     .join(', ');
-} 
+}

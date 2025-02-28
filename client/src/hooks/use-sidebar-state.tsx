@@ -53,10 +53,10 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
 
 export function useSidebarState() {
   const context = useContext(SidebarContext);
-  
+
   if (context === undefined) {
     throw new Error('useSidebarState must be used within a SidebarProvider');
   }
-  
+
   return context;
-} 
+}

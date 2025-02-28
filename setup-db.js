@@ -16,7 +16,7 @@ async function main() {
     const db = drizzle(client);
 
     console.log('Creating tables from schema...');
-    
+
     // Create users table
     await client`
       CREATE TABLE IF NOT EXISTS users (
@@ -85,7 +85,7 @@ async function main() {
       )
     `;
     console.log('✓ Sessions table created');
-    
+
     await client`
       CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire")
     `;

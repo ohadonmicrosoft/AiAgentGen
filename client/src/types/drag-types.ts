@@ -71,4 +71,4 @@ export interface DragResult {
   isReordered: boolean;
   // True if the item was moved between containers
   isMoved: boolean;
-} 
+}

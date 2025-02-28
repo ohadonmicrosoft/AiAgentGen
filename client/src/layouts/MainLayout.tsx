@@ -1,22 +1,34 @@
-import { ReactNode, useState, useEffect, createContext, useContext } from "react";
-import Sidebar from "@/components/Sidebar";
-import TopNav from "@/components/TopNav";
-import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Backdrop } from "@/components/ui/backdrop";
-import { SidebarProvider, useSidebarState } from "@/hooks/use-sidebar-state";
-import { motion } from "framer-motion";
-import { SkipLink } from "@/components/SkipLink";
-import { useAnnouncer, useFocusTrap } from "@/lib/accessibility";
-import { useAuth } from "@/hooks/use-auth";
-import { usePreferences } from "@/context/preferences-context";
-import { useBreakpoint } from "@/hooks/use-breakpoint";
-import { Icons } from "@/components/ui/icons";
-import { PERMISSIONS } from "@/constants";
-import { NavItem } from "@/types";
-import { Bot, Home, Users, MessagesSquare, Compass, Settings, Sparkles, Database, AlertTriangle, Menu, X } from "lucide-react";
-import { FocusTrap } from "@radix-ui/react-focus-trap";
-import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { ReactNode, useState, useEffect, createContext, useContext } from 'react';
+import Sidebar from '@/components/Sidebar';
+import TopNav from '@/components/TopNav';
+import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Backdrop } from '@/components/ui/backdrop';
+import { SidebarProvider, useSidebarState } from '@/hooks/use-sidebar-state';
+import { motion } from 'framer-motion';
+import { SkipLink } from '@/components/SkipLink';
+import { useAnnouncer, useFocusTrap } from '@/lib/accessibility';
+import { useAuth } from '@/hooks/use-auth';
+import { usePreferences } from '@/context/preferences-context';
+import { useBreakpoint } from '@/hooks/use-breakpoint';
+import { Icons } from '@/components/ui/icons';
+import { PERMISSIONS } from '@/constants';
+import { NavItem } from '@/types';
+import {
+  Bot,
+  Home,
+  Users,
+  MessagesSquare,
+  Compass,
+  Settings,
+  Sparkles,
+  Database,
+  AlertTriangle,
+  Menu,
+  X,
+} from 'lucide-react';
+import { FocusTrap } from '@radix-ui/react-focus-trap';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -26,28 +38,28 @@ interface MainLayoutProps {
 // Define navigation items
 const navItems: NavItem[] = [
   {
-    label: "Dashboard",
-    path: "/",
+    label: 'Dashboard',
+    path: '/',
     icon: <Home className="w-5 h-5" />,
   },
   {
-    label: "Agents",
-    path: "/agents",
+    label: 'Agents',
+    path: '/agents',
     icon: <Bot className="w-5 h-5" />,
   },
   {
-    label: "Conversations",
-    path: "/conversations",
+    label: 'Conversations',
+    path: '/conversations',
     icon: <MessagesSquare className="w-5 h-5" />,
   },
   {
-    label: "Explore",
-    path: "/explore",
+    label: 'Explore',
+    path: '/explore',
     icon: <Compass className="w-5 h-5" />,
   },
   {
-    label: "Settings",
-    path: "/settings",
+    label: 'Settings',
+    path: '/settings',
     icon: <Settings className="w-5 h-5" />,
   },
 ];
@@ -55,8 +67,8 @@ const navItems: NavItem[] = [
 // Define demo items
 const demoItems: NavItem[] = [
   {
-    label: "UI Components",
-    path: "/demo/components",
+    label: 'UI Components',
+    path: '/demo/components',
     icon: <Sparkles className="w-5 h-5" />,
   },
 ];
@@ -64,13 +76,13 @@ const demoItems: NavItem[] = [
 // Define admin items
 const adminItems: NavItem[] = [
   {
-    label: "User Management",
-    path: "/admin/users",
+    label: 'User Management',
+    path: '/admin/users',
     icon: <Users className="w-5 h-5" />,
   },
   {
-    label: "System Status",
-    path: "/admin/system",
+    label: 'System Status',
+    path: '/admin/system',
     icon: <Database className="w-5 h-5" />,
   },
 ];
@@ -92,15 +104,12 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
   const { isCollapsed, isHovering } = useSidebarState();
-  
+
   // Set up announcer for dynamic content changes
   const { announce } = useAnnouncer();
-  
+
   // Focus trap for mobile sidebar
-  const sidebarFocusTrapRef = useFocusTrap(
-    isMobile && sidebarOpen,
-    () => setSidebarOpen(false)
-  );
+  const sidebarFocusTrapRef = useFocusTrap(isMobile && sidebarOpen, () => setSidebarOpen(false));
 
   // Close sidebar when transitioning from mobile to desktop
   useEffect(() => {
@@ -116,7 +125,7 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
         setSidebarOpen(false);
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [sidebarOpen]);
@@ -124,12 +133,12 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
   const toggleSidebar = () => {
     const newState = !sidebarOpen;
     setSidebarOpen(newState);
-    
+
     // Announce sidebar state change to screen readers
     if (newState) {
-      announce("Navigation sidebar opened");
+      announce('Navigation sidebar opened');
     } else {
-      announce("Navigation sidebar closed");
+      announce('Navigation sidebar closed');
     }
   };
 
@@ -142,7 +151,7 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
         document.body.style.overflow = '';
       }
     }
-    
+
     return () => {
       document.body.style.overflow = '';
     };
@@ -152,54 +161,54 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
     <SidebarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
       <div className="min-h-screen flex flex-col bg-background text-foreground antialiased transition-colors duration-300">
         {/* Skip link for accessibility */}
-        <a 
-          href="#main-content" 
+        <a
+          href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-background focus:text-foreground"
         >
           Skip to content
         </a>
-        
+
         {/* Mobile overlay */}
         {isMobile && sidebarOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30"
             onClick={() => setSidebarOpen(false)}
             aria-hidden="true"
           />
         )}
-        
+
         {/* Sidebar */}
         <FocusTrap active={isMobile && sidebarOpen}>
-          <aside 
+          <aside
             className={`
               fixed inset-y-0 left-0 z-40 
               w-64 transform transition-transform duration-300 ease-in-out
               lg:translate-x-0 lg:static lg:w-auto lg:flex-shrink-0
-              ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+              ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
               flex-shrink-0
             `}
           >
-            <Sidebar 
-              open={sidebarOpen} 
-              onClose={() => setSidebarOpen(false)} 
+            <Sidebar
+              open={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
               navItems={navItems}
               demoItems={demoItems}
               adminItems={adminItems}
             />
           </aside>
         </FocusTrap>
-        
+
         {/* Main content area */}
         <div className="flex-1 flex flex-col min-h-screen lg:pl-64">
           {/* Top navigation */}
           <TopNav title={title} onMenuClick={toggleSidebar} />
-          
+
           {/* Main content */}
-          <main 
-            id="main-content" 
+          <main
+            id="main-content"
             className="flex-1 transition-all duration-300 pt-16 pb-8 px-4 md:px-6"
           >
-            <ErrorBoundary 
+            <ErrorBoundary
               fallback={
                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
                   <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
@@ -207,7 +216,7 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
                   <p className="text-muted-foreground mb-4">
                     An error occurred while loading this page content.
                   </p>
-                  <button 
+                  <button
                     onClick={() => window.location.reload()}
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
                   >
@@ -220,15 +229,13 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
               <div className="mx-auto w-full max-w-7xl">
                 {/* Page title for screen readers if needed */}
                 {title && <h1 className="sr-only">{title}</h1>}
-                
+
                 {/* Animated page entry */}
-                <div className="animate-in fade-in duration-500">
-                  {children}
-                </div>
+                <div className="animate-in fade-in duration-500">{children}</div>
               </div>
             </ErrorBoundary>
           </main>
-          
+
           {/* Footer */}
           <footer className="py-4 px-6 border-t border-border/50 text-center text-sm text-muted-foreground">
             <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">

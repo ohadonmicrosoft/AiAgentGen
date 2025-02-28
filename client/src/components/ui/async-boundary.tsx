@@ -6,7 +6,9 @@ import { ErrorFallback } from '@/components/ui/error-fallback';
 interface AsyncBoundaryProps {
   children: ReactNode;
   loadingFallback?: ReactNode;
-  errorFallback?: ReactNode | ((props: { error: Error; resetErrorBoundary: () => void }) => React.ReactNode);
+  errorFallback?:
+    | ReactNode
+    | ((props: { error: Error; resetErrorBoundary: () => void }) => React.ReactNode);
   onError?: (error: Error, info: React.ErrorInfo) => void;
   onReset?: () => void;
   suspense?: boolean;
@@ -60,24 +62,24 @@ export function AsyncBoundary({
  */
 export function withAsyncBoundary<P extends object>(
   Component: React.ComponentType<P>,
-  options?: Omit<AsyncBoundaryProps, 'children'>
+  options?: Omit<AsyncBoundaryProps, 'children'>,
 ): React.FC<P> {
   const displayName = Component.displayName || Component.name || 'Component';
-  
+
   const WrappedComponent: React.FC<P> = (props) => (
     <AsyncBoundary {...options}>
       <Component {...props} />
     </AsyncBoundary>
   );
-  
+
   WrappedComponent.displayName = `withAsyncBoundary(${displayName})`;
-  
+
   return WrappedComponent;
 }
 
 /**
  * Example usage:
- * 
+ *
  * ```tsx
  * <AsyncBoundary
  *   loadingFallback={<LoadingSpinner />}
@@ -95,4 +97,4 @@ export function withAsyncBoundary<P extends object>(
  *   <DataComponent />
  * </AsyncBoundary>
  * ```
- */ 
+ */

@@ -21,15 +21,15 @@ export function ErrorFallback({
     <div className="flex flex-col items-center justify-center p-6 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 text-center space-y-4 min-h-[200px] w-full">
       <AlertTriangle className="h-10 w-10 text-red-500 dark:text-red-400" />
       <h2 className="text-lg font-semibold text-red-700 dark:text-red-300">{message}</h2>
-      
+
       {error && (
         <div className="max-w-full overflow-auto text-sm text-red-600 dark:text-red-400 p-2 bg-red-100 dark:bg-red-900/30 rounded border border-red-200 dark:border-red-800">
           <p className="font-mono">{error.message || String(error)}</p>
         </div>
       )}
-      
+
       {resetErrorBoundary && (
-        <Button 
+        <Button
           onClick={resetErrorBoundary}
           variant="outline"
           className="mt-4 border-red-300 hover:bg-red-100 dark:border-red-700 dark:hover:bg-red-900/50"
@@ -54,9 +54,9 @@ export function CompactErrorFallback({
         <AlertTriangle className="h-4 w-4 text-red-500 dark:text-red-400" />
         <span className="text-red-700 dark:text-red-300">{message}</span>
       </div>
-      
+
       {resetErrorBoundary && (
-        <Button 
+        <Button
           onClick={resetErrorBoundary}
           variant="ghost"
           size="sm"
@@ -67,4 +67,4 @@ export function CompactErrorFallback({
       )}
     </div>
   );
-} 
+}

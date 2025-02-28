@@ -12,28 +12,28 @@ function fluidType(minSize, maxSize, minWidth = 320, maxWidth = 1280) {
 
 /**
  * Fluid Typography Plugin for Tailwind CSS
- * 
- * This plugin adds responsive typography utilities that scale smoothly 
+ *
+ * This plugin adds responsive typography utilities that scale smoothly
  * between minimum and maximum sizes based on the viewport width.
- * 
+ *
  * It adds:
  * - .fluid-{scale} classes for font sizes
  * - .fluid-leading-{ratio} classes for line heights
  */
-module.exports = plugin(function({ addUtilities, theme, e }) {
+module.exports = plugin(function ({ addUtilities, theme, e }) {
   // Define our type scale with min and max sizes
   const fluidTypeScale = {
-    'h1': { min: 28, max: 40 },
-    'h2': { min: 24, max: 36 },
-    'h3': { min: 20, max: 30 },
-    'h4': { min: 18, max: 24 },
-    'h5': { min: 16, max: 20 },
-    'h6': { min: 14, max: 18 },
-    'body': { min: 14, max: 16 },
-    'small': { min: 12, max: 14 },
-    'xs': { min: 10, max: 12 },
+    h1: { min: 28, max: 40 },
+    h2: { min: 24, max: 36 },
+    h3: { min: 20, max: 30 },
+    h4: { min: 18, max: 24 },
+    h5: { min: 16, max: 20 },
+    h6: { min: 14, max: 18 },
+    body: { min: 14, max: 16 },
+    small: { min: 12, max: 14 },
+    xs: { min: 10, max: 12 },
   };
-  
+
   // Create fluid font size utilities
   const fluidFontSizes = Object.entries(fluidTypeScale).reduce((acc, [name, { min, max }]) => {
     acc[`.fluid-${e(name)}`] = {
@@ -41,7 +41,7 @@ module.exports = plugin(function({ addUtilities, theme, e }) {
     };
     return acc;
   }, {});
-  
+
   // Create fluid line height utilities based on ratios
   const fluidLineHeights = {
     '.fluid-leading-tight': {
@@ -66,10 +66,10 @@ module.exports = plugin(function({ addUtilities, theme, e }) {
       lineHeight: 'auto',
     },
   };
-  
+
   // Add fluid utilities to Tailwind
   addUtilities({
     ...fluidFontSizes,
     ...fluidLineHeights,
   });
-}); 
+});

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 // Navigation item interface for sidebar
 export interface NavItem {
@@ -7,4 +7,4 @@ export interface NavItem {
   icon: ReactNode;
   requiresAuth?: boolean;
   permission?: string;
-} 
+}

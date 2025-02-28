@@ -1,14 +1,14 @@
-import { Monitor, Moon, Sun, Palette } from "lucide-react";
-import { useTheme } from "@/hooks/use-theme";
+import { Monitor, Moon, Sun, Palette } from 'lucide-react';
+import { useTheme } from '@/hooks/use-theme';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import { AnimatePresence, motion } from "framer-motion";
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -17,11 +17,11 @@ export function ThemeToggle() {
   // Define icon to use based on current theme
   const getButtonIcon = () => {
     switch (theme) {
-      case "light":
+      case 'light':
         return <Sun className="h-4 w-4" />;
-      case "dark":
+      case 'dark':
         return <Moon className="h-4 w-4" />;
-      case "custom":
+      case 'custom':
         return <Palette className="h-4 w-4" />;
       default:
         return <Monitor className="h-4 w-4" />;
@@ -47,20 +47,20 @@ export function ThemeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+        <DropdownMenuItem onClick={() => setTheme('light')}>
           <Sun className="mr-2 h-4 w-4" />
           <span>Light</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
+        <DropdownMenuItem onClick={() => setTheme('dark')}>
           <Moon className="mr-2 h-4 w-4" />
           <span>Dark</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
+        <DropdownMenuItem onClick={() => setTheme('system')}>
           <Monitor className="mr-2 h-4 w-4" />
           <span>System</span>
         </DropdownMenuItem>
-        {theme === "custom" && (
-          <DropdownMenuItem onClick={() => setTheme("system")}>
+        {theme === 'custom' && (
+          <DropdownMenuItem onClick={() => setTheme('system')}>
             <Palette className="mr-2 h-4 w-4" />
             <span>Custom</span>
           </DropdownMenuItem>
@@ -68,4 +68,4 @@ export function ThemeToggle() {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-} 
+}

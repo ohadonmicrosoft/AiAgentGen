@@ -1,11 +1,25 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const formSchema = z.object({
   temperature: z.number().min(0).max(1),
@@ -24,12 +38,12 @@ interface AgentConfigurationProps {
   preview?: boolean;
 }
 
-export default function AgentConfiguration({ 
-  formData, 
-  updateFormData, 
-  onNext, 
-  onBack, 
-  preview = false 
+export default function AgentConfiguration({
+  formData,
+  updateFormData,
+  onNext,
+  onBack,
+  preview = false,
 }: AgentConfigurationProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -56,10 +70,7 @@ export default function AgentConfiguration({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>AI Model</FormLabel>
-                <Select 
-                  onValueChange={field.onChange} 
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select an AI model" />
@@ -72,13 +83,14 @@ export default function AgentConfiguration({
                   </SelectContent>
                 </Select>
                 <FormDescription>
-                  Select the AI model that will power your agent. Different models have different capabilities and costs.
+                  Select the AI model that will power your agent. Different models have different
+                  capabilities and costs.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="temperature"
@@ -95,13 +107,14 @@ export default function AgentConfiguration({
                   />
                 </FormControl>
                 <FormDescription>
-                  Controls randomness: 0 is focused and deterministic, 1 is more creative and random.
+                  Controls randomness: 0 is focused and deterministic, 1 is more creative and
+                  random.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="maxTokens"
@@ -124,17 +137,14 @@ export default function AgentConfiguration({
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="responseStyle"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Response Style</FormLabel>
-                <Select 
-                  onValueChange={field.onChange} 
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a response style" />
@@ -148,15 +158,13 @@ export default function AgentConfiguration({
                     <SelectItem value="technical">Technical</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormDescription>
-                  Choose the tone of your AI agent's responses.
-                </FormDescription>
+                <FormDescription>Choose the tone of your AI agent's responses.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        
+
         <div className="flex justify-between mt-6">
           <Button type="button" variant="outline" onClick={onBack} disabled={preview}>
             Back

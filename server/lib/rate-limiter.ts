@@ -3,30 +3,32 @@ import { MemoryCache } from './cache';
 import { logger } from '../api/logs';
 
 interface RateLimitOptions {
-  windowMs: number;      // Time window in milliseconds
-  maxRequests: number;   // Maximum number of requests allowed in the time window
-  message?: string;      // Message to return when rate limit is exceeded
-  statusCode?: number;   // Status code to return when rate limit is exceeded
+  windowMs: number; // Time window in milliseconds
+  maxRequests: number; // Maximum number of requests allowed in the time window
+  message?: string; // Message to return when rate limit is exceeded
+  statusCode?: number; // Status code to return when rate limit is exceeded
   keyGenerator?: (req: Request) => string; // Function to generate a unique key for the request
-  skip?: (req: Request) => boolean;        // Function to skip rate limiting for certain requests
-  headers?: boolean;     // Whether to include rate limit info in response headers
+  skip?: (req: Request) => boolean; // Function to skip rate limiting for certain requests
+  headers?: boolean; // Whether to include rate limit info in response headers
 }
 
 // Default options
 const defaultOptions: RateLimitOptions = {
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 60,     // 60 requests per minute
+  maxRequests: 60, // 60 requests per minute
   message: 'Too many requests, please try again later',
-  statusCode: 429,     // Too Many Requests
+  statusCode: 429, // Too Many Requests
   keyGenerator: (req) => {
     // Default: IP address
-    return req.ip || 
-           req.connection.remoteAddress || 
-           req.headers['x-forwarded-for'] as string || 
-           'unknown';
+    return (
+      req.ip ||
+      req.connection.remoteAddress ||
+      (req.headers['x-forwarded-for'] as string) ||
+      'unknown'
+    );
   },
-  skip: () => false,   // Don't skip any requests by default
-  headers: true,       // Include headers by default
+  skip: () => false, // Don't skip any requests by default
+  headers: true, // Include headers by default
 };
 
 // Cache to store rate limit info
@@ -43,22 +45,22 @@ export function rateLimiter(options: Partial<RateLimitOptions> = {}) {
     ...defaultOptions,
     ...options,
   };
-  
+
   return (req: Request, res: Response, next: NextFunction) => {
     // Skip rate limiting if specified
     if (opts.skip && opts.skip(req)) {
       return next();
     }
-    
+
     // Generate key for this request
     const key = opts.keyGenerator!(req);
-    
+
     // Get current time
     const now = Date.now();
-    
+
     // Get or create rate limit info for this key
     let rateInfo = cache.get(key);
-    
+
     if (!rateInfo) {
       // Create new rate limit info
       rateInfo = {
@@ -66,30 +68,30 @@ export function rateLimiter(options: Partial<RateLimitOptions> = {}) {
         resetTime: now + opts.windowMs,
       };
     }
-    
+
     // If the time window has passed, reset the counter
     if (now > rateInfo.resetTime) {
       rateInfo.count = 0;
       rateInfo.resetTime = now + opts.windowMs;
     }
-    
+
     // Increment the counter
     rateInfo.count++;
-    
+
     // Store the updated rate limit info
     cache.set(key, rateInfo, opts.windowMs);
-    
+
     // Calculate remaining requests and reset time
     const remaining = Math.max(0, opts.maxRequests - rateInfo.count);
     const resetTime = rateInfo.resetTime;
-    
+
     // Add rate limit headers if enabled
     if (opts.headers) {
       res.setHeader('X-RateLimit-Limit', opts.maxRequests.toString());
       res.setHeader('X-RateLimit-Remaining', remaining.toString());
       res.setHeader('X-RateLimit-Reset', Math.ceil(resetTime / 1000).toString());
     }
-    
+
     // If rate limit is exceeded, return error
     if (rateInfo.count > opts.maxRequests) {
       // Log rate limit exceeded
@@ -101,17 +103,17 @@ export function rateLimiter(options: Partial<RateLimitOptions> = {}) {
         limit: opts.maxRequests,
         window: opts.windowMs,
       });
-      
+
       // Set retry-after header
       res.setHeader('Retry-After', Math.ceil((resetTime - now) / 1000).toString());
-      
+
       // Return error
       return res.status(opts.statusCode!).json({
         error: opts.message,
         retryAfter: Math.ceil((resetTime - now) / 1000),
       });
     }
-    
+
     // If rate limit is not exceeded, continue
     next();
   };
@@ -127,7 +129,7 @@ export function rateLimiter(options: Partial<RateLimitOptions> = {}) {
 export function adaptiveRateLimiter(
   authMaxRequests = 120,
   unauthMaxRequests = 30,
-  windowMs = 60 * 1000
+  windowMs = 60 * 1000,
 ) {
   return rateLimiter({
     windowMs,
@@ -135,33 +137,36 @@ export function adaptiveRateLimiter(
     keyGenerator: (req) => {
       // Use user ID if authenticated, IP address otherwise
       const userId = req.user?.id;
-      const ip = req.ip || 
-                req.connection.remoteAddress || 
-                req.headers['x-forwarded-for'] as string || 
-                'unknown';
-      
+      const ip =
+        req.ip ||
+        req.connection.remoteAddress ||
+        (req.headers['x-forwarded-for'] as string) ||
+        'unknown';
+
       return userId ? `user:${userId}` : `ip:${ip}`;
     },
     headers: true,
     message: 'Rate limit exceeded. Please slow down your requests.',
-    
+
     // Override maxRequests based on authentication status
     skip: (req) => {
       // Don't skip, but adjust the limit
       if (!req.user) {
         // For unauthenticated requests, update the cache to use a lower limit
-        const key = `ip:${req.ip || 
-                          req.connection.remoteAddress || 
-                          req.headers['x-forwarded-for'] as string || 
-                          'unknown'}`;
-        
+        const key = `ip:${
+          req.ip ||
+          req.connection.remoteAddress ||
+          (req.headers['x-forwarded-for'] as string) ||
+          'unknown'
+        }`;
+
         // Store the lower limit for this key
         // This is a bit of a hack, but it works because we know the cache implementation
         // @ts-ignore
         req.rateLimit = { maxRequests: unauthMaxRequests };
       }
-      
+
       return false;
     },
   });
-} 
+}

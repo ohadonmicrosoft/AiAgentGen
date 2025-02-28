@@ -31,9 +31,7 @@ describe('Authentication API', () => {
     });
 
     it('should return 400 if password is missing', async () => {
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send({ username: 'testuser' });
+      const response = await request(app).post('/api/auth/register').send({ username: 'testuser' });
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty('error');
@@ -58,7 +56,7 @@ describe('Authentication API', () => {
     it('should register a new user successfully', async () => {
       // Mock that the user doesn't exist yet
       (storage.getUserByUsername as jest.Mock).mockResolvedValue(null);
-      
+
       // Mock successful user creation
       (storage.createUser as jest.Mock).mockResolvedValue({
         id: 2,
@@ -75,7 +73,7 @@ describe('Authentication API', () => {
       expect(response.body).toHaveProperty('username', 'newuser');
       expect(response.body).toHaveProperty('role', 'creator');
       expect(response.body).not.toHaveProperty('password');
-      
+
       expect(storage.getUserByUsername).toHaveBeenCalledWith('newuser');
       expect(storage.createUser).toHaveBeenCalledWith({
         username: 'newuser',
@@ -87,9 +85,7 @@ describe('Authentication API', () => {
 
   describe('POST /api/auth/login', () => {
     it('should return 400 if credentials are missing', async () => {
-      const response = await request(app)
-        .post('/api/auth/login')
-        .send({});
+      const response = await request(app).post('/api/auth/login').send({});
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty('error');
@@ -97,4 +93,4 @@ describe('Authentication API', () => {
 
     // Add more login tests as needed
   });
-}); 
+});

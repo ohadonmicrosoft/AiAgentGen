@@ -1,6 +1,6 @@
 /**
  * Drag and Drop Utilities
- * 
+ *
  * This module provides utilities to implement smooth and animated
  * drag and drop functionality throughout the application.
  */
@@ -13,7 +13,7 @@ export const DRAG_TRANSITION = {
   type: 'spring',
   damping: 35,
   stiffness: 400,
-  mass: 0.5
+  mass: 0.5,
 };
 
 export const ANIMATION_DURATION = 0.4;
@@ -25,7 +25,7 @@ export const SCALE_WHILE_DRAGGING = 1.04;
 export function getPositionDelta(currentPosition: Position, originalPosition: Position): Position {
   return {
     x: currentPosition.x - originalPosition.x,
-    y: currentPosition.y - originalPosition.y
+    y: currentPosition.y - originalPosition.y,
   };
 }
 
@@ -35,12 +35,12 @@ export function getPositionDelta(currentPosition: Position, originalPosition: Po
 export function createDragConstraints(
   containerRef: React.RefObject<HTMLElement>,
   elementWidth: number,
-  elementHeight: number
+  elementHeight: number,
 ): { top: number; right: number; bottom: number; left: number } | false {
   if (!containerRef.current) return false;
-  
+
   const container = containerRef.current.getBoundingClientRect();
-  
+
   return {
     left: 0,
     right: Math.max(0, container.width - elementWidth),
@@ -67,14 +67,14 @@ export function isOverlapping(draggedElem: DOMRect, dropTargetElem: DOMRect): bo
 export function getOverlapArea(rect1: DOMRect, rect2: DOMRect): number {
   const xOverlap = Math.max(
     0,
-    Math.min(rect1.right, rect2.right) - Math.max(rect1.left, rect2.left)
+    Math.min(rect1.right, rect2.right) - Math.max(rect1.left, rect2.left),
   );
-  
+
   const yOverlap = Math.max(
     0,
-    Math.min(rect1.bottom, rect2.bottom) - Math.max(rect1.top, rect2.top)
+    Math.min(rect1.bottom, rect2.bottom) - Math.max(rect1.top, rect2.top),
   );
-  
+
   return xOverlap * yOverlap;
 }
 
@@ -83,22 +83,22 @@ export function getOverlapArea(rect1: DOMRect, rect2: DOMRect): number {
  */
 export function findBestDropTarget(
   draggedRect: DOMRect,
-  dropTargets: { id: string; rect: DOMRect }[]
+  dropTargets: { id: string; rect: DOMRect }[],
 ): string | null {
   let bestTarget = null;
   let maxOverlap = 0;
-  
+
   for (const target of dropTargets) {
     if (isOverlapping(draggedRect, target.rect)) {
       const overlapArea = getOverlapArea(draggedRect, target.rect);
-      
+
       if (overlapArea > maxOverlap) {
         maxOverlap = overlapArea;
         bestTarget = target.id;
       }
     }
   }
-  
+
   return bestTarget;
 }
 
@@ -108,10 +108,10 @@ export function findBestDropTarget(
 export function updateDragAnimation(
   controls: AnimationControls,
   isDragging: boolean,
-  disableAnimation = false
+  disableAnimation = false,
 ): void {
   if (disableAnimation) return;
-  
+
   if (isDragging) {
     controls.start({
       scale: SCALE_WHILE_DRAGGING,
@@ -130,14 +130,10 @@ export function updateDragAnimation(
 /**
  * Generate drag ghost element (visible while dragging)
  */
-export function createDragGhost(
-  element: HTMLElement,
-  offsetX = 20,
-  offsetY = 20
-): HTMLElement {
+export function createDragGhost(element: HTMLElement, offsetX = 20, offsetY = 20): HTMLElement {
   const rect = element.getBoundingClientRect();
   const ghost = element.cloneNode(true) as HTMLElement;
-  
+
   // Style the ghost element
   Object.assign(ghost.style, {
     position: 'fixed',
@@ -152,14 +148,14 @@ export function createDragGhost(
     transform: 'scale(0.95)',
     boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
   });
-  
+
   document.body.appendChild(ghost);
-  
+
   // Apply a slight "pop" effect
   requestAnimationFrame(() => {
     ghost.style.transform = 'scale(1.02)';
   });
-  
+
   return ghost;
 }
 
@@ -169,7 +165,7 @@ export function createDragGhost(
 export function removeDragGhost(ghost: HTMLElement): void {
   ghost.style.transform = 'scale(0.9)';
   ghost.style.opacity = '0';
-  
+
   setTimeout(() => {
     if (ghost.parentNode) {
       ghost.parentNode.removeChild(ghost);
@@ -180,15 +176,11 @@ export function removeDragGhost(ghost: HTMLElement): void {
 /**
  * Reorder an array after drag and drop
  */
-export function reorderItems<T>(
-  list: T[],
-  startIndex: number,
-  endIndex: number
-): T[] {
+export function reorderItems<T>(list: T[], startIndex: number, endIndex: number): T[] {
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
-  
+
   return result;
 }
 
@@ -199,14 +191,14 @@ export function moveItemBetweenLists<T>(
   sourceList: T[],
   destinationList: T[],
   sourceIndex: number,
-  destinationIndex: number
-): { sourceList: T[], destinationList: T[] } {
+  destinationIndex: number,
+): { sourceList: T[]; destinationList: T[] } {
   const sourceCopy = Array.from(sourceList);
   const destCopy = Array.from(destinationList);
   const [removed] = sourceCopy.splice(sourceIndex, 1);
-  
+
   destCopy.splice(destinationIndex, 0, removed);
-  
+
   return {
     sourceList: sourceCopy,
     destinationList: destCopy,
@@ -216,7 +208,9 @@ export function moveItemBetweenLists<T>(
 /**
  * Get cursor position from drag event
  */
-export function getCursorPosition(event: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent): Position {
+export function getCursorPosition(
+  event: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent,
+): Position {
   // Touch event
   if ('touches' in event) {
     return {
@@ -224,7 +218,7 @@ export function getCursorPosition(event: MouseEvent | TouchEvent | React.MouseEv
       y: event.touches[0].clientY,
     };
   }
-  
+
   // Mouse event
   return {
     x: event.clientX,
@@ -238,7 +232,7 @@ export function getCursorPosition(event: MouseEvent | TouchEvent | React.MouseEv
 export function isCursorOutOfBounds(
   cursorPos: Position,
   elementRect: DOMRect,
-  threshold = 0
+  threshold = 0,
 ): boolean {
   return (
     cursorPos.x < elementRect.left - threshold ||
@@ -246,4 +240,4 @@ export function isCursorOutOfBounds(
     cursorPos.y < elementRect.top - threshold ||
     cursorPos.y > elementRect.bottom + threshold
   );
-} 
+}

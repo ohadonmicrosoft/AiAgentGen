@@ -8,14 +8,11 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testPathIgnorePatterns: ['/node_modules/', '/client/'],
-  collectCoverageFrom: [
-    'server/**/*.{js,ts}',
-    '!server/**/*.d.ts',
-  ],
+  collectCoverageFrom: ['server/**/*.{js,ts}', '!server/**/*.d.ts'],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'clover'],
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-}; 
+};

@@ -40,22 +40,18 @@ export function useErrorBoundary(): UseErrorBoundaryResult {
       error,
       errorInfo,
     });
-    
+
     // Log the error
     console.error('Error caught by useErrorBoundary:', error, errorInfo);
   }, []);
 
   const ErrorBoundaryWrapper: React.FC<{ children: ReactNode; fallback?: ReactNode }> = useCallback(
     ({ children, fallback }) => (
-      <ErrorBoundary 
-        fallback={fallback} 
-        onReset={resetBoundary}
-        onError={handleError}
-      >
+      <ErrorBoundary fallback={fallback} onReset={resetBoundary} onError={handleError}>
         {children}
       </ErrorBoundary>
     ),
-    [resetBoundary, handleError]
+    [resetBoundary, handleError],
   );
 
   return {
@@ -69,11 +65,11 @@ export function useErrorBoundary(): UseErrorBoundaryResult {
 
 /**
  * Example usage:
- * 
+ *
  * ```tsx
  * function MyComponent() {
  *   const { ErrorBoundaryWrapper, hasError, resetBoundary } = useErrorBoundary();
- *   
+ *
  *   return (
  *     <ErrorBoundaryWrapper>
  *       <ComponentThatMightThrow />
@@ -81,4 +77,4 @@ export function useErrorBoundary(): UseErrorBoundaryResult {
  *   );
  * }
  * ```
- */ 
+ */

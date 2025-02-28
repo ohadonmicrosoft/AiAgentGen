@@ -1,22 +1,49 @@
-import React, { useState } from "react";
-import MainLayout from "@/layouts/MainLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
-import { Loader2, User, Shield } from "lucide-react";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
-import { Redirect } from "wouter";
-import { ROLES, PERMISSIONS, Permission, Role } from "@shared/schema";
+import React, { useState } from 'react';
+import MainLayout from '@/layouts/MainLayout';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { getQueryFn, apiRequest, queryClient } from '@/lib/queryClient';
+import { Loader2, User, Shield } from 'lucide-react';
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
+import { Redirect } from 'wouter';
+import { ROLES, PERMISSIONS, Permission, Role } from '@shared/schema';
 
 // Form schema for user role update
 const userRoleUpdateSchema = z.object({
@@ -50,61 +77,53 @@ export default function AdminUsersPage() {
     isLoading,
     error,
   } = useQuery<ApiUser[]>({
-    queryKey: ["/api/admin/users"],
-    queryFn: getQueryFn({ on401: "throw" }),
+    queryKey: ['/api/admin/users'],
+    queryFn: getQueryFn({ on401: 'throw' }),
   });
 
   // Fetch roles
-  const {
-    data: roles,
-    isLoading: rolesLoading,
-  } = useQuery<string[]>({
-    queryKey: ["/api/admin/roles"],
-    queryFn: getQueryFn({ on401: "throw" }),
+  const { data: roles, isLoading: rolesLoading } = useQuery<string[]>({
+    queryKey: ['/api/admin/roles'],
+    queryFn: getQueryFn({ on401: 'throw' }),
   });
 
   // Fetch permissions
-  const {
-    data: permissions,
-    isLoading: permissionsLoading,
-  } = useQuery<string[]>({
-    queryKey: ["/api/admin/permissions"],
-    queryFn: getQueryFn({ on401: "throw" }),
+  const { data: permissions, isLoading: permissionsLoading } = useQuery<string[]>({
+    queryKey: ['/api/admin/permissions'],
+    queryFn: getQueryFn({ on401: 'throw' }),
   });
 
   // Update user role mutation
   const updateRoleMutation = useMutation({
     mutationFn: async (data: UserRoleFormValues) => {
-      const res = await apiRequest(
-        "PUT",
-        `/api/admin/users/${data.userId}/role`,
-        { role: data.role }
-      );
+      const res = await apiRequest('PUT', `/api/admin/users/${data.userId}/role`, {
+        role: data.role,
+      });
       return await res.json();
     },
     onSuccess: () => {
       toast({
-        title: "Role updated",
-        description: "User role has been updated successfully",
+        title: 'Role updated',
+        description: 'User role has been updated successfully',
       });
       setIsRoleDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to update role",
+        title: 'Failed to update role',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
 
-  // Role update form 
+  // Role update form
   const form = useForm<UserRoleFormValues>({
     resolver: zodResolver(userRoleUpdateSchema),
     defaultValues: {
       userId: -1,
-      role: "",
+      role: '',
     },
   });
 
@@ -142,7 +161,10 @@ export default function AdminUsersPage() {
         <div className="flex flex-col items-center justify-center h-64">
           <h2 className="text-xl font-semibold mb-2">Error</h2>
           <p className="text-muted-foreground">Could not load users. Please try again.</p>
-          <Button className="mt-4" onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] })}>
+          <Button
+            className="mt-4"
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] })}
+          >
             Retry
           </Button>
         </div>
@@ -183,19 +205,24 @@ export default function AdminUsersPage() {
                   users.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.username}</TableCell>
-                      <TableCell>{user.email || "-"}</TableCell>
+                      <TableCell>{user.email || '-'}</TableCell>
                       <TableCell>
-                        <Badge 
-                          variant={user.role === ROLES.ADMIN ? "default" : 
-                                 user.role === ROLES.MANAGER ? "outline" : "secondary"}
+                        <Badge
+                          variant={
+                            user.role === ROLES.ADMIN
+                              ? 'default'
+                              : user.role === ROLES.MANAGER
+                                ? 'outline'
+                                : 'secondary'
+                          }
                         >
                           {user.role}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
+                        <Button
+                          variant="outline"
+                          size="sm"
                           className="flex items-center gap-1"
                           onClick={() => onOpenRoleDialog(user)}
                           disabled={user.id === user?.id} // Prevent changing own role
@@ -225,19 +252,19 @@ export default function AdminUsersPage() {
           <DialogHeader>
             <DialogTitle>Manage User Role</DialogTitle>
           </DialogHeader>
-          
+
           {selectedUser && (
             <div className="mb-4">
               <p>
                 <span className="font-semibold">Username:</span> {selectedUser.username}
               </p>
               <p>
-                <span className="font-semibold">Current Role:</span>{" "}
+                <span className="font-semibold">Current Role:</span>{' '}
                 <Badge variant="outline">{selectedUser.role}</Badge>
               </p>
             </div>
           )}
-          
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmitRoleForm)} className="space-y-4">
               <FormField
@@ -246,7 +273,7 @@ export default function AdminUsersPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Role</FormLabel>
-                    <Select 
+                    <Select
                       disabled={updateRoleMutation.isPending || rolesLoading}
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -257,38 +284,36 @@ export default function AdminUsersPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {roles && roles.map((role) => (
-                          <SelectItem key={role} value={role}>
-                            {role}
-                          </SelectItem>
-                        ))}
+                        {roles &&
+                          roles.map((role) => (
+                            <SelectItem key={role} value={role}>
+                              {role}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <DialogFooter>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => setIsRoleDialogOpen(false)}
                   disabled={updateRoleMutation.isPending}
                 >
                   Cancel
                 </Button>
-                <Button 
-                  type="submit"
-                  disabled={updateRoleMutation.isPending}
-                >
+                <Button type="submit" disabled={updateRoleMutation.isPending}>
                   {updateRoleMutation.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Updating...
                     </>
                   ) : (
-                    "Save Changes"
+                    'Save Changes'
                   )}
                 </Button>
               </DialogFooter>

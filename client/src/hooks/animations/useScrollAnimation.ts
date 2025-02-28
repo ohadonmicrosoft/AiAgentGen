@@ -12,14 +12,10 @@ interface ScrollAnimationOptions {
  * Used to trigger animations when elements scroll into view
  */
 export function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
-  options: ScrollAnimationOptions = {}
+  options: ScrollAnimationOptions = {},
 ): [RefObject<T>, boolean] {
-  const { 
-    threshold = 0.1,
-    rootMargin = '0px',
-    triggerOnce = true 
-  } = options;
-  
+  const { threshold = 0.1, rootMargin = '0px', triggerOnce = true } = options;
+
   const ref = useRef<T>(null);
   const [isVisible, setIsVisible] = useState(false);
   const prefersReducedMotion = useReducedMotion();
@@ -30,7 +26,7 @@ export function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
       setIsVisible(true);
       return;
     }
-    
+
     const element = ref.current;
     if (!element) return;
 
@@ -47,7 +43,7 @@ export function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
           setIsVisible(false);
         }
       },
-      { threshold, rootMargin }
+      { threshold, rootMargin },
     );
 
     observer.observe(element);
@@ -65,18 +61,16 @@ export function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
  */
 export function useScrollAnimationVariants() {
   const prefersReducedMotion = useReducedMotion();
-  
+
   return {
-    hidden: prefersReducedMotion 
-      ? { opacity: 1, y: 0 } 
-      : { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    hidden: prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         duration: prefersReducedMotion ? 0 : 0.5,
-        ease: [0.25, 0.1, 0.25, 1.0]
-      }
-    }
+        ease: [0.25, 0.1, 0.25, 1.0],
+      },
+    },
   };
-} 
+}

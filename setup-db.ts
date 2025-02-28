@@ -12,7 +12,7 @@ async function main() {
     const client = postgres(process.env.DATABASE_URL);
 
     console.log('Creating tables from schema...');
-    
+
     // Create users table
     await client`
       CREATE TABLE IF NOT EXISTS users (
@@ -81,14 +81,14 @@ async function main() {
       )
     `;
     console.log('✓ Sessions table created');
-    
+
     await client`
       CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire")
     `;
     console.log('✓ Sessions index created');
 
     console.log('Database setup completed successfully!');
-    
+
     await client.end();
     process.exit(0);
   } catch (error) {

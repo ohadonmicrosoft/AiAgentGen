@@ -1,10 +1,12 @@
 import { isOnline, submitForm, getPendingForms, syncOfflineForms } from '../offline-forms';
 
 // Mock fetch
-global.fetch = jest.fn(() => Promise.resolve({
-  ok: true,
-  json: () => Promise.resolve({ success: true }),
-})) as jest.Mock;
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({ success: true }),
+  }),
+) as jest.Mock;
 
 // Mock navigator.onLine
 Object.defineProperty(navigator, 'onLine', {
@@ -73,7 +75,7 @@ global.navigator.serviceWorker = {
 describe('Offline Forms Utility', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Reset mock implementations
     mockIDBDatabase.transaction.mockReturnValue(mockIDBTransaction);
     mockIDBObjectStore.add.mockImplementation((data) => {
@@ -84,7 +86,7 @@ describe('Offline Forms Utility', () => {
       }, 0);
       return mockRequestSuccess;
     });
-    
+
     mockIDBObjectStore.getAll.mockImplementation(() => {
       setTimeout(() => {
         if (mockRequestSuccess.onsuccess) {
@@ -94,7 +96,7 @@ describe('Offline Forms Utility', () => {
       }, 0);
       return mockRequestSuccess;
     });
-    
+
     mockIDBObjectStore.delete.mockImplementation((id) => {
       setTimeout(() => {
         if (mockRequestSuccess.onsuccess) {
@@ -103,13 +105,13 @@ describe('Offline Forms Utility', () => {
       }, 0);
       return mockRequestSuccess;
     });
-    
+
     // Reset online status
     Object.defineProperty(navigator, 'onLine', {
       configurable: true,
       value: true,
     });
-    
+
     // Reset fetch mock
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
@@ -123,7 +125,7 @@ describe('Offline Forms Utility', () => {
         configurable: true,
         value: true,
       });
-      
+
       expect(isOnline()).toBe(true);
     });
 
@@ -132,7 +134,7 @@ describe('Offline Forms Utility', () => {
         configurable: true,
         value: false,
       });
-      
+
       expect(isOnline()).toBe(false);
     });
   });
@@ -144,14 +146,17 @@ describe('Offline Forms Utility', () => {
         method: 'POST' as const,
         data: { name: 'Test' },
       };
-      
+
       const result = await submitForm(formData);
-      
-      expect(fetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ name: 'Test' }),
-      }));
-      
+
+      expect(fetch).toHaveBeenCalledWith(
+        '/api/test',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ name: 'Test' }),
+        }),
+      );
+
       expect(result).toEqual({ success: true });
     });
 
@@ -161,7 +166,7 @@ describe('Offline Forms Utility', () => {
         configurable: true,
         value: false,
       });
-      
+
       // Setup mock for getting pending forms
       mockIDBObjectStore.getAll.mockImplementation(() => {
         setTimeout(() => {
@@ -172,21 +177,21 @@ describe('Offline Forms Utility', () => {
         }, 0);
         return mockRequestSuccess;
       });
-      
+
       const formData = {
         url: '/api/test',
         method: 'POST' as const,
         data: { name: 'Test' },
       };
-      
+
       const result = await submitForm(formData);
-      
+
       // Verify fetch was not called
       expect(fetch).not.toHaveBeenCalled();
-      
+
       // Verify form was saved for later
       expect(mockIDBObjectStore.add).toHaveBeenCalled();
-      
+
       // Verify correct result format
       expect(result).toHaveProperty('_offlineSubmitted', true);
       expect(result).toHaveProperty('_formId');
@@ -195,18 +200,18 @@ describe('Offline Forms Utility', () => {
     it('saves form data for later when fetch fails with network error', async () => {
       // Mock fetch failing
       (global.fetch as jest.Mock).mockRejectedValue(new TypeError('Failed to fetch'));
-      
+
       const formData = {
         url: '/api/test',
         method: 'POST' as const,
         data: { name: 'Test' },
       };
-      
+
       const result = await submitForm(formData);
-      
+
       // Verify form was saved for later
       expect(mockIDBObjectStore.add).toHaveBeenCalled();
-      
+
       // Verify correct result format
       expect(result).toHaveProperty('_offlineSubmitted', true);
       expect(result).toHaveProperty('_formId');
@@ -225,9 +230,9 @@ describe('Offline Forms Utility', () => {
         }, 0);
         return mockRequestSuccess;
       });
-      
+
       const result = await getPendingForms();
-      
+
       expect(result).toEqual([]);
       expect(mockIDBObjectStore.getAll).toHaveBeenCalled();
     });
@@ -235,9 +240,17 @@ describe('Offline Forms Utility', () => {
     it('returns pending forms if available', async () => {
       // Setup mock pending forms
       const pendingForms = [
-        { id: '1', url: '/api/test', method: 'POST', body: '{}', headers: {}, timestamp: Date.now(), retries: 0 },
+        {
+          id: '1',
+          url: '/api/test',
+          method: 'POST',
+          body: '{}',
+          headers: {},
+          timestamp: Date.now(),
+          retries: 0,
+        },
       ];
-      
+
       mockIDBObjectStore.getAll.mockImplementation(() => {
         setTimeout(() => {
           if (mockRequestSuccess.onsuccess) {
@@ -247,9 +260,9 @@ describe('Offline Forms Utility', () => {
         }, 0);
         return mockRequestSuccess;
       });
-      
+
       const result = await getPendingForms();
-      
+
       expect(result).toEqual(pendingForms);
     });
   });
@@ -266,9 +279,9 @@ describe('Offline Forms Utility', () => {
         }, 0);
         return mockRequestSuccess;
       });
-      
+
       const result = await syncOfflineForms();
-      
+
       expect(result).toEqual({ success: 0, failed: 0 });
       expect(fetch).not.toHaveBeenCalled();
     });
@@ -276,10 +289,26 @@ describe('Offline Forms Utility', () => {
     it('syncs pending forms and deletes successful ones', async () => {
       // Setup mock pending forms
       const pendingForms = [
-        { id: '1', url: '/api/test', method: 'POST', body: '{}', headers: {}, timestamp: Date.now(), retries: 0 },
-        { id: '2', url: '/api/test2', method: 'POST', body: '{}', headers: {}, timestamp: Date.now(), retries: 0 },
+        {
+          id: '1',
+          url: '/api/test',
+          method: 'POST',
+          body: '{}',
+          headers: {},
+          timestamp: Date.now(),
+          retries: 0,
+        },
+        {
+          id: '2',
+          url: '/api/test2',
+          method: 'POST',
+          body: '{}',
+          headers: {},
+          timestamp: Date.now(),
+          retries: 0,
+        },
       ];
-      
+
       mockIDBObjectStore.getAll.mockImplementation(() => {
         setTimeout(() => {
           if (mockRequestSuccess.onsuccess) {
@@ -289,23 +318,23 @@ describe('Offline Forms Utility', () => {
         }, 0);
         return mockRequestSuccess;
       });
-      
+
       // First request succeeds, second fails
       (global.fetch as jest.Mock)
-        .mockResolvedValueOnce({ ok: true })  // First will succeed
+        .mockResolvedValueOnce({ ok: true }) // First will succeed
         .mockResolvedValueOnce({ ok: false }); // Second will fail
-      
+
       const result = await syncOfflineForms();
-      
+
       // Should have tried to sync both forms
       expect(fetch).toHaveBeenCalledTimes(2);
-      
+
       // Should have tried to delete only the successful form
       expect(mockIDBObjectStore.delete).toHaveBeenCalledWith('1');
       expect(mockIDBObjectStore.delete).not.toHaveBeenCalledWith('2');
-      
+
       // Should report the sync results
       expect(result).toEqual({ success: 1, failed: 1 });
     });
   });
-}); 
+});

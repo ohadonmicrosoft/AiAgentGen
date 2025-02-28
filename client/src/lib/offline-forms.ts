@@ -36,20 +36,20 @@ export function isOnline(): boolean {
 async function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('offline-storage', 1);
-    
+
     request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
       const db = (event.target as IDBOpenDBRequest).result;
-      
+
       // Create object stores if they don't exist
       if (!db.objectStoreNames.contains('offline-forms')) {
         db.createObjectStore('offline-forms', { keyPath: 'id' });
       }
     };
-    
+
     request.onsuccess = (event: Event) => {
       resolve((event.target as IDBOpenDBRequest).result);
     };
-    
+
     request.onerror = (event: Event) => {
       reject((event.target as IDBOpenDBRequest).error);
     };
@@ -64,14 +64,14 @@ async function saveFormForLater(formData: OfflineFormData): Promise<void> {
     const db = await openDatabase();
     const tx = db.transaction('offline-forms', 'readwrite');
     const store = tx.objectStore('offline-forms');
-    
+
     await new Promise<void>((resolve, reject) => {
       const request = store.add(formData);
-      
+
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
-    
+
     // Request a sync when back online if supported
     if ('serviceWorker' in navigator && 'SyncManager' in window) {
       const registration = await navigator.serviceWorker.ready;
@@ -90,18 +90,18 @@ async function saveFormForLater(formData: OfflineFormData): Promise<void> {
  */
 export async function submitForm<T = any>(options: SubmitFormOptions): Promise<T> {
   const { url, method, data, headers = {} } = options;
-  
+
   // Default headers
   const defaultHeaders = {
     'Content-Type': 'application/json',
   };
-  
+
   // Combine headers
   const combinedHeaders = {
     ...defaultHeaders,
     ...headers,
   };
-  
+
   // Prepare the form data
   const formData: OfflineFormData = {
     id: uuidv4(),
@@ -112,7 +112,7 @@ export async function submitForm<T = any>(options: SubmitFormOptions): Promise<T
     timestamp: Date.now(),
     retries: 0,
   };
-  
+
   // If online, try to submit normally
   if (isOnline()) {
     try {
@@ -122,33 +122,33 @@ export async function submitForm<T = any>(options: SubmitFormOptions): Promise<T
         body: JSON.stringify(data),
         credentials: 'include',
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
       }
-      
+
       return await response.json();
     } catch (error) {
       // If fetch fails due to network issues, save for later
       if (error instanceof TypeError || !isOnline()) {
         await saveFormForLater(formData);
-        return { 
-          _offlineSubmitted: true, 
+        return {
+          _offlineSubmitted: true,
           _formId: formData.id,
-          message: 'Form saved for submission when online'
+          message: 'Form saved for submission when online',
         } as unknown as T;
       }
-      
+
       // Re-throw other errors
       throw error;
     }
   } else {
     // If offline, save for later
     await saveFormForLater(formData);
-    return { 
-      _offlineSubmitted: true, 
+    return {
+      _offlineSubmitted: true,
       _formId: formData.id,
-      message: 'Form saved for submission when online'
+      message: 'Form saved for submission when online',
     } as unknown as T;
   }
 }
@@ -161,10 +161,10 @@ export async function getPendingForms(): Promise<OfflineFormData[]> {
     const db = await openDatabase();
     const tx = db.transaction('offline-forms', 'readonly');
     const store = tx.objectStore('offline-forms');
-    
+
     return new Promise<OfflineFormData[]>((resolve, reject) => {
       const request = store.getAll();
-      
+
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -182,7 +182,7 @@ export async function syncOfflineForms(): Promise<{ success: number; failed: num
     const forms = await getPendingForms();
     let success = 0;
     let failed = 0;
-    
+
     for (const form of forms) {
       try {
         const response = await fetch(form.url, {
@@ -191,7 +191,7 @@ export async function syncOfflineForms(): Promise<{ success: number; failed: num
           body: form.body,
           credentials: 'include',
         });
-        
+
         if (response.ok) {
           // If successful, delete the form
           const db = await openDatabase();
@@ -206,7 +206,7 @@ export async function syncOfflineForms(): Promise<{ success: number; failed: num
         failed++;
       }
     }
-    
+
     return { success, failed };
   } catch (error) {
     console.error('Failed to sync offline forms:', error);
@@ -221,7 +221,7 @@ export function setupOfflineListeners(): void {
   // When coming back online, try to sync forms
   window.addEventListener('online', async () => {
     console.log('Back online, attempting to sync forms');
-    
+
     if ('serviceWorker' in navigator && 'SyncManager' in window) {
       const registration = await navigator.serviceWorker.ready;
       await registration.sync.register('sync-forms');
@@ -230,10 +230,10 @@ export function setupOfflineListeners(): void {
       await syncOfflineForms();
     }
   });
-  
+
   // When going offline, notify the user
   window.addEventListener('offline', () => {
     console.log('Offline mode activated');
     // You could show a notification here
   });
-} 
+}

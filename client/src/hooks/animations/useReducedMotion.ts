@@ -6,15 +6,15 @@ import { useEffect, useState, useMemo } from 'react';
  */
 export function isLowPowerDevice(): boolean {
   if (typeof window === 'undefined') return false;
-  
+
   // Check for hardware concurrency (CPU cores)
   const lowConcurrency = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
-  
+
   // Check for mobile devices
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
+    navigator.userAgent,
   );
-  
+
   // Check for battery status if available
   let isBatterySaving = false;
   if ('getBattery' in navigator) {
@@ -23,7 +23,7 @@ export function isLowPowerDevice(): boolean {
       isBatterySaving = battery.level <= 0.2 && !battery.charging;
     });
   }
-  
+
   // Consider it a low power device if it meets at least two conditions
   return (lowConcurrency && isMobile) || isBatterySaving;
 }
@@ -42,21 +42,21 @@ export function useReducedMotion(forceReduce?: boolean) {
   useEffect(() => {
     // Check if the browser supports matchMedia
     const mediaQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
-    
+
     // Set the initial value
     setPrefersReducedMotion(mediaQuery?.matches ?? false);
-    
+
     // Check for low power device
     setIsLowPower(isLowPowerDevice());
-    
+
     // Add listener for changes
     const handleChange = (event: MediaQueryListEvent) => {
       setPrefersReducedMotion(event.matches);
     };
-    
+
     // Add event listener
     mediaQuery?.addEventListener('change', handleChange);
-    
+
     // Clean up
     return () => {
       mediaQuery?.removeEventListener('change', handleChange);
@@ -77,16 +77,16 @@ export interface AnimationConfig {
     ease?: number[] | string;
     delay?: number;
   };
-  
+
   // Hover animation properties
   hover: Record<string, any>;
-  
+
   // Entrance animation properties
   entrance: Record<string, any>;
-  
+
   // Exit animation properties
   exit: Record<string, any>;
-  
+
   // Whether animations are enabled
   enabled: boolean;
 }
@@ -98,43 +98,43 @@ export interface AnimationConfig {
  */
 export function useAnimationConfig(customConfig?: Partial<AnimationConfig>): AnimationConfig {
   const prefersReducedMotion = useReducedMotion();
-  
+
   return useMemo(() => {
     // Base configuration with animations enabled
     const baseConfig: AnimationConfig = {
-      transition: { 
-        duration: 0.3, 
+      transition: {
+        duration: 0.3,
         ease: [0.25, 0.1, 0.25, 1.0],
-        delay: 0
+        delay: 0,
       },
-      hover: { 
+      hover: {
         scale: 1.02,
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       },
-      entrance: { 
-        opacity: [0, 1], 
+      entrance: {
+        opacity: [0, 1],
         y: [20, 0],
-        transition: { duration: 0.4, ease: "easeOut" }
+        transition: { duration: 0.4, ease: 'easeOut' },
       },
       exit: {
         opacity: [1, 0],
-        transition: { duration: 0.2, ease: "easeIn" }
+        transition: { duration: 0.2, ease: 'easeIn' },
       },
-      enabled: true
+      enabled: true,
     };
-    
+
     // If reduced motion is preferred, create an accessible version
     if (prefersReducedMotion) {
       return {
-        transition: { duration: 0.1, ease: "linear", delay: 0 },
+        transition: { duration: 0.1, ease: 'linear', delay: 0 },
         hover: {},
         entrance: { opacity: 1, y: 0 },
         exit: { opacity: 0 },
         enabled: false,
-        ...customConfig
+        ...customConfig,
       };
     }
-    
+
     // Return the base config with any custom overrides
     return { ...baseConfig, ...customConfig };
   }, [prefersReducedMotion, customConfig]);
@@ -146,75 +146,78 @@ export function useAnimationConfig(customConfig?: Partial<AnimationConfig>): Ani
  */
 export function useAnimationPresets() {
   const prefersReducedMotion = useReducedMotion();
-  
-  return useMemo(() => ({
-    // Fade in animation
-    fadeIn: prefersReducedMotion 
-      ? { opacity: 1 }
-      : { 
-          opacity: [0, 1], 
-          transition: { duration: 0.3, ease: "easeOut" } 
+
+  return useMemo(
+    () => ({
+      // Fade in animation
+      fadeIn: prefersReducedMotion
+        ? { opacity: 1 }
+        : {
+            opacity: [0, 1],
+            transition: { duration: 0.3, ease: 'easeOut' },
+          },
+
+      // Slide in from bottom
+      slideInBottom: prefersReducedMotion
+        ? { opacity: 1 }
+        : {
+            opacity: [0, 1],
+            y: [20, 0],
+            transition: { duration: 0.4, ease: 'easeOut' },
+          },
+
+      // Slide in from left
+      slideInLeft: prefersReducedMotion
+        ? { opacity: 1 }
+        : {
+            opacity: [0, 1],
+            x: [-20, 0],
+            transition: { duration: 0.4, ease: 'easeOut' },
+          },
+
+      // Slide in from right
+      slideInRight: prefersReducedMotion
+        ? { opacity: 1 }
+        : {
+            opacity: [0, 1],
+            x: [20, 0],
+            transition: { duration: 0.4, ease: 'easeOut' },
+          },
+
+      // Scale up animation
+      scaleUp: prefersReducedMotion
+        ? { opacity: 1 }
+        : {
+            opacity: [0, 1],
+            scale: [0.95, 1],
+            transition: { duration: 0.3, ease: 'easeOut' },
+          },
+
+      // Stagger children animations
+      stagger: (staggerChildren = 0.05, delayChildren = 0) => ({
+        transition: {
+          staggerChildren: prefersReducedMotion ? 0 : staggerChildren,
+          delayChildren: prefersReducedMotion ? 0 : delayChildren,
         },
-    
-    // Slide in from bottom
-    slideInBottom: prefersReducedMotion
-      ? { opacity: 1 }
-      : {
-          opacity: [0, 1],
-          y: [20, 0],
-          transition: { duration: 0.4, ease: "easeOut" }
-        },
-    
-    // Slide in from left
-    slideInLeft: prefersReducedMotion
-      ? { opacity: 1 }
-      : {
-          opacity: [0, 1],
-          x: [-20, 0],
-          transition: { duration: 0.4, ease: "easeOut" }
-        },
-    
-    // Slide in from right
-    slideInRight: prefersReducedMotion
-      ? { opacity: 1 }
-      : {
-          opacity: [0, 1],
-          x: [20, 0],
-          transition: { duration: 0.4, ease: "easeOut" }
-        },
-    
-    // Scale up animation
-    scaleUp: prefersReducedMotion
-      ? { opacity: 1 }
-      : {
-          opacity: [0, 1],
-          scale: [0.95, 1],
-          transition: { duration: 0.3, ease: "easeOut" }
-        },
-    
-    // Stagger children animations
-    stagger: (staggerChildren = 0.05, delayChildren = 0) => ({
-      transition: {
-        staggerChildren: prefersReducedMotion ? 0 : staggerChildren,
-        delayChildren: prefersReducedMotion ? 0 : delayChildren
-      }
+      }),
+
+      // Button hover animation
+      buttonHover: prefersReducedMotion
+        ? {}
+        : {
+            scale: 1.02,
+            transition: { duration: 0.2 },
+          },
+
+      // Card hover animation
+      cardHover: prefersReducedMotion
+        ? {}
+        : {
+            y: -5,
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+            transition: { duration: 0.2 },
+          },
     }),
-    
-    // Button hover animation
-    buttonHover: prefersReducedMotion
-      ? {}
-      : {
-          scale: 1.02,
-          transition: { duration: 0.2 }
-        },
-    
-    // Card hover animation
-    cardHover: prefersReducedMotion
-      ? {}
-      : {
-          y: -5,
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
-          transition: { duration: 0.2 }
-        }
-  }), [prefersReducedMotion]);
-} 
+    [prefersReducedMotion],
+  );
+}

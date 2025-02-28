@@ -1,32 +1,32 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-import * as schema from "../shared/schema";
-import { logger } from "./api/logs";
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import * as schema from '../shared/schema';
+import { logger } from './api/logs';
 
 // Create a mock for the postgres client
 class MockPostgresClient {
   // This method mimics the tagged template behavior of postgres
   async query(...args: any[]) {
-    logger.debug("[Mock DB] Query received:", { args });
+    logger.debug('[Mock DB] Query received:', { args });
     // Return an empty array for any query
     return [];
   }
-  
+
   // Mock the sql template literal tag function
   sql(strings: TemplateStringsArray, ...values: any[]) {
-    logger.debug("[Mock DB] SQL template:", { strings: strings.join(''), values });
+    logger.debug('[Mock DB] SQL template:', { strings: strings.join(''), values });
     return [];
   }
-  
+
   // Add mock for end method
   async end() {
-    logger.debug("[Mock DB] Connection pool ended");
+    logger.debug('[Mock DB] Connection pool ended');
     return true;
   }
-  
+
   // Make the mock callable like a template literal function
-  async (...args: any[]) {
-    logger.debug("[Mock DB] Template query:", { args });
+  async(...args: any[]) {
+    logger.debug('[Mock DB] Template query:', { args });
     return [];
   }
 }
@@ -44,42 +44,44 @@ let db: any;
  */
 async function initializeDatabase() {
   if (isDevelopmentTesting) {
-    logger.info("[DB] Using mock database for testing - no actual PostgreSQL connection will be made");
-    
+    logger.info(
+      '[DB] Using mock database for testing - no actual PostgreSQL connection will be made',
+    );
+
     // Create a mock postgres client
     pool = new MockPostgresClient();
-    
+
     // Create a mock drizzle instance
     db = {
       select: () => ({
         from: () => ({
           where: () => ({
             limit: () => Promise.resolve([]),
-            execute: () => Promise.resolve([])
+            execute: () => Promise.resolve([]),
           }),
-          execute: () => Promise.resolve([])
-        })
+          execute: () => Promise.resolve([]),
+        }),
       }),
       insert: () => ({
         values: () => ({
-          returning: () => Promise.resolve([])
-        })
+          returning: () => Promise.resolve([]),
+        }),
       }),
       update: () => ({
         set: () => ({
           where: () => ({
-            returning: () => Promise.resolve([])
-          })
-        })
+            returning: () => Promise.resolve([]),
+          }),
+        }),
       }),
       delete: () => ({
-        where: () => Promise.resolve()
+        where: () => Promise.resolve(),
       }),
       query: {
-        raw: () => Promise.resolve([])
-      }
+        raw: () => Promise.resolve([]),
+      },
     };
-    
+
     return { pool, db };
   } else {
     // Environment-based pool configuration
@@ -88,22 +90,22 @@ async function initializeDatabase() {
     const IDLE_TIMEOUT = isDevelopment ? 20 : 60; // seconds
     const MAX_RETRY_ATTEMPTS = 5;
     const RETRY_DELAY_MS = 2000;
-    
+
     let retryAttempt = 0;
     let lastError: Error | null = null;
-    
+
     while (retryAttempt < MAX_RETRY_ATTEMPTS) {
       try {
         // Create a real postgres connection pool with improved settings
         const newPool = postgres(process.env.DATABASE_URL!, {
           max: MAX_CONNECTIONS,
           idle_timeout: IDLE_TIMEOUT,
-          connect_timeout: 20,          // Increased connection timeout (20 seconds)
-          max_lifetime: 60 * 60,        // Connections live max 60 minutes
-          prepare: false,               // Disable prepared statements for simplicity
+          connect_timeout: 20, // Increased connection timeout (20 seconds)
+          max_lifetime: 60 * 60, // Connections live max 60 minutes
+          prepare: false, // Disable prepared statements for simplicity
           ssl: process.env.DATABASE_SSL === 'true',
           connection: {
-            application_name: "ai-agent-generator"
+            application_name: 'ai-agent-generator',
           },
           debug: isDevelopment,
           onnotice: (notice) => {
@@ -114,46 +116,53 @@ async function initializeDatabase() {
           },
           // Add retry logic for connection errors
           onretry: (err, attempts) => {
-            logger.warn(`Connection error, retrying (${attempts}/${MAX_CONNECTIONS * 2})`, { error: err.message });
+            logger.warn(`Connection error, retrying (${attempts}/${MAX_CONNECTIONS * 2})`, {
+              error: err.message,
+            });
             return true; // Continue retrying
           },
         });
-        
+
         // Test the connection
         await newPool`SELECT 1`;
-        
+
         // Connection successful, assign to pool and create drizzle instance
         pool = newPool;
         db = drizzle(pool, { schema });
-        
+
         logger.info('[DB] Database connection established successfully');
         return { pool, db };
       } catch (error: any) {
         lastError = error;
         retryAttempt++;
-        
-        logger.error(`[DB] Database connection attempt ${retryAttempt}/${MAX_RETRY_ATTEMPTS} failed`, { 
-          error: error.message,
-          code: error.code
-        });
-        
+
+        logger.error(
+          `[DB] Database connection attempt ${retryAttempt}/${MAX_RETRY_ATTEMPTS} failed`,
+          {
+            error: error.message,
+            code: error.code,
+          },
+        );
+
         if (retryAttempt < MAX_RETRY_ATTEMPTS) {
           logger.info(`[DB] Retrying in ${RETRY_DELAY_MS}ms...`);
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
         }
       }
     }
-    
+
     // All retry attempts failed
-    logger.error('[DB] Failed to establish database connection after multiple attempts', { lastError });
-    
+    logger.error('[DB] Failed to establish database connection after multiple attempts', {
+      lastError,
+    });
+
     // Fallback to mock in development, but throw in production
     if (isDevelopment) {
       logger.warn('[DB] Falling back to mock database since connection failed in development mode');
-      
+
       // Create a mock postgres client as fallback
       pool = new MockPostgresClient();
-      
+
       // Create a mock drizzle instance
       db = {
         // ... same mock implementation as above
@@ -161,31 +170,31 @@ async function initializeDatabase() {
           from: () => ({
             where: () => ({
               limit: () => Promise.resolve([]),
-              execute: () => Promise.resolve([])
+              execute: () => Promise.resolve([]),
             }),
-            execute: () => Promise.resolve([])
-          })
+            execute: () => Promise.resolve([]),
+          }),
         }),
         insert: () => ({
           values: () => ({
-            returning: () => Promise.resolve([])
-          })
+            returning: () => Promise.resolve([]),
+          }),
         }),
         update: () => ({
           set: () => ({
             where: () => ({
-              returning: () => Promise.resolve([])
-            })
-          })
+              returning: () => Promise.resolve([]),
+            }),
+          }),
         }),
         delete: () => ({
-          where: () => Promise.resolve()
+          where: () => Promise.resolve(),
         }),
         query: {
-          raw: () => Promise.resolve([])
-        }
+          raw: () => Promise.resolve([]),
+        },
       };
-      
+
       return { pool, db };
     } else {
       throw new Error('Failed to establish database connection in production environment');
@@ -198,13 +207,13 @@ initializeDatabase()
   .then(({ pool: p, db: d }) => {
     pool = p;
     db = d;
-    
+
     // Start health checks if using real database
     if (!isDevelopmentTesting && process.env.NODE_ENV === 'production') {
       startHealthCheck();
     }
   })
-  .catch(err => {
+  .catch((err) => {
     logger.error('Failed to initialize database', { error: err.message });
     // Don't exit process here as we have fallback mechanisms
   });
@@ -221,43 +230,45 @@ let failedHealthChecks = 0;
  */
 export function startHealthCheck(intervalMs = 30000): void {
   if (isDevelopmentTesting) {
-    logger.info("[DB] Health checks skipped in test mode");
+    logger.info('[DB] Health checks skipped in test mode');
     return;
   }
-  
+
   if (healthCheckInterval) {
     clearInterval(healthCheckInterval);
   }
-  
+
   healthCheckInterval = setInterval(async () => {
     try {
       // Simple query to test connection
       await pool`SELECT 1`;
-      
+
       // Reset counter on successful check
       if (failedHealthChecks > 0) {
-        logger.info(`Database connection recovered after ${failedHealthChecks} failed health checks`);
+        logger.info(
+          `Database connection recovered after ${failedHealthChecks} failed health checks`,
+        );
       }
       failedHealthChecks = 0; // Reset on success
       logger.debug('Database health check passed');
     } catch (error) {
       failedHealthChecks++;
-      logger.error('Database health check failed', { 
-        failedHealthChecks, 
-        error 
+      logger.error('Database health check failed', {
+        failedHealthChecks,
+        error,
       });
-      
+
       // If we have several consecutive failures, restart the connection pool
       if (failedHealthChecks >= 3) {
         logger.warn('Multiple database health check failures, attempting to reset pool');
         try {
           await pool.end({ timeout: 5 });
-          
+
           // Reinitialize the connection
           const { pool: newPool, db: newDb } = await initializeDatabase();
           pool = newPool;
           db = newDb;
-          
+
           logger.info('Database connection pool reset successfully');
           failedHealthChecks = 0;
         } catch (endError) {
@@ -266,7 +277,7 @@ export function startHealthCheck(intervalMs = 30000): void {
       }
     }
   }, intervalMs);
-  
+
   logger.info('Database health checks started', { intervalMs });
 }
 
@@ -293,13 +304,15 @@ if (!isDevelopmentTesting) {
 // Set up error handling for database-related errors
 process.on('uncaughtException', (err: Error) => {
   logger.error('Uncaught exception:', { error: err.message, stack: err.stack });
-  
+
   // If connection errors persist, try to recover rather than exiting
-  if (err.message.includes('connect ECONNREFUSED') || 
-      err.message.includes('too many clients') ||
-      err.message.includes('Failed to acquire permit')) {
+  if (
+    err.message.includes('connect ECONNREFUSED') ||
+    err.message.includes('too many clients') ||
+    err.message.includes('Failed to acquire permit')
+  ) {
     logger.warn('Database connection issues detected, attempting recovery');
-    
+
     // Try to reset the connection pool
     initializeDatabase()
       .then(({ pool: newPool, db: newDb }) => {
@@ -307,7 +320,7 @@ process.on('uncaughtException', (err: Error) => {
         db = newDb;
         logger.info('Database connection recovered after error');
       })
-      .catch(recoveryErr => {
+      .catch((recoveryErr) => {
         logger.error('Failed to recover database connection', { error: recoveryErr.message });
         // In production, exit after failed recovery to let the system restart
         if (process.env.NODE_ENV === 'production') {
@@ -320,9 +333,9 @@ process.on('uncaughtException', (err: Error) => {
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason: unknown) => {
   if (reason instanceof Error) {
-    logger.error('Unhandled promise rejection:', { 
+    logger.error('Unhandled promise rejection:', {
       error: reason.message,
-      stack: reason.stack
+      stack: reason.stack,
     });
   } else {
     logger.error('Unhandled promise rejection with non-error reason:', { reason });

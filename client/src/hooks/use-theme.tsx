@@ -29,13 +29,13 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
   );
   const [customColors, setCustomColors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const root = window.document.documentElement;
-    
+
     // Remove previous theme classes
     root.classList.remove('light', 'dark');
 
@@ -43,23 +43,25 @@ export function ThemeProvider({
       const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
         ? 'dark'
         : 'light';
-      
+
       root.classList.add(systemTheme);
       return;
     }
 
     if (theme === 'custom') {
-      // For custom theme, we still need a base (light/dark) 
+      // For custom theme, we still need a base (light/dark)
       // to ensure proper color contrasts
-      const baseTheme = customColors?.background ? 
-        // Check if background is light or dark
-        isLightColor(customColors.background) ? 'light' : 'dark' 
+      const baseTheme = customColors?.background
+        ? // Check if background is light or dark
+          isLightColor(customColors.background)
+          ? 'light'
+          : 'dark'
         : 'light';
-        
+
       root.classList.add(baseTheme);
       return;
     }
-    
+
     root.classList.add(theme);
   }, [theme, customColors]);
 
@@ -77,7 +79,7 @@ export function ThemeProvider({
     // Simple implementation - more advanced would use relative luminance
     // Remove any leading #
     color = color.replace(/^#/, '');
-    
+
     // Convert hex to RGB
     let r, g, b;
     if (color.length === 3) {
@@ -89,11 +91,11 @@ export function ThemeProvider({
       g = parseInt(color.substring(2, 4), 16);
       b = parseInt(color.substring(4, 6), 16);
     }
-    
+
     // Calculate relative luminance (simplified)
     // Using formula: (0.299*R + 0.587*G + 0.114*B)
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    
+
     // Return true if luminance is high (light color)
     return luminance > 0.5;
   };
@@ -104,13 +106,13 @@ export function ThemeProvider({
     customColors,
     setCustomColors: (colors: Record<string, string>) => {
       setCustomColors(colors);
-      
+
       // Apply these colors to CSS variables
       const root = window.document.documentElement;
       Object.entries(colors).forEach(([key, value]) => {
         root.style.setProperty(`--${key}`, value);
       });
-    }
+    },
   };
 
   return (
@@ -122,9 +124,8 @@ export function ThemeProvider({
 
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
-  
-  if (context === undefined)
-    throw new Error('useTheme must be used within a ThemeProvider');
-    
+
+  if (context === undefined) throw new Error('useTheme must be used within a ThemeProvider');
+
   return context;
-}; 
+};

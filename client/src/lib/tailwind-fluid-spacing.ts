@@ -3,12 +3,12 @@ import { fluidSpaceScale } from './fluid-spacing';
 
 /**
  * Tailwind plugin to generate fluid spacing utilities
- * 
+ *
  * This will create utility classes like:
  * - fluid-p-sm, fluid-p-md, fluid-p-lg (padding)
  * - fluid-m-sm, fluid-m-md, fluid-m-lg (margin)
  * - fluid-gap-sm, fluid-gap-md, fluid-gap-lg (gap)
- * 
+ *
  * As well as device-specific classes:
  * - mobile-p-sm, tablet-p-md, desktop-p-lg
  * - mobile-m-sm, tablet-m-md, desktop-m-lg
@@ -17,7 +17,7 @@ import { fluidSpaceScale } from './fluid-spacing';
 export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
   // Extract the fluid space scale
   const spacingScale = fluidSpaceScale;
-  
+
   // Create padding utilities
   const paddingUtilities = Object.entries(spacingScale).reduce((acc, [key, value]) => {
     acc[`.${e(`fluid-p-${key}`)}`] = { padding: value };
@@ -29,7 +29,7 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
     acc[`.${e(`fluid-pl-${key}`)}`] = { paddingLeft: value };
     return acc;
   }, {});
-  
+
   // Create margin utilities
   const marginUtilities = Object.entries(spacingScale).reduce((acc, [key, value]) => {
     acc[`.${e(`fluid-m-${key}`)}`] = { margin: value };
@@ -41,7 +41,7 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
     acc[`.${e(`fluid-ml-${key}`)}`] = { marginLeft: value };
     return acc;
   }, {});
-  
+
   // Create gap utilities
   const gapUtilities = Object.entries(spacingScale).reduce((acc, [key, value]) => {
     acc[`.${e(`fluid-gap-${key}`)}`] = { gap: value };
@@ -49,14 +49,14 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
     acc[`.${e(`fluid-gap-y-${key}`)}`] = { rowGap: value };
     return acc;
   }, {});
-  
+
   // Create space utilities
   const spaceUtilities = Object.entries(spacingScale).reduce((acc, [key, value]) => {
     acc[`.${e(`fluid-space-x-${key}`)} > * + *`] = { marginLeft: value };
     acc[`.${e(`fluid-space-y-${key}`)} > * + *`] = { marginTop: value };
     return acc;
   }, {});
-  
+
   // Define device-specific spacing values
   const deviceSpacing = {
     mobile: {
@@ -79,13 +79,13 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
       md: '24px',
       lg: '32px',
       xl: '48px',
-    }
+    },
   };
-  
+
   // Create device-specific spacing utilities
   const deviceTypes = ['mobile', 'tablet', 'desktop'];
   const sizeTypes = ['xs', 'sm', 'md', 'lg', 'xl'];
-  
+
   // Create device-specific padding utilities
   const devicePaddingUtilities = deviceTypes.reduce((deviceAcc, device) => {
     return {
@@ -100,10 +100,10 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
         sizeAcc[`.${e(`${device}-pb-${size}`)}`] = { paddingBottom: value };
         sizeAcc[`.${e(`${device}-pl-${size}`)}`] = { paddingLeft: value };
         return sizeAcc;
-      }, {})
+      }, {}),
     };
   }, {});
-  
+
   // Create device-specific margin utilities
   const deviceMarginUtilities = deviceTypes.reduce((deviceAcc, device) => {
     return {
@@ -118,10 +118,10 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
         sizeAcc[`.${e(`${device}-mb-${size}`)}`] = { marginBottom: value };
         sizeAcc[`.${e(`${device}-ml-${size}`)}`] = { marginLeft: value };
         return sizeAcc;
-      }, {})
+      }, {}),
     };
   }, {});
-  
+
   // Create device-specific gap utilities
   const deviceGapUtilities = deviceTypes.reduce((deviceAcc, device) => {
     return {
@@ -132,10 +132,10 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
         sizeAcc[`.${e(`${device}-gap-x-${size}`)}`] = { columnGap: value };
         sizeAcc[`.${e(`${device}-gap-y-${size}`)}`] = { rowGap: value };
         return sizeAcc;
-      }, {})
+      }, {}),
     };
   }, {});
-  
+
   // Create device-specific space utilities
   const deviceSpaceUtilities = deviceTypes.reduce((deviceAcc, device) => {
     return {
@@ -145,22 +145,22 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
         sizeAcc[`.${e(`${device}-space-x-${size}`)} > * + *`] = { marginLeft: value };
         sizeAcc[`.${e(`${device}-space-y-${size}`)} > * + *`] = { marginTop: value };
         return sizeAcc;
-      }, {})
+      }, {}),
     };
   }, {});
-  
+
   // Add all utilities
   addUtilities(paddingUtilities);
   addUtilities(marginUtilities);
   addUtilities(gapUtilities);
   addUtilities(spaceUtilities);
-  
+
   // Add device-specific utilities
   addUtilities(devicePaddingUtilities);
   addUtilities(deviceMarginUtilities);
   addUtilities(deviceGapUtilities);
   addUtilities(deviceSpaceUtilities);
-  
+
   // Add responsive container classes
   addUtilities({
     '.fluid-container': {
@@ -229,7 +229,7 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
       gap: spacingScale.form_gap,
     },
   });
-  
+
   // Add responsive layout utilities
   addUtilities({
     '.fluid-stack': {
@@ -249,4 +249,4 @@ export const fluidSpacingPlugin = plugin(({ addUtilities, theme, e }) => {
       gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
     },
   });
-}); 
+});

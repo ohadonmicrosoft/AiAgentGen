@@ -16,38 +16,39 @@ export default function TestAgentPage() {
   const [_, setLocation] = useLocation();
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<string>('test');
-  
+
   // If we have an ID, fetch the agent
   const {
     data: agent,
     isLoading,
-    error
+    error,
   } = useQuery<Agent>({
     queryKey: ['/api/agents', id],
     queryFn: getQueryFn({ on401: 'throw' }),
     enabled: !!id,
   });
-  
+
   // Log agent data for debugging
   useEffect(() => {
     if (agent) {
       console.log('Agent data loaded:', agent);
     }
   }, [agent]);
-  
+
   // If we don't have an ID, we'll use a temporary agent
   const tempAgent: Partial<Agent> = {
     name: 'Test Agent',
     description: 'This is a temporary agent for testing',
-    systemPrompt: 'You are a helpful, creative, clever, and friendly AI assistant. Your purpose is to engage in natural, helpful conversations. You have a cheerful, optimistic, and supportive personality. You help users with their questions and problems to the best of your ability. You respond to questions conversationally.',
+    systemPrompt:
+      'You are a helpful, creative, clever, and friendly AI assistant. Your purpose is to engage in natural, helpful conversations. You have a cheerful, optimistic, and supportive personality. You help users with their questions and problems to the best of your ability. You respond to questions conversationally.',
     model: 'gpt-4o',
     temperature: '0.7',
     maxTokens: 1000,
-    status: 'draft'
+    status: 'draft',
   };
-  
+
   const currentAgent = id ? agent : tempAgent;
-  
+
   if (isLoading) {
     return (
       <MainLayout title="Agent Testing">
@@ -57,7 +58,7 @@ export default function TestAgentPage() {
       </MainLayout>
     );
   }
-  
+
   if (error && id) {
     return (
       <MainLayout title="Agent Testing">
@@ -74,9 +75,9 @@ export default function TestAgentPage() {
       </MainLayout>
     );
   }
-  
+
   return (
-    <MainLayout title={id ? `Testing: ${currentAgent?.name}` : "Test an Agent"}>
+    <MainLayout title={id ? `Testing: ${currentAgent?.name}` : 'Test an Agent'}>
       <div className="flex flex-col space-y-6">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -87,7 +88,7 @@ export default function TestAgentPage() {
               </Button>
             </Link>
             <h1 className="text-2xl font-bold">
-              {id ? currentAgent?.name : "Test Agent Configuration"}
+              {id ? currentAgent?.name : 'Test Agent Configuration'}
             </h1>
             {currentAgent?.status && (
               <Badge variant={currentAgent.status === 'active' ? 'default' : 'secondary'}>
@@ -95,7 +96,7 @@ export default function TestAgentPage() {
               </Badge>
             )}
           </div>
-          
+
           {id && (
             <div className="flex gap-2">
               <Link href={`/agents/${id}/edit`}>
@@ -113,7 +114,7 @@ export default function TestAgentPage() {
             </div>
           )}
         </div>
-        
+
         <Tabs defaultValue="test" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full md:w-[600px] grid-cols-3">
             <TabsTrigger value="test">
@@ -129,11 +130,11 @@ export default function TestAgentPage() {
               Configuration
             </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="test" className="space-y-4 pt-4">
             <AgentTester agent={currentAgent as Partial<Agent>} />
           </TabsContent>
-          
+
           <TabsContent value="history" className="space-y-4 pt-4">
             <Card>
               <CardHeader>
@@ -141,17 +142,16 @@ export default function TestAgentPage() {
                   <History className="h-5 w-5 text-primary" />
                   Conversation History
                 </CardTitle>
-                <CardDescription>
-                  View past conversations with this agent
-                </CardDescription>
+                <CardDescription>View past conversations with this agent</CardDescription>
               </CardHeader>
               <CardContent>
                 {id ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-2">
-                      To manage conversation history, go to the Test Agent tab and use the History button.
+                      To manage conversation history, go to the Test Agent tab and use the History
+                      button.
                     </p>
-                    <Button variant="outline" onClick={() => setActiveTab("test")}>
+                    <Button variant="outline" onClick={() => setActiveTab('test')}>
                       Go to Test Agent
                     </Button>
                   </div>
@@ -165,7 +165,7 @@ export default function TestAgentPage() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="config" className="space-y-4 pt-4">
             <Card>
               <CardHeader>
@@ -173,9 +173,7 @@ export default function TestAgentPage() {
                   <Wand2 className="h-5 w-5 text-primary" />
                   Agent Configuration
                 </CardTitle>
-                <CardDescription>
-                  These are the current settings for this agent
-                </CardDescription>
+                <CardDescription>These are the current settings for this agent</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -183,32 +181,32 @@ export default function TestAgentPage() {
                     <h3 className="font-medium">Model</h3>
                     <p className="text-sm">{currentAgent?.model || 'gpt-4o'}</p>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <h3 className="font-medium">Temperature</h3>
                     <p className="text-sm">{currentAgent?.temperature || 0.7}</p>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <h3 className="font-medium">Max Tokens</h3>
                     <p className="text-sm">{currentAgent?.maxTokens || 1000}</p>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <h3 className="font-medium">Status</h3>
                     <p className="text-sm">{currentAgent?.status || 'draft'}</p>
                   </div>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="space-y-2">
                   <h3 className="font-medium">System Prompt</h3>
                   <div className="bg-muted p-3 rounded-md text-sm whitespace-pre-wrap">
                     {currentAgent?.systemPrompt}
                   </div>
                 </div>
-                
+
                 {currentAgent?.description && (
                   <>
                     <Separator />

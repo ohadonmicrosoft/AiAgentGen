@@ -1,86 +1,104 @@
-import { useState } from "react";
-import { Link, useLocation } from "wouter";
-import MainLayout from "@/layouts/MainLayout";
-import StatsCard from "@/components/StatsCard";
-import QuickActionCard from "@/components/QuickActionCard";
-import AgentCard from "@/components/AgentCard";
-import AgentWizard from "@/components/wizard/AgentWizard";
-import { useQuery } from "@tanstack/react-query";
-import { Bot, MessageSquare, BarChart3, Plus, Edit2, Terminal, HelpCircle, Settings, Palette, FormInput, Layout, Move, GripVertical, ScrollText, EyeIcon, BarChart2, AlertTriangle } from "lucide-react";
-import { motion } from "framer-motion";
-import { useScrollAnimation } from "@/hooks/animations";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { buttonVariants } from "@/components/ui/button";
+import { useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import MainLayout from '@/layouts/MainLayout';
+import StatsCard from '@/components/StatsCard';
+import QuickActionCard from '@/components/QuickActionCard';
+import AgentCard from '@/components/AgentCard';
+import AgentWizard from '@/components/wizard/AgentWizard';
+import { useQuery } from '@tanstack/react-query';
+import {
+  Bot,
+  MessageSquare,
+  BarChart3,
+  Plus,
+  Edit2,
+  Terminal,
+  HelpCircle,
+  Settings,
+  Palette,
+  FormInput,
+  Layout,
+  Move,
+  GripVertical,
+  ScrollText,
+  EyeIcon,
+  BarChart2,
+  AlertTriangle,
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useScrollAnimation } from '@/hooks/animations';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 
 interface Agent {
   id: string;
   name: string;
   description: string;
-  status: "active" | "draft";
+  status: 'active' | 'draft';
   lastUpdated: string;
 }
 
 export default function Dashboard() {
   const [, navigate] = useLocation();
   const { ref, controls } = useScrollAnimation();
-  
+
   // Animation variants for staggered animations
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+        delayChildren: 0.2,
+      },
+    },
   };
-  
+
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { duration: 0.5 }
-    }
+      transition: { duration: 0.5 },
+    },
   };
-  
+
   // Mock data - would come from API in real implementation
   const { data: stats } = useQuery({
-    queryKey: ["/api/stats"],
+    queryKey: ['/api/stats'],
     queryFn: () => ({
       activeAgents: 4,
       savedPrompts: 12,
-      totalInteractions: 231
+      totalInteractions: 231,
     }),
   });
 
   const { data: agents } = useQuery<Agent[]>({
-    queryKey: ["/api/agents"],
-    queryFn: () => ([
+    queryKey: ['/api/agents'],
+    queryFn: () => [
       {
-        id: "1",
-        name: "Customer Support Bot",
-        description: "Handles customer inquiries automatically with a formal response style.",
-        status: "active",
-        lastUpdated: "Updated 2 days ago"
+        id: '1',
+        name: 'Customer Support Bot',
+        description: 'Handles customer inquiries automatically with a formal response style.',
+        status: 'active',
+        lastUpdated: 'Updated 2 days ago',
       },
       {
-        id: "2",
-        name: "Product Recommendation",
-        description: "Suggests products based on customer preferences and past purchases.",
-        status: "active",
-        lastUpdated: "Updated 5 days ago"
+        id: '2',
+        name: 'Product Recommendation',
+        description: 'Suggests products based on customer preferences and past purchases.',
+        status: 'active',
+        lastUpdated: 'Updated 5 days ago',
       },
       {
-        id: "3",
-        name: "Email Assistant",
-        description: "Drafts email responses based on incoming inquiries.",
-        status: "draft",
-        lastUpdated: "Created 1 week ago"
-      }
-    ]),
+        id: '3',
+        name: 'Email Assistant',
+        description: 'Drafts email responses based on incoming inquiries.',
+        status: 'draft',
+        lastUpdated: 'Created 1 week ago',
+      },
+    ],
   });
 
   return (
@@ -230,8 +248,8 @@ export default function Dashboard() {
                   <Link
                     to="/error-handling-demo"
                     className={buttonVariants({
-                      variant: "outline",
-                      className: "justify-start",
+                      variant: 'outline',
+                      className: 'justify-start',
                     })}
                   >
                     <AlertTriangle className="mr-2 h-4 w-4" />

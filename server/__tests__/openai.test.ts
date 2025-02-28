@@ -11,7 +11,7 @@ jest.mock('openai', () => {
   // Create a mock OpenAI client object
   const mockCompletionsCreate = jest.fn();
   const mockStreamingCompletionsCreate = jest.fn();
-  
+
   return {
     OpenAI: jest.fn().mockImplementation(() => ({
       chat: {
@@ -22,9 +22,9 @@ jest.mock('openai', () => {
             } else {
               return mockCompletionsCreate(options);
             }
-          }
-        }
-      }
+          },
+        },
+      },
     })),
     _mockCompletionsCreate: mockCompletionsCreate,
     _mockStreamingCompletionsCreate: mockStreamingCompletionsCreate,
@@ -54,8 +54,8 @@ describe('OpenAI Integration', () => {
         usage: {
           prompt_tokens: 10,
           completion_tokens: 5,
-          total_tokens: 15
-        }
+          total_tokens: 15,
+        },
       });
 
       // Call the function
@@ -67,9 +67,9 @@ describe('OpenAI Integration', () => {
         usage: {
           promptTokens: 10,
           completionTokens: 5,
-          totalTokens: 15
+          totalTokens: 15,
         },
-        isMock: false
+        isMock: false,
       });
 
       // Verify OpenAI was called with correct parameters
@@ -77,10 +77,10 @@ describe('OpenAI Integration', () => {
         model: 'gpt-4o', // Default model
         messages: [
           { role: 'system', content: 'System prompt' },
-          { role: 'user', content: 'User prompt' }
+          { role: 'user', content: 'User prompt' },
         ],
         temperature: 0.7,
-        max_tokens: 1000
+        max_tokens: 1000,
       });
     });
 
@@ -91,8 +91,8 @@ describe('OpenAI Integration', () => {
         usage: {
           prompt_tokens: 8,
           completion_tokens: 3,
-          total_tokens: 11
-        }
+          total_tokens: 11,
+        },
       });
 
       // Call with custom parameters
@@ -101,7 +101,7 @@ describe('OpenAI Integration', () => {
         temperature: 0.9,
         maxTokens: 500,
         userId: 123,
-        agentId: 456
+        agentId: 456,
       });
 
       // Verify parameters were passed correctly
@@ -110,10 +110,10 @@ describe('OpenAI Integration', () => {
         model: 'gpt-3.5-turbo',
         messages: [
           { role: 'system', content: 'System' },
-          { role: 'user', content: 'User' }
+          { role: 'user', content: 'User' },
         ],
         temperature: 0.9,
-        max_tokens: 500
+        max_tokens: 500,
       });
     });
 
@@ -122,13 +122,13 @@ describe('OpenAI Integration', () => {
       const apiError = new Error('API Error');
       apiError.response = {
         status: 429,
-        data: { error: { message: 'Rate limit exceeded' } }
+        data: { error: { message: 'Rate limit exceeded' } },
       };
       openaiModule._mockCompletionsCreate.mockRejectedValueOnce(apiError);
 
       // Expect error to be thrown
       await expect(generateResponse('System', 'User')).rejects.toThrow(
-        'OpenAI API rate limit exceeded. Please try again later.'
+        'OpenAI API rate limit exceeded. Please try again later.',
       );
     });
   });
@@ -139,45 +139,45 @@ describe('OpenAI Integration', () => {
       const mockStream = [
         { choices: [{ delta: { content: 'Hello' } }] },
         { choices: [{ delta: { content: ' world' } }] },
-        { choices: [{ delta: { content: '!' } }] }
+        { choices: [{ delta: { content: '!' } }] },
       ];
-      
+
       // Make the mock stream iterable with async iterator
       mockStream[Symbol.asyncIterator] = async function* () {
         for (const chunk of mockStream) {
           yield chunk;
         }
       };
-      
+
       openaiModule._mockStreamingCompletionsCreate.mockResolvedValueOnce(mockStream);
 
       // Collect all yielded values
       const generator = generateStreamingResponse('System prompt', 'User prompt');
       const results = [];
-      
+
       for await (const chunk of generator) {
         results.push(chunk);
       }
-      
+
       // Check first chunks have content
       expect(results[0]).toEqual({ content: 'Hello', done: false });
       expect(results[1]).toEqual({ content: ' world', done: false });
       expect(results[2]).toEqual({ content: '!', done: false });
-      
+
       // Last chunk should indicate completion
       expect(results[3].done).toBe(true);
       expect(results[3].timing).toBeDefined();
-      
+
       // Check OpenAI was called correctly
       expect(openaiModule._mockStreamingCompletionsCreate).toHaveBeenCalledWith({
         model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'System prompt' },
-          { role: 'user', content: 'User prompt' }
+          { role: 'user', content: 'User prompt' },
         ],
         temperature: 0.7,
         max_tokens: 1000,
-        stream: true
+        stream: true,
       });
     });
 
@@ -189,47 +189,47 @@ describe('OpenAI Integration', () => {
           yield chunk;
         }
       };
-      
+
       openaiModule._mockStreamingCompletionsCreate.mockResolvedValueOnce(mockStream);
-      
+
       // Call with conversation IDs
       const generator = generateStreamingResponse('System', 'User', {
         userId: 123,
         agentId: 456,
-        conversationId: 789
+        conversationId: 789,
       });
-      
+
       // Exhaust the generator
       for await (const _ of generator) {
         // Just consume the chunks
       }
-      
+
       // Verify conversation history was saved
       expect(storage.createMessage).toHaveBeenCalledWith({
         conversationId: 789,
         role: 'assistant',
         content: 'Response',
-        tokenCount: expect.any(Number)
+        tokenCount: expect.any(Number),
       });
     });
 
     it('should handle streaming errors', async () => {
       // Setup error during streaming
       openaiModule._mockStreamingCompletionsCreate.mockRejectedValueOnce(
-        new Error('Streaming error')
+        new Error('Streaming error'),
       );
-      
+
       // Call the generator
       const generator = generateStreamingResponse('System', 'User');
-      
+
       // First (and only) chunk should contain error info
       const firstChunk = await generator.next();
       expect(firstChunk.value).toEqual({
         content: '',
         error: 'Streaming error',
-        done: true
+        done: true,
       });
-      
+
       // The generator should complete after yielding the error
       const secondChunk = await generator.next();
       expect(secondChunk.done).toBe(true);
@@ -244,46 +244,46 @@ describe('OpenAI Integration', () => {
         usage: {
           prompt_tokens: 12,
           completion_tokens: 6,
-          total_tokens: 18
-        }
+          total_tokens: 18,
+        },
       });
-      
+
       // Mock agent object
       const agent = {
         id: 123,
         systemPrompt: 'You are a helpful assistant',
         model: 'gpt-4o',
         temperature: 0.8,
-        maxTokens: 2000
+        maxTokens: 2000,
       };
-      
+
       // Test the agent
       const result = await testAgentResponse(agent, 'Hello agent', 456);
-      
+
       // Check result
       expect(result.content).toBe('Agent response');
-      
+
       // Verify generateResponse was called with agent parameters
       expect(openaiModule._mockCompletionsCreate).toHaveBeenCalledWith({
         model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'You are a helpful assistant' },
-          { role: 'user', content: 'Hello agent' }
+          { role: 'user', content: 'Hello agent' },
         ],
         temperature: 0.8,
-        max_tokens: 2000
+        max_tokens: 2000,
       });
     });
 
     it('should throw an error if agent has no system prompt', async () => {
       const invalidAgent = {
-        id: 123
+        id: 123,
         // No systemPrompt
       };
-      
+
       await expect(testAgentResponse(invalidAgent, 'Hello')).rejects.toThrow(
-        'Agent system prompt is required'
+        'Agent system prompt is required',
       );
     });
   });
-}); 
+});

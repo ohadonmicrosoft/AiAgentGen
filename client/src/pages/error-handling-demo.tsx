@@ -12,18 +12,15 @@ import { AlertCircle, Bug, RefreshCw } from 'lucide-react';
 // Component that throws an error when the button is clicked
 function ErrorThrower() {
   const [shouldThrow, setShouldThrow] = useState(false);
-  
+
   if (shouldThrow) {
     throw new Error('This is a simulated error!');
   }
-  
+
   return (
     <div className="p-4 border rounded-md">
       <p className="mb-4">Click the button to simulate an error:</p>
-      <Button 
-        variant="destructive" 
-        onClick={() => setShouldThrow(true)}
-      >
+      <Button variant="destructive" onClick={() => setShouldThrow(true)}>
         <Bug className="mr-2 h-4 w-4" />
         Throw Error
       </Button>
@@ -40,37 +37,33 @@ function BrokenComponent() {
 // Component that throws an error after a delay
 function DelayedErrorComponent() {
   const [hasError, setHasError] = useState(false);
-  
+
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setHasError(true);
     }, 2000);
-    
+
     return () => clearTimeout(timer);
   }, []);
-  
+
   if (hasError) {
     throw new Error('Delayed error after component mount');
   }
-  
+
   return <div className="p-4">This component will throw an error after 2 seconds...</div>;
 }
 
 // Component using the hook approach
 function HookBasedErrorHandling() {
-  const { 
-    ErrorBoundaryWrapper, 
-    hasError, 
-    resetBoundary 
-  } = useErrorBoundary();
-  
+  const { ErrorBoundaryWrapper, hasError, resetBoundary } = useErrorBoundary();
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Hook-based Error Handling</h3>
       <p className="text-sm text-muted-foreground">
         This example uses the <code>useErrorBoundary</code> hook to manage errors.
       </p>
-      
+
       <ErrorBoundaryWrapper
         fallback={
           <div className="p-4 border rounded-md bg-muted">
@@ -90,7 +83,7 @@ function HookBasedErrorHandling() {
 
 export default function ErrorHandlingDemo() {
   const [activeTab, setActiveTab] = useState('basic');
-  
+
   return (
     <MainLayout>
       <div className="container mx-auto py-10 space-y-8">
@@ -100,7 +93,7 @@ export default function ErrorHandlingDemo() {
             Explore different error handling patterns using Error Boundaries
           </p>
         </div>
-        
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-4 w-full max-w-md">
             <TabsTrigger value="basic">Basic</TabsTrigger>
@@ -108,15 +101,13 @@ export default function ErrorHandlingDemo() {
             <TabsTrigger value="hook">Hook-based</TabsTrigger>
             <TabsTrigger value="advanced">Advanced</TabsTrigger>
           </TabsList>
-          
+
           <div className="mt-6">
             <TabsContent value="basic" className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Basic Error Boundary</CardTitle>
-                  <CardDescription>
-                    Simple error boundary with a fallback UI
-                  </CardDescription>
+                  <CardDescription>Simple error boundary with a fallback UI</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -128,7 +119,7 @@ export default function ErrorHandlingDemo() {
                         <ErrorThrower />
                       </ErrorBoundary>
                     </div>
-                    
+
                     <div>
                       <h3 className="text-lg font-medium mb-4">Render Error</h3>
                       <ErrorBoundary
@@ -141,7 +132,7 @@ export default function ErrorHandlingDemo() {
                 </CardContent>
               </Card>
             </TabsContent>
-            
+
             <TabsContent value="nested" className="space-y-6">
               <Card>
                 <CardHeader>
@@ -157,17 +148,19 @@ export default function ErrorHandlingDemo() {
                     <div className="p-6 border rounded-md mb-6">
                       <h3 className="text-lg font-medium mb-4">Outer Component</h3>
                       <p className="mb-4">This component has its own error boundary</p>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <ErrorBoundary
-                          fallback={<CompactErrorFallback message="Inner boundary 1 caught an error" />}
+                          fallback={
+                            <CompactErrorFallback message="Inner boundary 1 caught an error" />
+                          }
                         >
                           <div className="p-4 border rounded-md">
                             <h4 className="font-medium mb-2">Inner Component 1</h4>
                             <ErrorThrower />
                           </div>
                         </ErrorBoundary>
-                        
+
                         <div className="p-4 border rounded-md">
                           <h4 className="font-medium mb-2">Inner Component 2</h4>
                           <p className="text-sm mb-4">This component has no error boundary</p>
@@ -183,7 +176,7 @@ export default function ErrorHandlingDemo() {
                 </CardContent>
               </Card>
             </TabsContent>
-            
+
             <TabsContent value="hook" className="space-y-6">
               <Card>
                 <CardHeader>
@@ -197,14 +190,12 @@ export default function ErrorHandlingDemo() {
                 </CardContent>
               </Card>
             </TabsContent>
-            
+
             <TabsContent value="advanced" className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Advanced Error Handling</CardTitle>
-                  <CardDescription>
-                    Error recovery patterns and error logging
-                  </CardDescription>
+                  <CardDescription>Error recovery patterns and error logging</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
@@ -218,21 +209,21 @@ export default function ErrorHandlingDemo() {
                               Application Error
                             </h3>
                           </div>
-                          
+
                           <p className="text-amber-700 dark:text-amber-400 mb-4">
                             {error?.message || 'An unexpected error occurred'}
                           </p>
-                          
+
                           <div className="flex space-x-4">
-                            <Button 
+                            <Button
                               onClick={resetErrorBoundary}
                               variant="outline"
                               className="border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-800 dark:text-amber-300 dark:hover:bg-amber-950/50"
                             >
                               Try Again
                             </Button>
-                            
-                            <Button 
+
+                            <Button
                               onClick={() => window.location.reload()}
                               variant="ghost"
                               className="text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-950/50"
@@ -255,28 +246,25 @@ export default function ErrorHandlingDemo() {
                       <ErrorThrower />
                     </ErrorBoundary>
                   </div>
-                  
+
                   <Separator />
-                  
+
                   <div>
                     <h3 className="text-lg font-medium mb-4">Error Boundary with HOC</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       This component is wrapped with the withErrorBoundary HOC
                     </p>
-                    
+
                     {/* We would normally use the HOC outside the component, but for demo purposes: */}
                     {(() => {
                       // Import at the top in a real component
                       const { withErrorBoundary } = require('@/components/ui/error-boundary');
-                      
-                      const WrappedComponent = withErrorBoundary(
-                        () => <DelayedErrorComponent />,
-                        {
-                          FallbackComponent: ErrorFallback,
-                          onError: (error) => console.log('HOC caught:', error.message)
-                        }
-                      );
-                      
+
+                      const WrappedComponent = withErrorBoundary(() => <DelayedErrorComponent />, {
+                        FallbackComponent: ErrorFallback,
+                        onError: (error) => console.log('HOC caught:', error.message),
+                      });
+
                       return <WrappedComponent />;
                     })()}
                   </div>
@@ -288,4 +276,4 @@ export default function ErrorHandlingDemo() {
       </div>
     </MainLayout>
   );
-} 
+}

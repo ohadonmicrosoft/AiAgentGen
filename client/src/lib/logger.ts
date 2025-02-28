@@ -56,7 +56,7 @@ class LoggerService {
     this.options = { ...DEFAULT_OPTIONS, ...options };
     this.sessionId = this.generateSessionId();
     this.setupGlobalErrorHandlers();
-    
+
     if (this.options.enableRemoteLogging) {
       this.startFlushTimer();
     }
@@ -102,10 +102,12 @@ class LoggerService {
    */
   error(message: string, error?: unknown, context?: Record<string, any>, tags?: string[]): void {
     // Format the error if provided
-    const errorContext = error ? {
-      ...context,
-      error: formatErrorForLogging(error),
-    } : context;
+    const errorContext = error
+      ? {
+          ...context,
+          error: formatErrorForLogging(error),
+        }
+      : context;
 
     this.log('error', message, errorContext, tags);
   }
@@ -113,7 +115,12 @@ class LoggerService {
   /**
    * Internal log method
    */
-  private log(level: LogLevel, message: string, context?: Record<string, any>, tags?: string[]): void {
+  private log(
+    level: LogLevel,
+    message: string,
+    context?: Record<string, any>,
+    tags?: string[],
+  ): void {
     // Check if this log level should be processed
     if (!this.shouldLog(level)) {
       return;
@@ -153,7 +160,7 @@ class LoggerService {
   private logToConsole(entry: LogEntry): void {
     const timestamp = new Date(entry.timestamp).toLocaleTimeString();
     const prefix = `[${timestamp}] [${entry.level.toUpperCase()}]`;
-    
+
     switch (entry.level) {
       case 'debug':
         console.debug(`${prefix} ${entry.message}`, entry.context || '');
@@ -175,7 +182,7 @@ class LoggerService {
    */
   private queueLog(entry: LogEntry): void {
     this.logQueue.push(entry);
-    
+
     // If we've reached batch size, flush immediately
     if (this.logQueue.length >= (this.options.batchSize || 10)) {
       this.flush();
@@ -200,11 +207,7 @@ class LoggerService {
    */
   async flush(): Promise<void> {
     // Don't flush if already flushing, no logs, or not enabled
-    if (
-      this.isFlushing ||
-      this.logQueue.length === 0 ||
-      !this.options.enableRemoteLogging
-    ) {
+    if (this.isFlushing || this.logQueue.length === 0 || !this.options.enableRemoteLogging) {
       return;
     }
 
@@ -266,18 +269,16 @@ class LoggerService {
           lineno: event.lineno,
           colno: event.colno,
         },
-        ['uncaught', 'global']
+        ['uncaught', 'global'],
       );
     });
 
     // Handle unhandled promise rejections
     window.addEventListener('unhandledrejection', (event) => {
-      this.error(
-        'Unhandled promise rejection',
-        event.reason,
-        {},
-        ['unhandled-rejection', 'global']
-      );
+      this.error('Unhandled promise rejection', event.reason, {}, [
+        'unhandled-rejection',
+        'global',
+      ]);
     });
   }
 
@@ -301,17 +302,17 @@ if (typeof window !== 'undefined') {
 
 /**
  * Example usage:
- * 
+ *
  * ```ts
  * import { logger } from '@/lib/logger';
- * 
+ *
  * // Basic logging
  * logger.debug('This is a debug message');
  * logger.info('User signed in', { userId: 'user123' });
  * logger.warn('API rate limit approaching', { remainingCalls: 10 });
  * logger.error('Failed to load data', error, { componentName: 'UserProfile' });
- * 
+ *
  * // With tags for better filtering
  * logger.info('Page loaded', { page: '/dashboard' }, ['performance', 'pageview']);
  * ```
- */ 
+ */

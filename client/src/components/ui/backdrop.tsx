@@ -17,17 +17,17 @@ export function Backdrop({
   show,
   onClick,
   className,
-  zIndex = "z-40",
-  transparent = false
+  zIndex = 'z-40',
+  transparent = false,
 }: BackdropProps) {
   return (
     <div
       className={cn(
-        "fixed inset-0 transition-opacity duration-300 ease-in-out",
+        'fixed inset-0 transition-opacity duration-300 ease-in-out',
         zIndex,
-        transparent ? "bg-transparent" : "bg-black/50",
-        show ? "opacity-100" : "opacity-0 pointer-events-none",
-        className
+        transparent ? 'bg-transparent' : 'bg-black/50',
+        show ? 'opacity-100' : 'opacity-0 pointer-events-none',
+        className,
       )}
       onClick={onClick}
       aria-hidden="true"

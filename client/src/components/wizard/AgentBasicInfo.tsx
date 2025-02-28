@@ -1,18 +1,25 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Settings, ShoppingCart, HeadphonesIcon } from "lucide-react";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Settings, ShoppingCart, HeadphonesIcon } from 'lucide-react';
 
 const formSchema = z.object({
-  name: z.string().min(3, "Agent name must be at least 3 characters"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
-  type: z.enum(["customer-support", "sales", "custom"]),
+  name: z.string().min(3, 'Agent name must be at least 3 characters'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  type: z.enum(['customer-support', 'sales', 'custom']),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -24,7 +31,12 @@ interface AgentBasicInfoProps {
   preview?: boolean;
 }
 
-export default function AgentBasicInfo({ formData, updateFormData, onNext, preview = false }: AgentBasicInfoProps) {
+export default function AgentBasicInfo({
+  formData,
+  updateFormData,
+  onNext,
+  preview = false,
+}: AgentBasicInfoProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -57,7 +69,7 @@ export default function AgentBasicInfo({ formData, updateFormData, onNext, previ
             )}
           />
         </div>
-        
+
         <div className="mb-4">
           <FormField
             control={form.control}
@@ -66,18 +78,14 @@ export default function AgentBasicInfo({ formData, updateFormData, onNext, previ
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea 
-                    placeholder="What is this agent's purpose?" 
-                    rows={3} 
-                    {...field} 
-                  />
+                  <Textarea placeholder="What is this agent's purpose?" rows={3} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        
+
         <div className="mb-4">
           <FormField
             control={form.control}
@@ -86,16 +94,18 @@ export default function AgentBasicInfo({ formData, updateFormData, onNext, previ
               <FormItem>
                 <FormLabel>Agent Type</FormLabel>
                 <FormControl>
-                  <RadioGroup 
+                  <RadioGroup
                     className="grid grid-cols-1 gap-4 sm:grid-cols-3 mt-2"
                     value={field.value}
                     onValueChange={field.onChange}
                   >
-                    <div className={`relative p-4 border rounded-lg cursor-pointer ${
-                      field.value === "customer-support" 
-                        ? "border-primary ring-2 ring-primary/50" 
-                        : "border-border"
-                    }`}>
+                    <div
+                      className={`relative p-4 border rounded-lg cursor-pointer ${
+                        field.value === 'customer-support'
+                          ? 'border-primary ring-2 ring-primary/50'
+                          : 'border-border'
+                      }`}
+                    >
                       <RadioGroupItem
                         value="customer-support"
                         id="agent-type-customer"
@@ -111,17 +121,15 @@ export default function AgentBasicInfo({ formData, updateFormData, onNext, previ
                         <span className="text-sm font-medium">Customer Support</span>
                       </Label>
                     </div>
-                    
-                    <div className={`relative p-4 border rounded-lg cursor-pointer ${
-                      field.value === "sales" 
-                        ? "border-primary ring-2 ring-primary/50" 
-                        : "border-border"
-                    }`}>
-                      <RadioGroupItem
-                        value="sales"
-                        id="agent-type-sales"
-                        className="sr-only"
-                      />
+
+                    <div
+                      className={`relative p-4 border rounded-lg cursor-pointer ${
+                        field.value === 'sales'
+                          ? 'border-primary ring-2 ring-primary/50'
+                          : 'border-border'
+                      }`}
+                    >
+                      <RadioGroupItem value="sales" id="agent-type-sales" className="sr-only" />
                       <Label
                         htmlFor="agent-type-sales"
                         className="flex flex-col items-center cursor-pointer"
@@ -132,17 +140,15 @@ export default function AgentBasicInfo({ formData, updateFormData, onNext, previ
                         <span className="text-sm font-medium">Sales Assistant</span>
                       </Label>
                     </div>
-                    
-                    <div className={`relative p-4 border rounded-lg cursor-pointer ${
-                      field.value === "custom" 
-                        ? "border-primary ring-2 ring-primary/50" 
-                        : "border-border"
-                    }`}>
-                      <RadioGroupItem
-                        value="custom"
-                        id="agent-type-custom"
-                        className="sr-only"
-                      />
+
+                    <div
+                      className={`relative p-4 border rounded-lg cursor-pointer ${
+                        field.value === 'custom'
+                          ? 'border-primary ring-2 ring-primary/50'
+                          : 'border-border'
+                      }`}
+                    >
+                      <RadioGroupItem value="custom" id="agent-type-custom" className="sr-only" />
                       <Label
                         htmlFor="agent-type-custom"
                         className="flex flex-col items-center cursor-pointer"
@@ -160,7 +166,7 @@ export default function AgentBasicInfo({ formData, updateFormData, onNext, previ
             )}
           />
         </div>
-      
+
         <div className="flex justify-end mt-6 space-x-3">
           <Button type="button" variant="outline" disabled={preview}>
             Cancel

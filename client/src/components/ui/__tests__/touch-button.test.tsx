@@ -31,7 +31,11 @@ jest.mock('@/hooks/use-fluid-spacing', () => ({
 // Mock framer-motion to avoid animation-related issues in tests
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: any) => <div data-testid="motion-div" {...props}>{children}</div>,
+    div: ({ children, ...props }: any) => (
+      <div data-testid="motion-div" {...props}>
+        {children}
+      </div>
+    ),
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
@@ -48,14 +52,22 @@ describe('TouchButton Component', () => {
   });
 
   it('renders with specified variant and size', () => {
-    const { rerender } = render(<TouchButton variant="destructive" size="sm">Click Me</TouchButton>);
-    
+    const { rerender } = render(
+      <TouchButton variant="destructive" size="sm">
+        Click Me
+      </TouchButton>,
+    );
+
     // Check that classes are applied
     const button = screen.getByRole('button');
     expect(button).toHaveClass('destructive');
     expect(button).toHaveClass('sm');
-    
-    rerender(<TouchButton variant="outline" size="lg">Click Me</TouchButton>);
+
+    rerender(
+      <TouchButton variant="outline" size="lg">
+        Click Me
+      </TouchButton>,
+    );
     expect(button).toHaveClass('outline');
     expect(button).toHaveClass('lg');
   });
@@ -63,7 +75,7 @@ describe('TouchButton Component', () => {
   it('handles click events correctly', () => {
     const handleClick = jest.fn();
     render(<TouchButton onClick={handleClick}>Click Me</TouchButton>);
-    
+
     fireEvent.click(screen.getByRole('button'));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -75,10 +87,10 @@ describe('TouchButton Component', () => {
 
   it('applies ripple effect when showRipple is true', () => {
     render(<TouchButton showRipple>Click Me</TouchButton>);
-    
+
     // Trigger a click to create ripple
     fireEvent.mouseDown(screen.getByRole('button'), { clientX: 50, clientY: 50 });
-    
+
     // Check for the presence of ripple container
     expect(screen.getByTestId('motion-div')).toBeInTheDocument();
   });
@@ -86,14 +98,14 @@ describe('TouchButton Component', () => {
   it('handles touch events correctly', () => {
     const handleClick = jest.fn();
     render(<TouchButton onClick={handleClick}>Touch Me</TouchButton>);
-    
+
     // Simulate touch events
     fireEvent.touchStart(screen.getByRole('button'));
     fireEvent.touchEnd(screen.getByRole('button'));
-    
+
     // The click handler should not be called until an actual click
     expect(handleClick).not.toHaveBeenCalled();
-    
+
     // Then simulate a click
     fireEvent.click(screen.getByRole('button'));
     expect(handleClick).toHaveBeenCalledTimes(1);
@@ -103,4 +115,4 @@ describe('TouchButton Component', () => {
     render(<TouchButton className="custom-class">Click Me</TouchButton>);
     expect(screen.getByRole('button')).toHaveClass('custom-class');
   });
-}); 
+});
