@@ -1,15 +1,15 @@
+import { type Server, createServer } from 'http';
+import { PERMISSIONS, ROLES, userRoleUpdateSchema } from '@shared/schema';
 import type { Express } from 'express';
-import { createServer, type Server } from 'http';
 import { setupAuth } from './auth';
-import { storage } from './storage';
 import {
-  checkAuthenticated,
   checkAdmin,
+  checkAuthenticated,
   checkPermission,
   checkResourceOwnership,
 } from './middleware';
 import openaiService, { testAgentResponse } from './openai';
-import { PERMISSIONS, ROLES, userRoleUpdateSchema } from '@shared/schema';
+import { storage } from './storage';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
@@ -854,12 +854,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate request body using the schema
       const validation = userRoleUpdateSchema.safeParse(req.body);
       if (!validation.success) {
-        return res
-          .status(400)
-          .json({
-            error: 'Invalid role update data',
-            details: validation.error,
-          });
+        return res.status(400).json({
+          error: 'Invalid role update data',
+          details: validation.error,
+        });
       }
 
       const { role, customPermissions } = validation.data;
@@ -1001,12 +999,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           agent.userId !== userId &&
           !(await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT))
         ) {
-          return res
-            .status(403)
-            .json({
-              error:
-                "You don't have permission to view this agent's conversations",
-            });
+          return res.status(403).json({
+            error:
+              "You don't have permission to view this agent's conversations",
+          });
         }
 
         const conversations = await storage.getConversationsByAgentId(agentId);
@@ -1044,11 +1040,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           PERMISSIONS.VIEW_ANY_CONVERSATION,
         ))
       ) {
-        return res
-          .status(403)
-          .json({
-            error: "You don't have permission to view this conversation",
-          });
+        return res.status(403).json({
+          error: "You don't have permission to view this conversation",
+        });
       }
 
       // Get messages for this conversation
@@ -1100,11 +1094,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             PERMISSIONS.VIEW_ANY_CONVERSATION,
           ))
         ) {
-          return res
-            .status(403)
-            .json({
-              error: "You don't have permission to access this conversation",
-            });
+          return res.status(403).json({
+            error: "You don't have permission to access this conversation",
+          });
         }
 
         // Create message
@@ -1147,11 +1139,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         conversation.userId !== userId &&
         !(await storage.hasPermission(userId, PERMISSIONS.MANAGE_CONVERSATIONS))
       ) {
-        return res
-          .status(403)
-          .json({
-            error: "You don't have permission to delete this conversation",
-          });
+        return res.status(403).json({
+          error: "You don't have permission to delete this conversation",
+        });
       }
 
       // Delete conversation (this should cascade delete all messages)

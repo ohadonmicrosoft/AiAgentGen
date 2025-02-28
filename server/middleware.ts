@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { Permission, PERMISSIONS, ROLES } from '@shared/schema';
+import { PERMISSIONS, Permission, ROLES } from '@shared/schema';
+import { NextFunction, Request, Response } from 'express';
 import { storage } from './storage';
 
 // Authentication middleware

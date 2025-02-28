@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { MemoryCache } from './cache';
+import { NextFunction, Request, Response } from 'express';
 import { logger } from '../api/logs';
+import { MemoryCache } from './cache';
 
 interface RateLimitOptions {
   windowMs: number; // Time window in milliseconds

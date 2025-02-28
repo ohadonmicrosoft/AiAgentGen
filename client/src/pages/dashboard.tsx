@@ -1,32 +1,8 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'wouter';
-import MainLayout from '@/layouts/MainLayout';
-import StatsCard from '@/components/StatsCard';
-import QuickActionCard from '@/components/QuickActionCard';
 import AgentCard from '@/components/AgentCard';
-import AgentWizard from '@/components/wizard/AgentWizard';
-import { useQuery } from '@tanstack/react-query';
-import {
-  Bot,
-  MessageSquare,
-  BarChart3,
-  Plus,
-  Edit2,
-  Terminal,
-  HelpCircle,
-  Settings,
-  Palette,
-  FormInput,
-  Layout,
-  Move,
-  GripVertical,
-  ScrollText,
-  EyeIcon,
-  BarChart2,
-  AlertTriangle,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useScrollAnimation } from '@/hooks/animations';
+import QuickActionCard from '@/components/QuickActionCard';
+import StatsCard from '@/components/StatsCard';
+import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -34,8 +10,32 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { buttonVariants } from '@/components/ui/button';
+import AgentWizard from '@/components/wizard/AgentWizard';
+import { useScrollAnimation } from '@/hooks/animations';
+import MainLayout from '@/layouts/MainLayout';
+import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import {
+  AlertTriangle,
+  BarChart2,
+  BarChart3,
+  Bot,
+  Edit2,
+  EyeIcon,
+  FormInput,
+  GripVertical,
+  HelpCircle,
+  Layout,
+  MessageSquare,
+  Move,
+  Palette,
+  Plus,
+  ScrollText,
+  Settings,
+  Terminal,
+} from 'lucide-react';
+import { useState } from 'react';
+import { Link, useLocation } from 'wouter';
 
 interface Agent {
   id: string;

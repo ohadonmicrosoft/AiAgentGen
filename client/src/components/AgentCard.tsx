@@ -1,17 +1,17 @@
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Edit, Play, MoreHorizontal } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useLocation } from 'wouter';
+import { useMicroInteractions, useScrollAnimation } from '@/hooks/animations';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { useMicroInteractions, useScrollAnimation } from '@/hooks/animations';
+import { Edit, MoreHorizontal, Play } from 'lucide-react';
+import { useLocation } from 'wouter';
 
 interface Agent {
   id: string;

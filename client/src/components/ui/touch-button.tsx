@@ -1,12 +1,12 @@
-import * as React from 'react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import { Button, ButtonProps } from '@/components/ui/button';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useHaptic } from '@/hooks/use-haptic';
 import { withErrorBoundary } from '@/components/ui/error-boundary';
 import { useReducedMotion } from '@/hooks/animations/useReducedMotion';
 import { useFluidSpacing } from '@/hooks/use-fluid-spacing';
+import { useHaptic } from '@/hooks/use-haptic';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import * as React from 'react';
 
 // Define haptic feedback types
 type HapticType =

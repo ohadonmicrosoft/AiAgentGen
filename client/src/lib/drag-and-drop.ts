@@ -5,7 +5,7 @@
  * drag and drop functionality throughout the application.
  */
 
-import { Position, DragState } from '@/types/drag-types';
+import { DragState, Position } from '@/types/drag-types';
 import { AnimationControls } from 'framer-motion';
 
 // Constants for drag animation configuration

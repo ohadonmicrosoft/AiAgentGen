@@ -1,6 +1,6 @@
-import React, { forwardRef } from 'react';
-import { GripVertical, Move } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { GripVertical, Move } from 'lucide-react';
+import React, { forwardRef } from 'react';
 
 export interface DragHandleProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'minimal' | 'icon';

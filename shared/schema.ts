@@ -1,10 +1,10 @@
 import {
-  pgTable,
-  text,
-  serial,
-  integer,
   boolean,
+  integer,
   json,
+  pgTable,
+  serial,
+  text,
   timestamp,
 } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';

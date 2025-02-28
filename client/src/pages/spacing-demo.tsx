@@ -1,4 +1,4 @@
-import { MainLayout } from '@/layouts/main-layout';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -6,13 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { fluidSpacingToClassName } from '@/hooks/use-fluid-spacing';
+import { MainLayout } from '@/layouts/main-layout';
+import { fluidSpaceScale } from '@/lib/fluid-spacing';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { fluidSpacingToClassName } from '@/hooks/use-fluid-spacing';
-import { fluidSpaceScale } from '@/lib/fluid-spacing';
 
 export default function SpacingDemo() {
   const [selectedTab, setSelectedTab] = useState<string>('containers');

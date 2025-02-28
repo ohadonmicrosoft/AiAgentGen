@@ -1,12 +1,12 @@
-import { useMemo } from 'react';
 import {
-  fluidSpaceScale,
-  contentMaxWidth,
-  responsiveGap,
   containerPadding,
-  hierarchicalSpacing,
+  contentMaxWidth,
   deviceSpecificSpace,
+  fluidSpaceScale,
+  hierarchicalSpacing,
+  responsiveGap,
 } from '@/lib/fluid-spacing';
+import { useMemo } from 'react';
 import { useActiveBreakpoint } from './use-mobile';
 
 export type SpaceScaleKey = keyof typeof fluidSpaceScale;

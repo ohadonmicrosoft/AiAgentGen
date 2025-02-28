@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Check, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useLocation } from 'wouter';
-import { useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useMutation } from '@tanstack/react-query';
+import { Check, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { useLocation } from 'wouter';
 
 interface AgentReviewProps {
   formData: any;

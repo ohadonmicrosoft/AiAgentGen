@@ -1,5 +1,3 @@
-const undefined;
-
 /**
  * Calculates a fluid typography value using CSS clamp
  */
@@ -42,7 +40,7 @@ module.exports = plugin(function ({ addUtilities, theme, e }) {
       };
       return acc;
     },
-    {}
+    {},
   );
 
   // Create fluid line height utilities based on ratios

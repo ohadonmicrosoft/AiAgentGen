@@ -1,52 +1,3 @@
-import { useState } from 'react';
-import MainLayout from '@/layouts/MainLayout';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import {
-  Plus,
-  Search,
-  Edit,
-  Clock,
-  Star,
-  StarOff,
-  Trash2,
-  Loader2,
-} from 'lucide-react';
-import { queryClient, apiRequest } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
-import { Prompt } from '@shared/schema';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -57,6 +8,55 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import MainLayout from '@/layouts/MainLayout';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Prompt } from '@shared/schema';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  Clock,
+  Edit,
+  Loader2,
+  Plus,
+  Search,
+  Star,
+  StarOff,
+  Trash2,
+} from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 const promptFormSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),

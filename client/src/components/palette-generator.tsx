@@ -1,11 +1,5 @@
-import { useState, useEffect } from 'react';
-import {
-  generatePalette,
-  getContrastRatio,
-  getAccessibleTextColor,
-  generateThemeColors,
-  toHslString,
-} from '@/lib/color-palette';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -14,21 +8,27 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Copy, Check, Paintbrush, Save, RefreshCw } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
 import { useTheme } from '@/hooks/use-theme';
+import {
+  generatePalette,
+  generateThemeColors,
+  getAccessibleTextColor,
+  getContrastRatio,
+  toHslString,
+} from '@/lib/color-palette';
 import { motion } from 'framer-motion';
+import { Check, Copy, Paintbrush, RefreshCw, Save } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface ColorSwatchProps {
   color: string;

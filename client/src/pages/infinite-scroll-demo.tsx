@@ -1,16 +1,16 @@
-import React, { useState, useCallback, useRef } from 'react';
 import { MainLayout } from '@/components/layouts/MainLayout';
-import { Card } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   InfiniteScrollLoader,
   LoadingIndicator,
 } from '@/components/ui/loading-indicator';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { Input } from '@/components/ui/input';
 import { motion } from 'framer-motion';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import React, { useState, useCallback, useRef } from 'react';
 
 // Generate a random color for cards
 const getRandomColor = () => {

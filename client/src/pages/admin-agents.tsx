@@ -1,33 +1,3 @@
-import React, { useState } from 'react';
-import MainLayout from '@/layouts/MainLayout';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { getQueryFn, apiRequest, queryClient } from '@/lib/queryClient';
-import { Loader2, Edit, Trash2, Eye, Bot, Activity } from 'lucide-react';
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from '@/components/ui/table';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,12 +9,42 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import MainLayout from '@/layouts/MainLayout';
+import { apiRequest, getQueryFn, queryClient } from '@/lib/queryClient';
+import { Agent, ROLES } from '@shared/schema';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Activity, Bot, Edit, Eye, Loader2, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
 import { Redirect } from 'wouter';
-import { ROLES, Agent } from '@shared/schema';
 
 interface ExtendedAgent extends Agent {
   createdBy: {

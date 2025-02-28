@@ -1,9 +1,4 @@
-import { useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -12,8 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
@@ -22,9 +15,16 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { insertUserSchema } from '@shared/schema';
 import { Bot } from 'lucide-react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useLocation } from 'wouter';
+import { z } from 'zod';
 
 const loginSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),

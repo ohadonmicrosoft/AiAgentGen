@@ -1,3 +1,11 @@
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { getCursorPosition, isCursorOutOfBounds } from '@/lib/drag-and-drop';
+import {
+  DragResult,
+  DragState,
+  DraggableItem,
+  Position,
+} from '@/types/drag-types';
 import React, {
   createContext,
   useContext,
@@ -6,14 +14,6 @@ import React, {
   useCallback,
   useEffect,
 } from 'react';
-import {
-  DragState,
-  Position,
-  DraggableItem,
-  DragResult,
-} from '@/types/drag-types';
-import { getCursorPosition, isCursorOutOfBounds } from '@/lib/drag-and-drop';
-import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 // Initial drag state
 const initialDragState: DragState = {

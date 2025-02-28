@@ -1,4 +1,4 @@
-import { offlinePlugin, isOffline } from '../offline-plugin';
+import { isOffline, offlinePlugin } from '../offline-plugin';
 
 // Mock localStorage
 const localStorageMock = (() => {

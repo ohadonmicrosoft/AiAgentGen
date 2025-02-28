@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layouts/MainLayout';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -8,20 +9,19 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { motion } from 'framer-motion';
 import {
   checkContrast,
   getContrastLevel,
-  suggestBetterContrast,
   getRecommendedTextColor,
+  suggestBetterContrast,
 } from '@/lib/color-contrast';
 import { hexToRgb, rgbToHex } from '@/lib/color-utils';
+import { motion } from 'framer-motion';
 import { AlertCircle, Check, Copy, RefreshCw } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import React, { useState, useEffect } from 'react';
 
 const ContrastCheckerDemo: React.FC = () => {
   const [foreground, setForeground] = useState('#000000');

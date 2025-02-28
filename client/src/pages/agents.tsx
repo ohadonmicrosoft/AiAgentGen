@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { useLocation } from 'wouter';
-import MainLayout from '@/layouts/MainLayout';
 import AgentCard from '@/components/AgentCard';
-import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Search, Loader2 } from 'lucide-react';
-import { Agent as AgentSchema } from '@shared/schema';
-import { useAuth } from '@/hooks/use-auth';
-import { motion } from 'framer-motion';
 import { useScrollAnimation } from '@/hooks/animations';
+import { useAuth } from '@/hooks/use-auth';
+import MainLayout from '@/layouts/MainLayout';
+import { Agent as AgentSchema } from '@shared/schema';
+import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import { Loader2, Plus, Search } from 'lucide-react';
+import { useState } from 'react';
+import { useLocation } from 'wouter';
 
 // Define the UIAgent type to match the AgentCard component props
 interface UIAgent {

@@ -2,7 +2,7 @@
  * Real User Metrics (RUM) for monitoring application performance in production
  */
 
-import { performanceMonitor, PerformanceMetric } from './performance-metrics';
+import { PerformanceMetric, performanceMonitor } from './performance-metrics';
 
 // Metric types
 export type CoreWebVitalMetric = 'LCP' | 'FID' | 'CLS' | 'TTFB' | 'FCP';

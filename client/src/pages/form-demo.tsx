@@ -1,9 +1,14 @@
-import { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { motion } from 'framer-motion';
+import { AnimatedFormField } from '@/components/ui/animated-form-field';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { FloatingLabelInput } from '@/components/ui/floating-label-input';
 import {
   Form,
   FormControl,
@@ -14,19 +19,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FloatingLabelInput } from '@/components/ui/floating-label-input';
-import { AnimatedFormField } from '@/components/ui/animated-form-field';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import MainLayout from '@/layouts/MainLayout';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 // Define schema
 const formSchema = z

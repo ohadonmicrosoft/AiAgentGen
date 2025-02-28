@@ -1,4 +1,4 @@
-import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
+import { ChatPostMessageArguments, WebClient } from '@slack/web-api';
 import { log } from './vite';
 
 // Initialize the Slack Web Client with the bot token

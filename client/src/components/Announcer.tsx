@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { AnnouncementType } from '@/lib/accessibility';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface AnnouncerProps {
   /**

@@ -1,6 +1,6 @@
+import { logger } from '@/lib/logger';
 import { useCallback } from 'react';
 import { useIsMobile } from './use-mobile';
-import { logger } from '@/lib/logger';
 
 /**
  * Haptic patterns for different feedback types

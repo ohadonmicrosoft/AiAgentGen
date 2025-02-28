@@ -1,8 +1,8 @@
-import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
-import { OfflineIndicator } from '../offline-indicator';
-import * as offlineForms from '@/lib/offline-forms';
 import { useToast } from '@/hooks/use-toast';
+import * as offlineForms from '@/lib/offline-forms';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import React from 'react';
+import { OfflineIndicator } from '../offline-indicator';
 
 // Mock the offline forms functionality
 jest.mock('@/lib/offline-forms', () => ({

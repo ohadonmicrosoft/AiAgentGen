@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import { MainLayout } from '@/components/layouts/main-layout';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -7,16 +7,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import {
-  ErrorFallback,
   CompactErrorFallback,
+  ErrorFallback,
 } from '@/components/ui/error-fallback';
-import { useErrorBoundary } from '@/hooks/use-error-boundary';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useErrorBoundary } from '@/hooks/use-error-boundary';
 import { AlertCircle, Bug, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
 
 // Component that throws an error when the button is clicked
 function ErrorThrower() {

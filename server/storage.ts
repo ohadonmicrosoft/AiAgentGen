@@ -1,37 +1,37 @@
 import {
-  users,
+  type Agent,
+  type Conversation,
+  type InsertAgent,
+  type InsertConversation,
+  type InsertMessage,
+  type InsertPrompt,
+  type InsertUser,
+  type Message,
+  PERMISSIONS,
+  type Permission,
+  type Prompt,
+  ROLES,
+  ROLE_PERMISSIONS,
+  type Role,
+  type User,
   agents,
-  prompts,
   conversations,
   messages,
-  ROLES,
-  PERMISSIONS,
-  ROLE_PERMISSIONS,
-  type User,
-  type InsertUser,
-  type Agent,
-  type InsertAgent,
-  type Prompt,
-  type InsertPrompt,
-  type Conversation,
-  type InsertConversation,
-  type Message,
-  type InsertMessage,
-  type Role,
-  type Permission,
+  prompts,
+  users,
 } from '@shared/schema';
+import connectPg from 'connect-pg-simple';
+import { and, eq } from 'drizzle-orm';
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import session from 'express-session';
 import createMemoryStore from 'memorystore';
-import { eq, and } from 'drizzle-orm';
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { db } from './db'; // Import the shared db instance directly
-import connectPg from 'connect-pg-simple';
 import {
-  userCache,
   agentCache,
-  promptCache,
   conversationCache,
   getOrCompute,
+  promptCache,
+  userCache,
 } from './lib/cache';
 
 const MemoryStore = createMemoryStore(session);
@@ -40,7 +40,7 @@ type SessionStore = any;
 
 // Create a separate table for API keys
 // We'll define this inside storage.ts since it's internal implementation detail
-import { pgTable, text, integer, serial } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 export const apiKeys = pgTable('api_keys', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')

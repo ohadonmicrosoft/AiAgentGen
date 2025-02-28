@@ -1,7 +1,7 @@
-import React, { ReactNode } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useLocation } from 'wouter';
 import { usePageTransition } from '@/hooks/animations';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { ReactNode } from 'react';
+import { useLocation } from 'wouter';
 
 interface PageTransitionProps {
   children: ReactNode;

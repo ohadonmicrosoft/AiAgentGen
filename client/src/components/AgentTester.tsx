@@ -1,10 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { apiRequest, getQueryFn } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -20,31 +15,36 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
+import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest, getQueryFn } from '@/lib/queryClient';
+import { cn } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Agent, Conversation, Message as DBMessage } from '@shared/schema';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import {
-  Loader2,
-  Send,
-  RotateCcw,
   Bot,
-  User,
-  Clock,
-  Save,
-  Maximize2,
-  Minimize2,
-  X,
   ChevronDown,
   ChevronUp,
+  Clock,
   Download,
   Info,
+  Loader2,
+  Maximize2,
   MessageSquare,
+  Minimize2,
+  RotateCcw,
+  Save,
+  Send,
+  User,
+  X,
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Agent, Conversation, Message as DBMessage } from '@shared/schema';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { format } from 'date-fns';
-import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
+import React, { useState, useRef, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 // Form schema
 const formSchema = z.object({

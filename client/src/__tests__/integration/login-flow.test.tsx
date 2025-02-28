@@ -1,12 +1,12 @@
-import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/auth-context';
 import { ToastProvider } from '@/contexts/toast-context';
-import LoginPage from '@/pages/login';
 import DashboardPage from '@/pages/dashboard';
+import LoginPage from '@/pages/login';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 // Mock API calls
 jest.mock('@/lib/api', () => ({

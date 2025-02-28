@@ -1,11 +1,11 @@
-import passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
+import { randomBytes, scrypt, timingSafeEqual } from 'crypto';
+import { promisify } from 'util';
+import { User as SelectUser } from '@shared/schema';
 import { Express } from 'express';
 import session from 'express-session';
-import { scrypt, randomBytes, timingSafeEqual } from 'crypto';
-import { promisify } from 'util';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
 import { storage } from './storage';
-import { User as SelectUser } from '@shared/schema';
 
 declare global {
   namespace Express {

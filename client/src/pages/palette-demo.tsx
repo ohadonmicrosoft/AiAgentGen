@@ -1,4 +1,3 @@
-import { MainLayout } from '@/layouts/main-layout';
 import { PaletteGenerator } from '@/components/palette-generator';
 import {
   Card,
@@ -7,8 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MainLayout } from '@/layouts/main-layout';
 import { motion } from 'framer-motion';
 
 export default function PaletteDemo() {

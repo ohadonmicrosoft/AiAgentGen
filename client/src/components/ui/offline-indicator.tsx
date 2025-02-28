@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Wifi, WifiOff } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 import { isOnline } from '@/lib/offline-forms';
 import { getPendingForms, syncOfflineForms } from '@/lib/offline-forms';
-import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+import { Wifi, WifiOff } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Button } from './button';
 
 interface OfflineIndicatorProps {

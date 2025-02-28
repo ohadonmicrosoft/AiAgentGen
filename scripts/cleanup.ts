@@ -1,9 +1,9 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { glob } from 'glob';
-import { createInterface } from 'readline';
 import { exec } from 'child_process';
+import path from 'path';
+import { createInterface } from 'readline';
 import { promisify } from 'util';
+import fs from 'fs/promises';
+import { glob } from 'glob';
 
 const execAsync = promisify(exec);
 

@@ -1,7 +1,7 @@
-import React, { ReactNode, Suspense } from 'react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
-import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorFallback } from '@/components/ui/error-fallback';
+import { Skeleton } from '@/components/ui/skeleton';
+import React, { ReactNode, Suspense } from 'react';
 
 interface AsyncBoundaryProps {
   children: ReactNode;

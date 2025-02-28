@@ -1,4 +1,3 @@
-import { MainLayout } from '@/layouts/main-layout';
 import {
   Card,
   CardContent,
@@ -7,6 +6,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { MainLayout } from '@/layouts/main-layout';
 import { motion } from 'framer-motion';
 
 export default function TypographyDemo() {

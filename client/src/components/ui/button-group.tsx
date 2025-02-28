@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { cn } from '@/lib/utils';
 import { ButtonProps } from '@/components/ui/button';
 import { withErrorBoundary } from '@/components/ui/error-boundary';
+import { cn } from '@/lib/utils';
+import * as React from 'react';
 
 export interface ButtonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   /**

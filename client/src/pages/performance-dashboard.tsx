@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
 import { MainLayout } from '@/components/layouts/MainLayout';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -7,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -16,28 +17,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { motion } from 'framer-motion';
-import {
-  performanceMonitor,
-  PerformanceMetric,
-} from '@/lib/performance-metrics';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { initializePerformanceMonitoring } from '@/hooks/use-performance';
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-} from 'recharts';
+  PerformanceMetric,
+  performanceMonitor,
+} from '@/lib/performance-metrics';
+import { motion } from 'framer-motion';
 import {
   AlertCircle,
   BarChart2,
@@ -49,6 +36,19 @@ import {
   StopCircle,
   Trash2,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 // Initialize performance monitoring
 const performanceControls = initializePerformanceMonitoring();

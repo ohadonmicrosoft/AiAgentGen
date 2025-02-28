@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from './use-reduced-motion';
 
 export interface InfiniteScrollOptions {

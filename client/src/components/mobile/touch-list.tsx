@@ -1,9 +1,9 @@
-import * as React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import { withErrorBoundary } from '@/components/ui/error-boundary';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Logger } from '@/lib/logger';
+import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'framer-motion';
+import * as React from 'react';
 import { SwipeContainer } from './swipe-container';
 
 const logger = new Logger('TouchList');

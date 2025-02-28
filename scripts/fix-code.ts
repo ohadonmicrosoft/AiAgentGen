@@ -1,16 +1,16 @@
 import { execSync } from 'node:child_process';
 import {
+  existsSync,
   readFileSync,
-  writeFileSync,
   readdirSync,
   statSync,
-  existsSync,
+  writeFileSync,
 } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { format } from 'prettier';
 import * as jscodeshift from 'jscodeshift';
 import type { API, FileInfo, Transform } from 'jscodeshift';
+import { format } from 'prettier';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

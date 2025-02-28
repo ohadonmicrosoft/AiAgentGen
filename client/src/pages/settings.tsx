@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import MainLayout from '@/layouts/MainLayout';
-import { useAuth } from '@/hooks/use-auth';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -15,18 +15,18 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { useTheme } from '@/providers/ThemeProvider';
-import { Moon, Sun, Info, Loader2, Laptop } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
+import MainLayout from '@/layouts/MainLayout';
+import { useTheme } from '@/providers/ThemeProvider';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Info, Laptop, Loader2, Moon, Sun } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 const profileFormSchema = z
   .object({

@@ -1,5 +1,5 @@
-import React, { useState, useCallback, ReactNode } from 'react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+import React, { useState, useCallback, ReactNode } from 'react';
 
 interface ErrorBoundaryState {
   hasError: boolean;

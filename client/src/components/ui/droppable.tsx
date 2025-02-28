@@ -1,8 +1,8 @@
-import React, { forwardRef } from 'react';
-import { motion } from 'framer-motion';
 import { useDroppable } from '@/hooks/use-droppable';
-import { DroppableConfig, DraggableItem, DragResult } from '@/types/drag-types';
 import { cn } from '@/lib/utils';
+import { DragResult, DraggableItem, DroppableConfig } from '@/types/drag-types';
+import { motion } from 'framer-motion';
+import React, { forwardRef } from 'react';
 
 export interface DroppableProps extends React.HTMLAttributes<HTMLDivElement> {
   id: string;

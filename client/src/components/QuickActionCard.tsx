@@ -1,7 +1,7 @@
-import { ReactNode } from 'react';
 import { Card } from '@/components/ui/card';
-import { motion } from 'framer-motion';
 import { useMicroInteractions, useScrollAnimation } from '@/hooks/animations';
+import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
 interface QuickActionCardProps {
   title: string;

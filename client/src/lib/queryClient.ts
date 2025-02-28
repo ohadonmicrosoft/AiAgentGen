@@ -1,8 +1,8 @@
 import {
-  QueryClient,
-  QueryFunction,
-  QueryClientConfig,
   DefaultOptions,
+  QueryClient,
+  QueryClientConfig,
+  QueryFunction,
 } from '@tanstack/react-query';
 import { offlinePlugin } from './offline-plugin'; // We'll create this next
 

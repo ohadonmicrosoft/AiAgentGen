@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useRef, memo } from 'react';
-import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/hooks/animations/useReducedMotion';
+import { useInView } from '@/hooks/use-in-view';
 import {
-  getOptimizedImageUrl,
-  getLowQualityImagePlaceholder,
-  getResponsiveSrcSet,
-  ImageOptimizationOptions,
   ImageLoadingMode,
+  ImageOptimizationOptions,
   getBestSupportedFormat,
+  getLowQualityImagePlaceholder,
+  getOptimizedImageUrl,
+  getResponsiveSrcSet,
   preloadImage,
 } from '@/lib/image-optimization';
-import { useInView } from '@/hooks/use-in-view';
-import { useReducedMotion } from '@/hooks/animations/useReducedMotion';
+import { cn } from '@/lib/utils';
+import React, { useState, useEffect, useRef, memo } from 'react';
 
 export interface OptimizedImageProps
   extends React.ImgHTMLAttributes<HTMLImageElement> {

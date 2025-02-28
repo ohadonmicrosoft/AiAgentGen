@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
 import {
-  fluidTypography,
-  fluidTypeScale,
-  fluidLineHeight,
   calculateOptimalLineLength,
+  fluidLineHeight,
+  fluidTypeScale,
+  fluidTypography,
 } from '@/lib/fluid-typography';
+import { useMemo } from 'react';
 
 export type TypeScaleKey = keyof typeof fluidTypeScale;
 

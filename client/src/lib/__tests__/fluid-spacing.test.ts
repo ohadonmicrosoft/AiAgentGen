@@ -1,4 +1,4 @@
-import { fluidSpace, convertToUnit, fluidSpaceScale } from '../fluid-spacing';
+import { convertToUnit, fluidSpace, fluidSpaceScale } from '../fluid-spacing';
 
 describe('Fluid Spacing Utilities', () => {
   describe('convertToUnit', () => {

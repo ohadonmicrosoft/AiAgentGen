@@ -1,9 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useParams, useLocation, Link } from 'wouter';
-import { getQueryFn } from '@/lib/queryClient';
-import MainLayout from '@/layouts/MainLayout';
 import AgentTester from '@/components/AgentTester';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -11,20 +8,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Loader2,
-  ArrowLeft,
-  Save,
-  Cog,
-  Bot,
-  Wand2,
-  History,
-} from 'lucide-react';
-import { Agent } from '@shared/schema';
 import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import MainLayout from '@/layouts/MainLayout';
+import { getQueryFn } from '@/lib/queryClient';
+import { Agent } from '@shared/schema';
+import { useQuery } from '@tanstack/react-query';
+import {
+  ArrowLeft,
+  Bot,
+  Cog,
+  History,
+  Loader2,
+  Save,
+  Wand2,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useParams } from 'wouter';
 
 export default function TestAgentPage() {
   const [_, setLocation] = useLocation();

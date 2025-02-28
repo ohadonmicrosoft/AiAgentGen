@@ -1,8 +1,8 @@
-import React, { forwardRef } from 'react';
-import { motion } from 'framer-motion';
 import { useDraggable } from '@/hooks/use-draggable';
-import { DraggableItem, DraggableConfig } from '@/types/drag-types';
 import { cn } from '@/lib/utils';
+import { DraggableConfig, DraggableItem } from '@/types/drag-types';
+import { motion } from 'framer-motion';
+import React, { forwardRef } from 'react';
 
 export interface DraggableProps extends React.HTMLAttributes<HTMLDivElement> {
   item: DraggableItem;

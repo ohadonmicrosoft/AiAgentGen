@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
 import {
-  performanceMonitor,
   PerformanceMetric,
+  performanceMonitor,
 } from '@/lib/performance-metrics';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Options for the usePerformance hook

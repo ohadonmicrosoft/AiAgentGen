@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { MainLayout } from '@/layouts/main-layout';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -7,28 +6,29 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { DragProvider } from '@/contexts/drag-context';
+import { DragHandle } from '@/components/ui/drag-handle';
 import { Draggable } from '@/components/ui/draggable';
 import { Droppable } from '@/components/ui/droppable';
-import { DragHandle } from '@/components/ui/drag-handle';
-import { DraggableItem, DragResult } from '@/types/drag-types';
-import { reorderItems, moveItemBetweenLists } from '@/lib/drag-and-drop';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DragProvider } from '@/contexts/drag-context';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { MainLayout } from '@/layouts/main-layout';
+import { moveItemBetweenLists, reorderItems } from '@/lib/drag-and-drop';
+import { DragResult, DraggableItem } from '@/types/drag-types';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Grip,
-  Plus,
-  X,
-  Check,
   Bookmark,
+  Check,
   FileText,
+  Grip,
   ImageIcon,
+  Plus,
   Trash2,
+  X,
 } from 'lucide-react';
+import React, { useState } from 'react';
 
 // Demo task type for the kanban board
 interface Task extends DraggableItem {

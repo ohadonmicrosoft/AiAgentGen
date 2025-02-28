@@ -1,40 +1,40 @@
-import {
-  ReactNode,
-  useState,
-  useEffect,
-  createContext,
-  useContext,
-} from 'react';
 import Sidebar from '@/components/Sidebar';
-import TopNav from '@/components/TopNav';
-import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Backdrop } from '@/components/ui/backdrop';
-import { SidebarProvider, useSidebarState } from '@/hooks/use-sidebar-state';
-import { motion } from 'framer-motion';
 import { SkipLink } from '@/components/SkipLink';
-import { useAnnouncer, useFocusTrap } from '@/lib/accessibility';
-import { useAuth } from '@/hooks/use-auth';
-import { usePreferences } from '@/context/preferences-context';
-import { useBreakpoint } from '@/hooks/use-breakpoint';
+import TopNav from '@/components/TopNav';
+import { Backdrop } from '@/components/ui/backdrop';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { Icons } from '@/components/ui/icons';
 import { PERMISSIONS } from '@/constants';
+import { usePreferences } from '@/context/preferences-context';
+import { useAuth } from '@/hooks/use-auth';
+import { useBreakpoint } from '@/hooks/use-breakpoint';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { SidebarProvider, useSidebarState } from '@/hooks/use-sidebar-state';
+import { useAnnouncer, useFocusTrap } from '@/lib/accessibility';
+import { cn } from '@/lib/utils';
 import { NavItem } from '@/types';
+import { FocusTrap } from '@radix-ui/react-focus-trap';
+import { motion } from 'framer-motion';
 import {
+  AlertTriangle,
   Bot,
-  Home,
-  Users,
-  MessagesSquare,
   Compass,
+  Database,
+  Home,
+  Menu,
+  MessagesSquare,
   Settings,
   Sparkles,
-  Database,
-  AlertTriangle,
-  Menu,
+  Users,
   X,
 } from 'lucide-react';
-import { FocusTrap } from '@radix-ui/react-focus-trap';
-import { ErrorBoundary } from '@/components/ui/error-boundary';
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 interface MainLayoutProps {
   children: ReactNode;

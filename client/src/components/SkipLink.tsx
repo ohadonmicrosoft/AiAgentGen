@@ -1,6 +1,6 @@
-import React from 'react';
 import { SkipLinkProps } from '@/lib/accessibility';
 import { cn } from '@/lib/utils';
+import React from 'react';
 
 /**
  * A skip link that allows keyboard users to bypass navigation

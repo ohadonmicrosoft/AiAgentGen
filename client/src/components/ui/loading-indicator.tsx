@@ -1,7 +1,7 @@
-import { FC } from 'react';
 import { cn } from '@/lib/utils';
-import { Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Loader } from 'lucide-react';
+import { FC } from 'react';
 
 export interface LoadingIndicatorProps {
   /**

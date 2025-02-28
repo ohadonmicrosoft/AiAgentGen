@@ -1,14 +1,14 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import {
   ApiError,
-  checkResponse,
-  formatErrorForLogging,
-  createNetworkError,
   ErrorCategory,
+  checkResponse,
+  createNetworkError,
+  formatErrorForLogging,
 } from '@/lib/api-error';
 import { logger } from '@/lib/logger';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Create a dedicated logger for API calls
 const logger = new Logger('APIClient');

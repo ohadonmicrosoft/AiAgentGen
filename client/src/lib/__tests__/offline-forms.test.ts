@@ -1,7 +1,7 @@
 import {
+  getPendingForms,
   isOnline,
   submitForm,
-  getPendingForms,
   syncOfflineForms,
 } from '../offline-forms';
 

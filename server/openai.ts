@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
-import { log } from './vite';
 import { storage } from './storage';
+import { log } from './vite';
 
 // Create a mock OpenAI client for testing
 function createMockOpenAIClient() {

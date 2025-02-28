@@ -1,7 +1,7 @@
-// Direct database setup script to create tables from schema
-import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
+// Direct database setup script to create tables from schema
+import postgres from 'postgres';
 import * as schema from './shared/schema.js';
 
 async function main() {

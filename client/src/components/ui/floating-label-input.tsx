@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useFormAnimations } from '@/hooks/use-form-animations';
+import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'framer-motion';
+import * as React from 'react';
 
 export interface FloatingLabelInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

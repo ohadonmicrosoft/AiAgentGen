@@ -1,15 +1,15 @@
-import { ReactNode, useEffect, useState } from 'react';
-import { cn } from '@/lib/utils';
+import {
+  fluidSpacingToClassName,
+  useFluidSpacing,
+} from '@/hooks/use-fluid-spacing';
+import { SpaceScaleKey } from '@/hooks/use-fluid-spacing';
 import {
   useActiveBreakpoint,
   useIsMobile,
   useIsTablet,
 } from '@/hooks/use-mobile';
-import {
-  useFluidSpacing,
-  fluidSpacingToClassName,
-} from '@/hooks/use-fluid-spacing';
-import { SpaceScaleKey } from '@/hooks/use-fluid-spacing';
+import { cn } from '@/lib/utils';
+import { ReactNode, useEffect, useState } from 'react';
 
 interface ResponsiveContainerProps {
   children: ReactNode;

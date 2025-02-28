@@ -1,16 +1,5 @@
-import React, { useState } from 'react';
-import MainLayout from '@/layouts/MainLayout';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { getQueryFn, apiRequest, queryClient } from '@/lib/queryClient';
-import { Loader2, User, Shield } from 'lucide-react';
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -18,15 +7,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import {
   Form,
@@ -43,13 +30,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useToast } from '@/hooks/use-toast';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import MainLayout from '@/layouts/MainLayout';
+import { apiRequest, getQueryFn, queryClient } from '@/lib/queryClient';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { PERMISSIONS, Permission, ROLES, Role } from '@shared/schema';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Loader2, Shield, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Redirect } from 'wouter';
-import { ROLES, PERMISSIONS, Permission, Role } from '@shared/schema';
+import { z } from 'zod';
 
 // Form schema for user role update
 const userRoleUpdateSchema = z.object({

@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { motion, useAnimation, PanInfo } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import { withErrorBoundary } from '@/components/ui/error-boundary';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Loader2 } from 'lucide-react';
 import { Logger } from '@/lib/logger';
+import { cn } from '@/lib/utils';
+import { PanInfo, motion, useAnimation } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
+import * as React from 'react';
 
 const logger = new Logger('PullRefresh');
 

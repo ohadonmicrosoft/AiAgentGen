@@ -1,44 +1,44 @@
-import { useLocation, Link } from 'wouter';
-import { useAuth } from '@/hooks/use-auth';
-import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Home,
-  Bot,
-  MessageSquare,
-  Settings,
-  LogOut,
-  X,
-  Zap,
-  Users,
-  FormInput,
-  ChevronRight,
-  Palette,
-  Layout,
-  Move,
-  ListFilter,
-  ScrollText,
-  EyeIcon,
-  BarChart2,
-  AlertTriangle,
-} from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { PERMISSIONS } from '@shared/schema';
-import { useSidebarState } from '@/hooks/use-sidebar-state';
 import { SidebarToggle } from '@/components/ui/sidebar-toggle';
-import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { NavItem } from '@/types';
-import { usePreferences } from '@/context/preferences-context';
 import { useAuth as useAuthContext } from '@/context/auth-context';
+import { usePreferences } from '@/context/preferences-context';
+import { useAuth } from '@/hooks/use-auth';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { useSidebarState } from '@/hooks/use-sidebar-state';
+import { cn } from '@/lib/utils';
+import { NavItem } from '@/types';
+import { PERMISSIONS } from '@shared/schema';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  AlertTriangle,
+  BarChart2,
+  Bot,
+  ChevronRight,
+  EyeIcon,
+  FormInput,
+  Home,
+  Layout,
+  ListFilter,
+  LogOut,
+  MessageSquare,
+  Move,
+  Palette,
+  ScrollText,
+  Settings,
+  Users,
+  X,
+  Zap,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'wouter';
 
 interface SidebarProps {
   open: boolean;
