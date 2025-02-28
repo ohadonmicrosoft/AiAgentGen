@@ -8,6 +8,7 @@ import { eq, and } from "drizzle-orm";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { db } from "./db"; // Import the shared db instance directly
 import connectPg from "connect-pg-simple";
+import { userCache, agentCache, promptCache, conversationCache, getOrCompute } from './lib/cache';
 
 const MemoryStore = createMemoryStore(session);
 // Create a simpler type definition that avoids complications
@@ -94,13 +95,21 @@ export class PostgresStorage implements IStorage {
   
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    const results = await this.db.select().from(users).where(eq(users.id, id));
-    return results[0];
+    const cacheKey = `user:id:${id}`;
+    
+    return getOrCompute(userCache, cacheKey, async () => {
+      const results = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
+      return results.length ? results[0] : undefined;
+    });
   }
   
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const results = await this.db.select().from(users).where(eq(users.username, username));
-    return results[0];
+    const cacheKey = `user:username:${username}`;
+    
+    return getOrCompute(userCache, cacheKey, async () => {
+      const results = await this.db.select().from(users).where(eq(users.username, username)).limit(1);
+      return results.length ? results[0] : undefined;
+    });
   }
   
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -242,8 +251,12 @@ export class PostgresStorage implements IStorage {
   
   // Agent methods
   async getAgent(id: number): Promise<Agent | undefined> {
-    const results = await this.db.select().from(agents).where(eq(agents.id, id));
-    return results[0];
+    const cacheKey = `agent:${id}`;
+    
+    return getOrCompute(agentCache, cacheKey, async () => {
+      const results = await this.db.select().from(agents).where(eq(agents.id, id)).limit(1);
+      return results.length ? results[0] : undefined;
+    });
   }
   
   async getAgentsByUserId(userId: number): Promise<Agent[]> {
@@ -270,14 +283,12 @@ export class PostgresStorage implements IStorage {
   }
   
   async updateAgent(id: number, updates: Partial<Agent>): Promise<Agent> {
-    // Remove any timestamps from updates as they're handled by the database
-    const { createdAt, updatedAt, ...safeUpdates } = updates;
+    // Invalidate cache
+    agentCache.delete(`agent:${id}`);
     
+    // Update in database
     const result = await this.db.update(agents)
-      .set({
-        ...safeUpdates,
-        updatedAt: new Date() // PostgreSQL will handle the timestamp conversion
-      })
+      .set(updates)
       .where(eq(agents.id, id))
       .returning();
     
@@ -294,8 +305,12 @@ export class PostgresStorage implements IStorage {
   
   // Prompt methods
   async getPrompt(id: number): Promise<Prompt | undefined> {
-    const results = await this.db.select().from(prompts).where(eq(prompts.id, id));
-    return results[0];
+    const cacheKey = `prompt:${id}`;
+    
+    return getOrCompute(promptCache, cacheKey, async () => {
+      const results = await this.db.select().from(prompts).where(eq(prompts.id, id)).limit(1);
+      return results.length ? results[0] : undefined;
+    });
   }
   
   async getPromptsByUserId(userId: number): Promise<Prompt[]> {
@@ -321,14 +336,12 @@ export class PostgresStorage implements IStorage {
   }
   
   async updatePrompt(id: number, updates: Partial<Prompt>): Promise<Prompt> {
-    // Remove any timestamps from updates as they're handled by the database
-    const { createdAt, updatedAt, ...safeUpdates } = updates;
+    // Invalidate cache
+    promptCache.delete(`prompt:${id}`);
     
+    // Update in database
     const result = await this.db.update(prompts)
-      .set({
-        ...safeUpdates,
-        updatedAt: new Date() // PostgreSQL will handle the timestamp conversion
-      })
+      .set(updates)
       .where(eq(prompts.id, id))
       .returning();
     
@@ -426,6 +439,27 @@ export class PostgresStorage implements IStorage {
     
     const result = await this.db.insert(messages).values(message).returning();
     return result[0];
+  }
+
+  // Get conversation with messages by ID with caching
+  async getConversationWithMessages(id: number): Promise<{ conversation: Conversation; messages: Message[] } | null> {
+    const cacheKey = `conversation:${id}:with-messages`;
+    
+    return getOrCompute(conversationCache, cacheKey, async () => {
+      // Get conversation
+      const conversationResult = await this.db.select().from(conversations).where(eq(conversations.id, id)).limit(1);
+      if (!conversationResult.length) {
+        return null;
+      }
+      
+      // Get messages
+      const messagesResult = await this.db.select().from(messages).where(eq(messages.conversationId, id));
+      
+      return {
+        conversation: conversationResult[0],
+        messages: messagesResult
+      };
+    });
   }
 }
 

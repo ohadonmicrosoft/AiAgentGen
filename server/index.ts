@@ -4,10 +4,16 @@ import { setupVite, serveStatic, log } from "./vite";
 import { setupAuthRouter } from './api/auth';
 import { setupApiRouter } from './api/api';
 import { setupLogsRouter } from './api/logs';
+import { runMigrations, isDatabaseUpToDate } from './migrations';
+import { logger } from './api/logs';
+import { adaptiveRateLimiter } from './lib/rate-limiter';
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Apply rate limiting to all API routes
+app.use('/api', adaptiveRateLimiter());
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -40,43 +46,59 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
-
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    // Log the error but don't throw it again
-    console.error(`Error: ${status} - ${message}`, err);
+  try {
+    // Check and run migrations before starting the server
+    logger.info('Checking database migrations status');
+    const isUpToDate = await isDatabaseUpToDate();
     
-    // Only send a response if headers haven't been sent yet
-    if (!res.headersSent) {
-      res.status(status).json({ error: message });
+    if (!isUpToDate) {
+      logger.info('Database needs migration, running migrations now');
+      await runMigrations();
+    } else {
+      logger.info('Database is up to date, no migrations needed');
     }
-  });
+    
+    const server = await registerRoutes(app);
 
-  // Register routers
-  app.use(setupAuthRouter());
-  app.use(setupApiRouter());
-  app.use(setupLogsRouter());
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+      // Log the error but don't throw it again
+      console.error(`Error: ${status} - ${message}`, err);
+      
+      // Only send a response if headers haven't been sent yet
+      if (!res.headersSent) {
+        res.status(status).json({ error: message });
+      }
+    });
+
+    // Register routers
+    app.use(setupAuthRouter());
+    app.use(setupApiRouter());
+    app.use(setupLogsRouter());
+
+    // importantly only setup vite in development and after
+    // setting up all the other routes so the catch-all route
+    // doesn't interfere with the other routes
+    if (app.get("env") === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
+
+    // ALWAYS serve the app on port 5000
+    // this serves both the API and the client
+    const port = 5000;
+    server.listen({
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    }, () => {
+      log(`serving on port ${port}`);
+    });
+  } catch (error) {
+    logger.error('Failed to start server', error);
+    process.exit(1);
   }
-
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
 })();
