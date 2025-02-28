@@ -1,7 +1,8 @@
-import { usePageTransition } from '@/hooks/animations';
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { ReactNode } from 'react';
-import { useLocation } from 'wouter';
+import { usePageTransition } from "@/hooks/animations";
+import { AnimatePresence, motion } from "framer-motion";
+import type React from "react";
+import type { ReactNode } from "react";
+import { useLocation } from "wouter";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -12,7 +13,10 @@ interface PageTransitionProps {
  * PageTransition component that wraps route content with animated transitions
  * This creates smooth transitions between pages
  */
-export const PageTransition: React.FC<PageTransitionProps> = ({ children, location }) => {
+export const PageTransition: React.FC<PageTransitionProps> = ({
+  children,
+  location,
+}) => {
   const [currentLocation] = useLocation();
   const { initial, animate, exit, transition } = usePageTransition();
 
@@ -38,7 +42,9 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children, locati
 /**
  * Higher-order component to wrap a page component with transition animations
  */
-export function withPageTransition<T extends object>(Component: React.ComponentType<T>) {
+export function withPageTransition<T extends object>(
+  Component: React.ComponentType<T>,
+) {
   return (props: T) => (
     <PageTransition>
       <Component {...props} />

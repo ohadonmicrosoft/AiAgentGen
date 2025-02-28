@@ -1,7 +1,7 @@
-import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import { Loader } from 'lucide-react';
-import { FC } from 'react';
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { Loader } from "lucide-react";
+import type { FC } from "react";
 
 export interface LoadingIndicatorProps {
   /**
@@ -46,7 +46,7 @@ export interface LoadingIndicatorProps {
 export const LoadingIndicator: FC<LoadingIndicatorProps> = ({
   className,
   size = 24,
-  color = 'currentColor',
+  color = "currentColor",
   text,
   centered = false,
   inline = false,
@@ -54,9 +54,9 @@ export const LoadingIndicator: FC<LoadingIndicatorProps> = ({
   return (
     <div
       className={cn(
-        'flex items-center gap-2',
-        centered && 'justify-center',
-        inline ? 'inline-flex' : 'w-full py-2',
+        "flex items-center gap-2",
+        centered && "justify-center",
+        inline ? "inline-flex" : "w-full py-2",
         className,
       )}
     >
@@ -64,8 +64,8 @@ export const LoadingIndicator: FC<LoadingIndicatorProps> = ({
         animate={{ rotate: 360 }}
         transition={{
           duration: 1.5,
-          repeat: Infinity,
-          ease: 'linear',
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "linear",
         }}
       >
         <Loader size={size} color={color} />
@@ -78,8 +78,8 @@ export const LoadingIndicator: FC<LoadingIndicatorProps> = ({
 /**
  * A specialized loading indicator for use with infinite scroll
  */
-export const InfiniteScrollLoader: FC<Omit<LoadingIndicatorProps, 'text' | 'centered'>> = (
-  props,
-) => {
+export const InfiniteScrollLoader: FC<
+  Omit<LoadingIndicatorProps, "text" | "centered">
+> = (props) => {
   return <LoadingIndicator text="Loading more items..." centered {...props} />;
 };

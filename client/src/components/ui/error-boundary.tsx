@@ -1,8 +1,9 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { logger } from '@/lib/logger';
-import { AlertCircle, RefreshCw } from 'lucide-react';
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { logger } from "@/lib/logger";
+import { AlertCircle, RefreshCw } from "lucide-react";
+import type React from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -22,7 +23,10 @@ interface ErrorBoundaryState {
  * Error Boundary component that catches JavaScript errors in its child component tree.
  * It logs the errors and displays a fallback UI instead of crashing the whole application.
  */
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -47,7 +51,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     });
 
     // Log the error using the logger
-    const componentName = this.props.name || 'UnnamedComponent';
+    const componentName = this.props.name || "UnnamedComponent";
     logger.error(`Error in component ${componentName}:`, {
       error: error.message,
       stack: error.stack,
@@ -61,7 +65,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     // Send error to server for tracking if in production
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       this.reportErrorToServer(error, errorInfo, componentName);
     }
   }
@@ -75,10 +79,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     componentName: string,
   ): void => {
     try {
-      fetch('/api/logs/client-error', {
-        method: 'POST',
+      fetch("/api/logs/client-error", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: error.name,
@@ -93,11 +97,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         keepalive: true,
       }).catch((err) => {
         // Log silently if reporting fails
-        console.error('Failed to report error to server:', err);
+        console.error("Failed to report error to server:", err); // eslint-disable-line no-console
       });
     } catch (reportError) {
       // Catch any errors in error reporting to prevent cascading issues
-      console.error('Error reporting failed:', reportError);
+      console.error("Error reporting failed:", reportError); // eslint-disable-line no-console
     }
   };
 
@@ -115,7 +119,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     // Log the reset action
-    logger.info('Error boundary reset by user');
+    logger.info("Error boundary reset by user");
   };
 
   render(): ReactNode {
@@ -132,7 +136,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <AlertCircle className="h-4 w-4 mr-2" />
             <AlertTitle>Something went wrong</AlertTitle>
             <AlertDescription>
-              {this.state.error?.message || 'An unexpected error occurred'}
+              {this.state.error?.message || "An unexpected error occurred"}
             </AlertDescription>
           </Alert>
 
@@ -159,9 +163,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
  */
 export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>,
+  errorBoundaryProps?: Omit<ErrorBoundaryProps, "children">,
 ): React.FC<P> {
-  const displayName = Component.displayName || Component.name || 'Component';
+  const displayName = Component.displayName || Component.name || "Component";
 
   // Include the component name in the error boundary props
   const mergedProps = {

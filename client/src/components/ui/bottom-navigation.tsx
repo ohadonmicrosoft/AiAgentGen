@@ -1,14 +1,14 @@
-import { useReducedMotion } from '@/hooks/animations/useReducedMotion';
-import { useFluidSpacing } from '@/hooks/use-fluid-spacing';
-import { useHaptic } from '@/hooks/use-haptic';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useIsTablet } from '@/hooks/use-tablet';
-import { cn } from '@/lib/utils';
-import { NavItem } from '@/types';
-import { AnimatePresence, motion } from 'framer-motion';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import * as React from 'react';
+import { useReducedMotion } from "@/hooks/animations/useReducedMotion";
+import { useFluidSpacing } from "@/hooks/use-fluid-spacing";
+import { useHaptic } from "@/hooks/use-haptic";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsTablet } from "@/hooks/use-tablet";
+import { cn } from "@/lib/utils";
+import type { NavItem } from "@/types";
+import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import * as React from "react";
 
 interface BottomNavigationProps {
   /**
@@ -84,9 +84,9 @@ export function BottomNavigation({
 
   // Get appropriate spacing based on device
   const itemPadding = getDeviceSpacing({
-    mobile: 'xs',
-    tablet: 'sm',
-    desktop: 'md',
+    mobile: "xs",
+    tablet: "sm",
+    desktop: "md",
   });
 
   // Don't render on non-mobile/tablet devices
@@ -118,10 +118,10 @@ export function BottomNavigation({
     <AnimatePresence>
       <motion.nav
         className={cn(
-          'fixed bottom-0 left-0 right-0 z-50 bg-background border-t',
-          'flex items-center justify-around h-16 px-2',
-          useGlassEffect && 'bg-background/80 backdrop-blur-md',
-          'touch-action-none', // Prevent scroll interference
+          "fixed bottom-0 left-0 right-0 z-50 bg-background border-t",
+          "flex items-center justify-around h-16 px-2",
+          useGlassEffect && "bg-background/80 backdrop-blur-md",
+          "touch-action-none", // Prevent scroll interference
           className,
         )}
         aria-label="Mobile navigation"
@@ -129,7 +129,7 @@ export function BottomNavigation({
         animate={{ y: 0 }}
         exit={{ y: 100 }}
         transition={{
-          type: 'spring',
+          type: "spring",
           stiffness: 300,
           damping: 30,
           duration: 0.3,
@@ -142,29 +142,29 @@ export function BottomNavigation({
             <Link
               key={item.path}
               href={item.path}
-              aria-current={isActive ? 'page' : undefined}
+              aria-current={isActive ? "page" : undefined}
               onClick={(e) => handleItemClick(item, e)}
               className={cn(
-                'flex flex-col items-center justify-center',
-                'relative py-1 px-1',
-                'min-w-[64px] h-full',
-                'transition-colors duration-200',
-                'active:scale-95', // Touch feedback
-                'touch-manipulation', // Optimize for touch
-                isActive ? 'text-primary' : 'text-muted-foreground',
+                "flex flex-col items-center justify-center",
+                "relative py-1 px-1",
+                "min-w-[64px] h-full",
+                "transition-colors duration-200",
+                "active:scale-95", // Touch feedback
+                "touch-manipulation", // Optimize for touch
+                isActive ? "text-primary" : "text-muted-foreground",
                 `p-[${itemPadding}]`,
               )}
             >
               {showActiveIndicator && isActive && (
                 <motion.div
                   className={cn(
-                    'absolute top-0 left-1/2 h-0.5 bg-primary rounded-full',
-                    'transform -translate-x-1/2',
+                    "absolute top-0 left-1/2 h-0.5 bg-primary rounded-full",
+                    "transform -translate-x-1/2",
                   )}
-                  layoutId={shouldAnimate ? 'bottomNavIndicator' : undefined}
-                  initial={shouldAnimate ? { width: 0 } : { width: '50%' }}
-                  animate={{ width: '50%' }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  layoutId={shouldAnimate ? "bottomNavIndicator" : undefined}
+                  initial={shouldAnimate ? { width: 0 } : { width: "50%" }}
+                  animate={{ width: "50%" }}
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               )}
 
@@ -177,7 +177,7 @@ export function BottomNavigation({
                     y: isActive ? -2 : 0,
                   }}
                   transition={{
-                    type: 'spring',
+                    type: "spring",
                     stiffness: 500,
                     damping: 30,
                     duration: 0.2,
@@ -190,8 +190,8 @@ export function BottomNavigation({
                 {showLabels && (
                   <motion.span
                     className={cn(
-                      'mt-1 text-xs font-medium block text-center',
-                      isActive && 'font-semibold',
+                      "mt-1 text-xs font-medium block text-center",
+                      isActive && "font-semibold",
                     )}
                     animate={{
                       opacity: isActive ? 1 : 0.8,
@@ -208,7 +208,7 @@ export function BottomNavigation({
               {isActive && (
                 <motion.div
                   className="absolute inset-0 bg-primary/5 rounded-md"
-                  layoutId={shouldAnimate ? 'activeItemBackground' : undefined}
+                  layoutId={shouldAnimate ? "activeItemBackground" : undefined}
                   transition={{ duration: 0.2 }}
                 />
               )}
@@ -268,9 +268,9 @@ export function TouchTabBar({
   return (
     <div
       className={cn(
-        'flex items-center justify-around',
-        'bg-muted/30 rounded-full p-1',
-        'touch-manipulation',
+        "flex items-center justify-around",
+        "bg-muted/30 rounded-full p-1",
+        "touch-manipulation",
         className,
       )}
       role="tablist"
@@ -288,12 +288,12 @@ export function TouchTabBar({
             aria-controls={`${item.id}-panel`}
             id={`${item.id}-tab`}
             className={cn(
-              'flex items-center justify-center px-4 py-2',
-              'relative rounded-full text-sm font-medium',
-              'transition-all duration-200',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-              'min-h-[40px] min-w-[80px]',
-              'active:scale-95', // Touch feedback
+              "flex items-center justify-center px-4 py-2",
+              "relative rounded-full text-sm font-medium",
+              "transition-all duration-200",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+              "min-h-[40px] min-w-[80px]",
+              "active:scale-95", // Touch feedback
             )}
             onClick={() => handleTabChange(item.id)}
           >
@@ -301,8 +301,10 @@ export function TouchTabBar({
             {isActive && (
               <motion.div
                 className="absolute inset-0 bg-background rounded-full shadow-sm"
-                layoutId={shouldReduceMotion ? undefined : 'activeTabBackground'}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                layoutId={
+                  shouldReduceMotion ? undefined : "activeTabBackground"
+                }
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
               />
             )}
 
@@ -313,11 +315,19 @@ export function TouchTabBar({
               transition={{ duration: 0.2 }}
             >
               {item.icon && (
-                <span className={isActive ? 'text-primary' : 'text-muted-foreground'}>
+                <span
+                  className={
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  }
+                >
                   {item.icon}
                 </span>
               )}
-              <span className={isActive ? 'text-foreground' : 'text-muted-foreground'}>
+              <span
+                className={
+                  isActive ? "text-foreground" : "text-muted-foreground"
+                }
+              >
                 {item.label}
               </span>
             </motion.div>

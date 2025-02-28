@@ -1,14 +1,14 @@
-import { Card } from '@/components/ui/card';
-import { useScrollAnimation } from '@/hooks/animations';
-import { motion } from 'framer-motion';
-import { ReactNode } from 'react';
-import React from 'react';
+import { Card } from "@/components/ui/card";
+import { useScrollAnimation } from "@/hooks/animations";
+import { motion } from "framer-motion";
+import type { ReactNode } from "react";
+import React from "react";
 
 interface StatsCardProps {
   title: string;
   value: number;
   icon: ReactNode;
-  color: 'primary' | 'green' | 'purple' | string;
+  color: "primary" | "green" | "purple" | string;
   animationDelay?: number;
 }
 
@@ -26,13 +26,14 @@ export default function StatsCard({
 
   // Map color to Tailwind classes
   const colorMap = {
-    primary: 'bg-primary text-primary-foreground',
-    green: 'bg-green-500 text-white',
-    purple: 'bg-purple-500 text-white',
-    gray: 'bg-gray-500 text-white',
+    primary: "bg-primary text-primary-foreground",
+    green: "bg-green-500 text-white",
+    purple: "bg-purple-500 text-white",
+    gray: "bg-gray-500 text-white",
   };
 
-  const bgColorClass = colorMap[color as keyof typeof colorMap] || colorMap.primary;
+  const bgColorClass =
+    colorMap[color as keyof typeof colorMap] || colorMap.primary;
 
   // Animation for counting up the number
   const countVariants = {
@@ -58,7 +59,7 @@ export default function StatsCard({
       }}
       whileHover={{
         scale: 1.02,
-        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+        boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
         transition: { duration: 0.2 },
       }}
       className="p-6 bg-card"
@@ -70,7 +71,7 @@ export default function StatsCard({
           animate={{ scale: 1, rotate: 0 }}
           transition={{
             delay: animationDelay * 0.1 + 0.2,
-            type: 'spring',
+            type: "spring",
             stiffness: 260,
             damping: 20,
           }}

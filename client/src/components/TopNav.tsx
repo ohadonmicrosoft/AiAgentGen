@@ -1,13 +1,20 @@
-import { ThemeToggle } from '@/components/theme-toggle';
-import { Button } from '@/components/ui/button';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { useSidebarState } from '@/hooks/use-sidebar-state';
-import { useTheme } from '@/hooks/use-theme';
-import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Menu, Moon, Search, Sun } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { useSidebarState } from "@/hooks/use-sidebar-state";
+import { useTheme } from "@/hooks/use-theme";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  Moon,
+  Search,
+  Sun,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface TopNavProps {
   title: string;
@@ -15,7 +22,7 @@ interface TopNavProps {
 }
 
 export default function TopNav({ title, onMenuClick }: TopNavProps) {
-  const { theme } = useTheme();
+  const { _theme } = useTheme();
   const isMobile = useIsMobile();
   const { isCollapsed, toggleCollapsed } = useSidebarState();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -33,26 +40,26 @@ export default function TopNav({ title, onMenuClick }: TopNavProps) {
       setIsScrolled(window.scrollY > 10);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
   return (
     <header
       className={cn(
-        'sticky top-0 z-20 w-full bg-background',
-        'transition-all duration-150',
-        isScrolled ? 'border-b shadow-sm' : '',
-        !mounted ? 'duration-0' : '', // No transition on first render
+        "sticky top-0 z-20 w-full bg-background",
+        "transition-all duration-150",
+        isScrolled ? "border-b shadow-sm" : "",
+        !mounted ? "duration-0" : "", // No transition on first render
       )}
     >
       <div
         className={cn(
-          'transition-all duration-150',
-          isMobile ? 'px-3 py-2.5' : 'px-4 py-3 md:px-6',
+          "transition-all duration-150",
+          isMobile ? "px-3 py-2.5" : "px-4 py-3 md:px-6",
         )}
       >
         <div className="flex items-center justify-between">
@@ -75,13 +82,13 @@ export default function TopNav({ title, onMenuClick }: TopNavProps) {
                 size="icon"
                 onClick={toggleCollapsed}
                 className="hidden lg:flex h-8 w-8 mr-2"
-                aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               >
                 <motion.div
                   animate={{ rotate: isCollapsed ? 180 : 0 }}
                   transition={{
                     duration: prefersReducedMotion ? 0 : 0.2,
-                    ease: 'easeInOut',
+                    ease: "easeInOut",
                   }}
                 >
                   {isCollapsed ? (

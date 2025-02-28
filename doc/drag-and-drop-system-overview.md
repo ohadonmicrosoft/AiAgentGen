@@ -60,10 +60,10 @@ For easier integration, the system includes ready-to-use components:
 ### Basic Draggable Item
 
 ```tsx
-import { Draggable } from '@/components/ui/draggable';
+import { Draggable } from "@/components/ui/draggable";
 
 function DraggableCard() {
-  const item = { id: 'card-1', type: 'card', title: 'Example Card' };
+  const item = { id: "card-1", type: "card", title: "Example Card" };
 
   return (
     <Draggable item={item} containerId="container-1">
@@ -79,18 +79,18 @@ function DraggableCard() {
 ### Drop Container
 
 ```tsx
-import { Droppable } from '@/components/ui/droppable';
+import { Droppable } from "@/components/ui/droppable";
 
 function CardContainer() {
   const handleDrop = (result) => {
-    console.log('Item dropped:', result.item);
+    console.log("Item dropped:", result.item);
     // Update your state here
   };
 
   return (
     <Droppable
       id="card-container"
-      accepts={['card']}
+      accepts={["card"]}
       onDrop={handleDrop}
       className="p-4 border rounded-md min-h-[200px]"
     >
@@ -105,11 +105,11 @@ function CardContainer() {
 ### Using Drag Handles
 
 ```tsx
-import { Draggable } from '@/components/ui/draggable';
-import { DragHandle } from '@/components/ui/drag-handle';
+import { Draggable } from "@/components/ui/draggable";
+import { DragHandle } from "@/components/ui/drag-handle";
 
 function DraggableWithHandle() {
-  const item = { id: 'item-1', type: 'item', content: 'Example' };
+  const item = { id: "item-1", type: "item", content: "Example" };
 
   return (
     <Draggable

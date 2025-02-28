@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Interface for offline form data
@@ -18,8 +18,8 @@ interface OfflineFormData {
  */
 interface SubmitFormOptions {
   url: string;
-  method: 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-  data: any;
+  method: "POST" | "PUT" | "PATCH" | "DELETE";
+  data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   headers?: Record<string, string>;
 }
 
@@ -35,14 +35,14 @@ export function isOnline(): boolean {
  */
 async function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('offline-storage', 1);
+    const request = indexedDB.open("offline-storage", 1);
 
     request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
       const db = (event.target as IDBOpenDBRequest).result;
 
       // Create object stores if they don't exist
-      if (!db.objectStoreNames.contains('offline-forms')) {
-        db.createObjectStore('offline-forms', { keyPath: 'id' });
+      if (!db.objectStoreNames.contains("offline-forms")) {
+        db.createObjectStore("offline-forms", { keyPath: "id" });
       }
     };
 
@@ -62,8 +62,8 @@ async function openDatabase(): Promise<IDBDatabase> {
 async function saveFormForLater(formData: OfflineFormData): Promise<void> {
   try {
     const db = await openDatabase();
-    const tx = db.transaction('offline-forms', 'readwrite');
-    const store = tx.objectStore('offline-forms');
+    const tx = db.transaction("offline-forms", "readwrite");
+    const store = tx.objectStore("offline-forms");
 
     await new Promise<void>((resolve, reject) => {
       const request = store.add(formData);
@@ -73,13 +73,13 @@ async function saveFormForLater(formData: OfflineFormData): Promise<void> {
     });
 
     // Request a sync when back online if supported
-    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    if ("serviceWorker" in navigator && "SyncManager" in window) {
       const registration = await navigator.serviceWorker.ready;
-      await registration.sync.register('sync-forms');
+      await registration.sync.register("sync-forms");
     }
   } catch (error) {
-    console.error('Failed to save form for later:', error);
-    throw new Error('Failed to save form for offline submission');
+    console.error("Failed to save form for later:", error); // eslint-disable-line no-console
+    throw new Error("Failed to save form for offline submission");
   }
 }
 
@@ -88,12 +88,14 @@ async function saveFormForLater(formData: OfflineFormData): Promise<void> {
  * @param options Form submission options
  * @returns Promise that resolves with the response data
  */
-export async function submitForm<T = any>(options: SubmitFormOptions): Promise<T> {
+export async function submitForm<T = any>(
+  options: SubmitFormOptions,
+): Promise<T> {
   const { url, method, data, headers = {} } = options;
 
   // Default headers
   const defaultHeaders = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   };
 
   // Combine headers
@@ -120,11 +122,13 @@ export async function submitForm<T = any>(options: SubmitFormOptions): Promise<T
         method,
         headers: combinedHeaders,
         body: JSON.stringify(data),
-        credentials: 'include',
+        credentials: "include",
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
+        throw new Error(
+          `HTTP error ${response.status}: ${response.statusText}`,
+        );
       }
 
       return await response.json();
@@ -135,7 +139,7 @@ export async function submitForm<T = any>(options: SubmitFormOptions): Promise<T
         return {
           _offlineSubmitted: true,
           _formId: formData.id,
-          message: 'Form saved for submission when online',
+          message: "Form saved for submission when online",
         } as unknown as T;
       }
 
@@ -148,7 +152,7 @@ export async function submitForm<T = any>(options: SubmitFormOptions): Promise<T
     return {
       _offlineSubmitted: true,
       _formId: formData.id,
-      message: 'Form saved for submission when online',
+      message: "Form saved for submission when online",
     } as unknown as T;
   }
 }
@@ -159,8 +163,8 @@ export async function submitForm<T = any>(options: SubmitFormOptions): Promise<T
 export async function getPendingForms(): Promise<OfflineFormData[]> {
   try {
     const db = await openDatabase();
-    const tx = db.transaction('offline-forms', 'readonly');
-    const store = tx.objectStore('offline-forms');
+    const tx = db.transaction("offline-forms", "readonly");
+    const store = tx.objectStore("offline-forms");
 
     return new Promise<OfflineFormData[]>((resolve, reject) => {
       const request = store.getAll();
@@ -169,7 +173,7 @@ export async function getPendingForms(): Promise<OfflineFormData[]> {
       request.onerror = () => reject(request.error);
     });
   } catch (error) {
-    console.error('Failed to get pending forms:', error);
+    console.error("Failed to get pending forms:", error); // eslint-disable-line no-console
     return [];
   }
 }
@@ -192,14 +196,14 @@ export async function syncOfflineForms(): Promise<{
           method: form.method,
           headers: form.headers,
           body: form.body,
-          credentials: 'include',
+          credentials: "include",
         });
 
         if (response.ok) {
           // If successful, delete the form
           const db = await openDatabase();
-          const tx = db.transaction('offline-forms', 'readwrite');
-          const store = tx.objectStore('offline-forms');
+          const tx = db.transaction("offline-forms", "readwrite");
+          const store = tx.objectStore("offline-forms");
           await store.delete(form.id);
           success++;
         } else {
@@ -212,7 +216,7 @@ export async function syncOfflineForms(): Promise<{
 
     return { success, failed };
   } catch (error) {
-    console.error('Failed to sync offline forms:', error);
+    console.error("Failed to sync offline forms:", error); // eslint-disable-line no-console
     return { success: 0, failed: 0 };
   }
 }
@@ -222,12 +226,12 @@ export async function syncOfflineForms(): Promise<{
  */
 export function setupOfflineListeners(): void {
   // When coming back online, try to sync forms
-  window.addEventListener('online', async () => {
-    console.log('Back online, attempting to sync forms');
+  window.addEventListener("online", async () => {
+    console.log("Back online, attempting to sync forms"); // eslint-disable-line no-console
 
-    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    if ("serviceWorker" in navigator && "SyncManager" in window) {
       const registration = await navigator.serviceWorker.ready;
-      await registration.sync.register('sync-forms');
+      await registration.sync.register("sync-forms");
     } else {
       // Fallback for browsers without background sync
       await syncOfflineForms();
@@ -235,8 +239,8 @@ export function setupOfflineListeners(): void {
   });
 
   // When going offline, notify the user
-  window.addEventListener('offline', () => {
-    console.log('Offline mode activated');
+  window.addEventListener("offline", () => {
+    console.log("Offline mode activated"); // eslint-disable-line no-console
     // You could show a notification here
   });
 }

@@ -1,14 +1,20 @@
-import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { getCursorPosition, isCursorOutOfBounds } from '@/lib/drag-and-drop';
-import { DragResult, DragState, DraggableItem, Position } from '@/types/drag-types';
-import React, {
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { getCursorPosition, isCursorOutOfBounds } from "@/lib/drag-and-drop";
+import {
+  type DragResult,
+  type DragState,
+  DraggableItem,
+  type Position,
+} from "@/types/drag-types";
+import type React from "react";
+import {
   createContext,
+  useCallback,
   useContext,
+  useEffect,
   useReducer,
   useRef,
-  useCallback,
-  useEffect,
-} from 'react';
+} from "react";
 
 // Initial drag state
 const initialDragState: DragState = {
@@ -24,29 +30,29 @@ const initialDragState: DragState = {
 // Actions for drag state reducer
 type DragAction =
   | {
-      type: 'START_DRAG';
+      type: "START_DRAG";
       payload: {
-        item: any;
+        item: any; // eslint-disable-line @typescript-eslint/no-explicit-any
         id: string;
         containerId: string;
         position: Position;
       };
     }
   | {
-      type: 'UPDATE_DRAG';
+      type: "UPDATE_DRAG";
       payload: { position: Position; targetContainerId?: string };
     }
   | {
-      type: 'END_DRAG';
+      type: "END_DRAG";
       payload?: { targetContainerId?: string; targetIndex?: number };
     }
-  | { type: 'CANCEL_DRAG' }
-  | { type: 'SET_TARGET_CONTAINER'; payload: { containerId: string | null } };
+  | { type: "CANCEL_DRAG" }
+  | { type: "SET_TARGET_CONTAINER"; payload: { containerId: string | null } };
 
 // Reducer for drag state
 function dragReducer(state: DragState, action: DragAction): DragState {
   switch (action.type) {
-    case 'START_DRAG':
+    case "START_DRAG":
       return {
         ...state,
         isDragging: true,
@@ -58,24 +64,26 @@ function dragReducer(state: DragState, action: DragAction): DragState {
         targetContainerId: action.payload.containerId, // Initially the same as source
       };
 
-    case 'UPDATE_DRAG':
+    case "UPDATE_DRAG":
       return {
         ...state,
         currentPosition: action.payload.position,
-        targetContainerId: action.payload.targetContainerId || state.targetContainerId,
+        targetContainerId:
+          action.payload.targetContainerId || state.targetContainerId,
       };
 
-    case 'END_DRAG':
+    case "END_DRAG":
       return {
         ...state,
         isDragging: false,
-        targetContainerId: action.payload?.targetContainerId || state.targetContainerId,
+        targetContainerId:
+          action.payload?.targetContainerId || state.targetContainerId,
       };
 
-    case 'CANCEL_DRAG':
+    case "CANCEL_DRAG":
       return initialDragState;
 
-    case 'SET_TARGET_CONTAINER':
+    case "SET_TARGET_CONTAINER":
       return {
         ...state,
         targetContainerId: action.payload.containerId,
@@ -90,16 +98,25 @@ function dragReducer(state: DragState, action: DragAction): DragState {
 interface DragContextValue {
   dragState: DragState;
   startDrag: (
-    item: any,
+    item: any, // eslint-disable-line @typescript-eslint/no-explicit-any
     id: string,
     containerId: string,
     event: React.MouseEvent | React.TouchEvent,
   ) => void;
-  updateDrag: (event: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent) => void;
-  endDrag: (targetContainerId?: string, targetIndex?: number) => DragResult | null;
+  updateDrag: (
+    event: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent,
+  ) => void;
+  endDrag: (
+    targetContainerId?: string,
+    targetIndex?: number,
+  ) => DragResult | null;
   cancelDrag: () => void;
   setTargetContainer: (containerId: string | null) => void;
-  registerDropContainer: (id: string, element: HTMLElement, accepts: string[]) => void;
+  registerDropContainer: (
+    id: string,
+    element: HTMLElement,
+    accepts: string[],
+  ) => void;
   unregisterDropContainer: (id: string) => void;
   prefersReducedMotion: boolean;
 }
@@ -114,7 +131,9 @@ type DropContainerRef = {
 };
 
 // Provider component
-export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const DragProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [dragState, dispatch] = useReducer(dragReducer, initialDragState);
   const dropContainersRef = useRef<Map<string, DropContainerRef>>(new Map());
   const prefersReducedMotion = useReducedMotion();
@@ -137,11 +156,16 @@ export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Start drag operation
   const startDrag = useCallback(
-    (item: any, id: string, containerId: string, event: React.MouseEvent | React.TouchEvent) => {
+    (
+      item: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+      id: string,
+      containerId: string,
+      event: React.MouseEvent | React.TouchEvent,
+    ) => {
       const position = getCursorPosition(event);
 
       dispatch({
-        type: 'START_DRAG',
+        type: "START_DRAG",
         payload: { item, id, containerId, position },
       });
     },
@@ -163,7 +187,10 @@ export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { element, accepts } = container;
 
         // Skip if the container doesn't accept this type of item
-        if (dragState.draggedItem && !accepts.includes(dragState.draggedItem.type)) {
+        if (
+          dragState.draggedItem &&
+          !accepts.includes(dragState.draggedItem.type)
+        ) {
           return;
         }
 
@@ -186,7 +213,7 @@ export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       dispatch({
-        type: 'UPDATE_DRAG',
+        type: "UPDATE_DRAG",
         payload: { position, targetContainerId },
       });
     },
@@ -213,19 +240,23 @@ export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: dragState.sourceContainerId,
           index: dragState.draggedItem.index || 0,
         },
-        destination: finalTargetId ? { id: finalTargetId, index: targetIndex || 0 } : null,
+        destination: finalTargetId
+          ? { id: finalTargetId, index: targetIndex || 0 }
+          : null,
         isDropped: Boolean(finalTargetId),
         isReordered: finalTargetId === dragState.sourceContainerId,
-        isMoved: Boolean(finalTargetId) && finalTargetId !== dragState.sourceContainerId,
+        isMoved:
+          Boolean(finalTargetId) &&
+          finalTargetId !== dragState.sourceContainerId,
       };
 
       dispatch({
-        type: 'END_DRAG',
+        type: "END_DRAG",
         payload: { targetContainerId: finalTargetId, targetIndex },
       });
 
       setTimeout(() => {
-        dispatch({ type: 'CANCEL_DRAG' });
+        dispatch({ type: "CANCEL_DRAG" });
       }, 100);
 
       return result;
@@ -235,13 +266,13 @@ export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Cancel drag operation
   const cancelDrag = useCallback(() => {
-    dispatch({ type: 'CANCEL_DRAG' });
+    dispatch({ type: "CANCEL_DRAG" });
   }, []);
 
   // Set target container manually
   const setTargetContainer = useCallback((containerId: string | null) => {
     dispatch({
-      type: 'SET_TARGET_CONTAINER',
+      type: "SET_TARGET_CONTAINER",
       payload: { containerId },
     });
   }, []);
@@ -265,34 +296,34 @@ export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Cancel drag on escape key
-      if (e.key === 'Escape' && dragState.isDragging) {
+      if (e.key === "Escape" && dragState.isDragging) {
         cancelDrag();
       }
     };
 
     // Only attach listeners when dragging
     if (dragState.isDragging && !dragListenersAttached.current) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('touchmove', handleTouchMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.addEventListener('touchend', handleTouchEnd);
-      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("touchmove", handleTouchMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("touchend", handleTouchEnd);
+      document.addEventListener("keydown", handleKeyDown);
       dragListenersAttached.current = true;
     } else if (!dragState.isDragging && dragListenersAttached.current) {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchend', handleTouchEnd);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("keydown", handleKeyDown);
       dragListenersAttached.current = false;
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchend', handleTouchEnd);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [dragState.isDragging, updateDrag, endDrag, cancelDrag]);
 
@@ -308,7 +339,9 @@ export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children
     prefersReducedMotion,
   };
 
-  return <DragContext.Provider value={contextValue}>{children}</DragContext.Provider>;
+  return (
+    <DragContext.Provider value={contextValue}>{children}</DragContext.Provider>
+  );
 };
 
 // Hook to use the drag context
@@ -316,7 +349,7 @@ export const useDragContext = () => {
   const context = useContext(DragContext);
 
   if (context === undefined) {
-    throw new Error('useDragContext must be used within a DragProvider');
+    throw new Error("useDragContext must be used within a DragProvider");
   }
 
   return context;

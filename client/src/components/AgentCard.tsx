@@ -1,23 +1,24 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useMicroInteractions, useScrollAnimation } from '@/hooks/animations';
-import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import { Edit, MoreHorizontal, Play } from 'lucide-react';
-import { useLocation } from 'wouter';
+} from "@/components/ui/dropdown-menu";
+import { useMicroInteractions, useScrollAnimation } from "@/hooks/animations";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { Edit, MoreHorizontal, Play } from "lucide-react";
+import React from "react";
+import { useLocation } from "wouter";
 
 interface Agent {
   id: string;
   name: string;
   description: string;
-  status: 'active' | 'draft';
+  status: "active" | "draft";
   lastUpdated: string;
 }
 
@@ -31,7 +32,12 @@ interface AgentCardProps {
 // Create a motion version of our Card component
 const MotionCard = motion(Card);
 
-export default function AgentCard({ agent, onEdit, onTest, animationDelay = 0 }: AgentCardProps) {
+export default function AgentCard({
+  agent,
+  onEdit,
+  onTest,
+  animationDelay = 0,
+}: AgentCardProps) {
   const [, navigate] = useLocation();
   const [ref, isVisible] = useScrollAnimation();
   const { cardHover } = useMicroInteractions();
@@ -74,7 +80,7 @@ export default function AgentCard({ agent, onEdit, onTest, animationDelay = 0 }:
             transition={{ delay: animationDelay * 0.1 + 0.2 }}
           >
             <Badge
-              variant={agent.status === 'active' ? 'default' : 'secondary'}
+              variant={agent.status === "active" ? "default" : "secondary"}
               className="capitalize"
             >
               {agent.status}
@@ -110,15 +116,22 @@ export default function AgentCard({ agent, onEdit, onTest, animationDelay = 0 }:
           <div className="ml-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <motion.div whileHover={{ rotate: 15 }} whileTap={{ scale: 0.9 }}>
+                <motion.div
+                  whileHover={{ rotate: 15 }}
+                  whileTap={{ scale: 0.9 }}
+                >
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </motion.div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem className="cursor-pointer">Duplicate</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">Share</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
+                  Share
+                </DropdownMenuItem>
                 <DropdownMenuItem className="text-destructive cursor-pointer">
                   Delete
                 </DropdownMenuItem>

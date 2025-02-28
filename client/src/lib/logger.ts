@@ -1,6 +1,7 @@
-import { formatErrorForLogging } from './api-error';
+/* eslint-disable no-console */
+import { formatErrorForLogging } from "./api-error";
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type LogLevel = "debug" | "info" | "warn" | "error";
 
 export interface LogEntry {
   level: LogLevel;
@@ -23,14 +24,14 @@ interface LoggerOptions {
 
 // Default options
 const DEFAULT_OPTIONS: LoggerOptions = {
-  minLevel: process.env.NODE_ENV === 'production' ? 'warn' : 'debug',
+  minLevel: process.env.NODE_ENV === "production" ? "warn" : "debug",
   enableConsole: true,
-  enableRemoteLogging: process.env.NODE_ENV === 'production',
-  remoteLoggingUrl: '/api/logs',
+  enableRemoteLogging: process.env.NODE_ENV === "production",
+  remoteLoggingUrl: "/api/logs",
   batchSize: 10,
   flushInterval: 30000, // 30 seconds
-  appVersion: process.env.APP_VERSION || 'unknown',
-  environment: process.env.NODE_ENV || 'development',
+  appVersion: process.env.APP_VERSION || "unknown",
+  environment: process.env.NODE_ENV || "development",
 };
 
 // Log level priority order
@@ -80,27 +81,32 @@ class LoggerService {
    * Log a debug message
    */
   debug(message: string, context?: Record<string, any>, tags?: string[]): void {
-    this.log('debug', message, context, tags);
+    this.log("debug", message, context, tags);
   }
 
   /**
    * Log an info message
    */
   info(message: string, context?: Record<string, any>, tags?: string[]): void {
-    this.log('info', message, context, tags);
+    this.log("info", message, context, tags);
   }
 
   /**
    * Log a warning message
    */
   warn(message: string, context?: Record<string, any>, tags?: string[]): void {
-    this.log('warn', message, context, tags);
+    this.log("warn", message, context, tags);
   }
 
   /**
    * Log an error message
    */
-  error(message: string, error?: unknown, context?: Record<string, any>, tags?: string[]): void {
+  error(
+    message: string,
+    error?: unknown,
+    context?: Record<string, any>,
+    tags?: string[],
+  ): void {
     // Format the error if provided
     const errorContext = error
       ? {
@@ -109,7 +115,7 @@ class LoggerService {
         }
       : context;
 
-    this.log('error', message, errorContext, tags);
+    this.log("error", message, errorContext, tags);
   }
 
   /**
@@ -149,7 +155,8 @@ class LoggerService {
    * Check if the log level should be processed
    */
   private shouldLog(level: LogLevel): boolean {
-    const minLevelPriority = LOG_LEVEL_PRIORITY[this.options.minLevel || 'debug'];
+    const minLevelPriority =
+      LOG_LEVEL_PRIORITY[this.options.minLevel || "debug"];
     const currentLevelPriority = LOG_LEVEL_PRIORITY[level];
     return currentLevelPriority >= minLevelPriority;
   }
@@ -162,17 +169,17 @@ class LoggerService {
     const prefix = `[${timestamp}] [${entry.level.toUpperCase()}]`;
 
     switch (entry.level) {
-      case 'debug':
-        console.debug(`${prefix} ${entry.message}`, entry.context || '');
+      case "debug":
+        console.debug(`${prefix} ${entry.message}`, entry.context || "");
         break;
-      case 'info':
-        console.info(`${prefix} ${entry.message}`, entry.context || '');
+      case "info":
+        console.info(`${prefix} ${entry.message}`, entry.context || "");
         break;
-      case 'warn':
-        console.warn(`${prefix} ${entry.message}`, entry.context || '');
+      case "warn":
+        console.warn(`${prefix} ${entry.message}`, entry.context || "");
         break;
-      case 'error':
-        console.error(`${prefix} ${entry.message}`, entry.context || '');
+      case "error":
+        console.error(`${prefix} ${entry.message}`, entry.context || "");
         break;
     }
   }
@@ -207,7 +214,11 @@ class LoggerService {
    */
   async flush(): Promise<void> {
     // Don't flush if already flushing, no logs, or not enabled
-    if (this.isFlushing || this.logQueue.length === 0 || !this.options.enableRemoteLogging) {
+    if (
+      this.isFlushing ||
+      this.logQueue.length === 0 ||
+      !this.options.enableRemoteLogging
+    ) {
       return;
     }
 
@@ -231,25 +242,30 @@ class LoggerService {
       };
 
       // Send logs to the server
-      const response = await fetch(this.options.remoteLoggingUrl || '/api/logs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        this.options.remoteLoggingUrl || "/api/logs",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+          // Don't let this request slow down the application
+          keepalive: true,
         },
-        body: JSON.stringify(payload),
-        // Don't let this request slow down the application
-        keepalive: true,
-      });
+      );
 
       if (!response.ok) {
         // Add logs back to the queue on failure
         this.logQueue = [...logsToSend, ...this.logQueue];
-        console.error(`Failed to send logs: ${response.status} ${response.statusText}`);
+        console.error(
+          `Failed to send logs: ${response.status} ${response.statusText}`,
+        );
       }
     } catch (error) {
       // Add logs back to the queue on error
       this.logQueue = [...logsToSend, ...this.logQueue];
-      console.error('Error sending logs:', error);
+      console.error("Error sending logs:", error);
     } finally {
       this.isFlushing = false;
     }
@@ -260,24 +276,24 @@ class LoggerService {
    */
   private setupGlobalErrorHandlers(): void {
     // Handle uncaught errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener("error", (event) => {
       this.error(
-        'Uncaught error',
+        "Uncaught error",
         event.error || event.message,
         {
           filename: event.filename,
           lineno: event.lineno,
           colno: event.colno,
         },
-        ['uncaught', 'global'],
+        ["uncaught", "global"],
       );
     });
 
     // Handle unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
-      this.error('Unhandled promise rejection', event.reason, {}, [
-        'unhandled-rejection',
-        'global',
+    window.addEventListener("unhandledrejection", (event) => {
+      this.error("Unhandled promise rejection", event.reason, {}, [
+        "unhandled-rejection",
+        "global",
       ]);
     });
   }
@@ -286,7 +302,7 @@ class LoggerService {
    * Flush logs before the page unloads
    */
   setupBeforeUnloadHandler(): void {
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener("beforeunload", () => {
       this.flush();
     });
   }
@@ -296,7 +312,7 @@ class LoggerService {
 export const logger = new LoggerService();
 
 // Setup the beforeunload handler
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   logger.setupBeforeUnloadHandler();
 }
 

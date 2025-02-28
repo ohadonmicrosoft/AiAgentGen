@@ -70,35 +70,35 @@ The color contrast system uses the relative luminance formula specified in WCAG 
 ### Basic Contrast Check
 
 ```typescript
-import { checkContrast } from '@/lib/color-contrast';
+import { checkContrast } from "@/lib/color-contrast";
 
 // Check if black text on white background meets WCAG standards
-const result = checkContrast('#000000', '#FFFFFF');
+const result = checkContrast("#000000", "#FFFFFF");
 console.log(`Contrast ratio: ${result.ratio}`);
-console.log(`Meets WCAG AA: ${result.aa ? 'Yes' : 'No'}`);
-console.log(`Meets WCAG AAA: ${result.aaa ? 'Yes' : 'No'}`);
+console.log(`Meets WCAG AA: ${result.aa ? "Yes" : "No"}`);
+console.log(`Meets WCAG AAA: ${result.aaa ? "Yes" : "No"}`);
 ```
 
 ### Getting Color Suggestions
 
 ```typescript
-import { suggestBetterContrast } from '@/lib/color-contrast';
+import { suggestBetterContrast } from "@/lib/color-contrast";
 
 // Get a suggested color that meets WCAG AA (4.5:1)
-const betterColor = suggestBetterContrast('#777777', '#FFFFFF');
+const betterColor = suggestBetterContrast("#777777", "#FFFFFF");
 console.log(`Try using ${betterColor} instead for better contrast`);
 
 // Get a suggested color that meets WCAG AAA (7:1)
-const aaa_color = suggestBetterContrast('#777777', '#FFFFFF', 7.0);
+const aaa_color = suggestBetterContrast("#777777", "#FFFFFF", 7.0);
 ```
 
 ### Recommended Text Color
 
 ```typescript
-import { getRecommendedTextColor } from '@/lib/color-contrast';
+import { getRecommendedTextColor } from "@/lib/color-contrast";
 
 // Get recommended text color (black or white) based on background
-const textColor = getRecommendedTextColor('#3366CC');
+const textColor = getRecommendedTextColor("#3366CC");
 // Will return '#FFFFFF' since white text has better contrast on this blue
 ```
 

@@ -1,10 +1,10 @@
-import { Card } from '@/components/ui/card';
-import { useState } from 'react';
-import AgentBasicInfo from './AgentBasicInfo';
-import AgentConfiguration from './AgentConfiguration';
-import AgentPrompt from './AgentPrompt';
-import AgentReview from './AgentReview';
-import WizardStepIndicator from './WizardStepIndicator';
+import { Card } from "@/components/ui/card";
+import { useState } from "react";
+import AgentBasicInfo from "./AgentBasicInfo";
+import AgentConfiguration from "./AgentConfiguration";
+import AgentPrompt from "./AgentPrompt";
+import AgentReview from "./AgentReview";
+import WizardStepIndicator from "./WizardStepIndicator";
 
 interface AgentWizardProps {
   preview?: boolean;
@@ -13,14 +13,14 @@ interface AgentWizardProps {
 export default function AgentWizard({ preview = false }: AgentWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    type: 'custom',
+    name: "",
+    description: "",
+    type: "custom",
     temperature: 0.7,
     maxTokens: 2048,
-    model: 'gpt-4o',
-    systemPrompt: '',
-    responseStyle: 'formal',
+    model: "gpt-4o",
+    systemPrompt: "",
+    responseStyle: "formal",
   });
 
   const totalSteps = 4;
@@ -63,10 +63,10 @@ export default function AgentWizard({ preview = false }: AgentWizardProps) {
         <WizardStepIndicator
           currentStep={currentStep}
           steps={[
-            { number: 1, label: 'Basic Info' },
-            { number: 2, label: 'Configuration' },
-            { number: 3, label: 'Prompt' },
-            { number: 4, label: 'Review' },
+            { number: 1, label: "Basic Info" },
+            { number: 2, label: "Configuration" },
+            { number: 3, label: "Prompt" },
+            { number: 4, label: "Review" },
           ]}
         />
       </div>
@@ -102,7 +102,11 @@ export default function AgentWizard({ preview = false }: AgentWizardProps) {
         )}
 
         {currentStep === 4 && (
-          <AgentReview formData={formData} onBack={handleBack} preview={preview} />
+          <AgentReview
+            formData={formData}
+            onBack={handleBack}
+            preview={preview}
+          />
         )}
       </div>
     </Card>

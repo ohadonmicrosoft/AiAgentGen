@@ -3,8 +3,8 @@ import {
   fluidLineHeight,
   fluidTypeScale,
   fluidTypography,
-} from '@/lib/fluid-typography';
-import { useMemo } from 'react';
+} from "@/lib/fluid-typography";
+import { useMemo } from "react";
 
 export type TypeScaleKey = keyof typeof fluidTypeScale;
 
@@ -14,7 +14,7 @@ export interface FluidTypeOptions {
   maxWidth?: number | boolean; // Character count or true for optimal
   fontWeight?: number;
   tracking?: string; // letter-spacing
-  unit?: 'px' | 'rem' | 'em';
+  unit?: "px" | "rem" | "em";
 }
 
 /**
@@ -29,22 +29,22 @@ export interface FluidTypeOptions {
  * return <p style={bodyStyles}>Paragraph with optimal line length</p>;
  */
 export function useFluidType({
-  size = 'body',
+  size = "body",
   lineHeight,
   maxWidth,
   fontWeight,
   tracking,
-  unit = 'rem',
+  unit = "rem",
 }: FluidTypeOptions = {}) {
   return useMemo(() => {
     const styles: Record<string, string | number> = {};
 
     // Calculate font size
-    if (typeof size === 'string') {
+    if (typeof size === "string") {
       // Use predefined scale
       const { minSize, maxSize } = fluidTypeScale[size];
       styles.fontSize = fluidTypography({ minSize, maxSize, unit });
-    } else if (typeof size === 'number') {
+    } else if (typeof size === "number") {
       // Use custom size (25% smaller on mobile)
       const minSize = size * 0.75;
       const maxSize = size;
@@ -68,9 +68,9 @@ export function useFluidType({
       if (maxWidth === true) {
         // Use optimal line length
         const currentSize =
-          typeof size === 'string'
+          typeof size === "string"
             ? fluidTypeScale[size].minSize
-            : typeof size === 'number'
+            : typeof size === "number"
               ? size
               : 16;
         styles.maxWidth = calculateOptimalLineLength(currentSize);
@@ -103,8 +103,8 @@ export function fluidTypeStyles(options: FluidTypeOptions = {}): string {
   return Object.entries(styles)
     .map(([key, value]) => {
       // Convert camelCase to kebab-case
-      const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+      const cssKey = key.replace(/([A-Z])/g, "-$1").toLowerCase();
       return `${cssKey}: ${value};`;
     })
-    .join(' ');
+    .join(" ");
 }

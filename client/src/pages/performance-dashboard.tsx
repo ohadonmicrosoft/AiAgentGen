@@ -1,21 +1,30 @@
-import { MainLayout } from '@/components/layouts/MainLayout';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { MainLayout } from "@/components/layouts/MainLayout";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { initializePerformanceMonitoring } from '@/hooks/use-performance';
-import { PerformanceMetric, performanceMonitor } from '@/lib/performance-metrics';
-import { motion } from 'framer-motion';
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { initializePerformanceMonitoring } from "@/hooks/use-performance";
+import {
+  type PerformanceMetric,
+  performanceMonitor,
+} from "@/lib/performance-metrics";
+import { motion } from "framer-motion";
 import {
   AlertCircle,
   BarChart2,
@@ -26,8 +35,9 @@ import {
   Save,
   StopCircle,
   Trash2,
-} from 'lucide-react';
-import React, { useState, useEffect, useCallback } from 'react';
+} from "lucide-react";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -39,19 +49,19 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from 'recharts';
+} from "recharts";
 
 // Initialize performance monitoring
 const performanceControls = initializePerformanceMonitoring();
 
 const PerformanceDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
   const [isMonitoring, setIsMonitoring] = useState(true);
-  const [filterType, setFilterType] = useState('all');
-  const [filterValue, setFilterValue] = useState('');
+  const [filterType, setFilterType] = useState("all");
+  const [filterValue, setFilterValue] = useState("");
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [groupBy, setGroupBy] = useState<'name' | 'unit'>('name');
+  const [groupBy, setGroupBy] = useState<"name" | "unit">("name");
 
   // Fetch metrics
   const fetchMetrics = useCallback(() => {
@@ -61,17 +71,17 @@ const PerformanceDashboard: React.FC = () => {
 
   // Filter metrics
   const filteredMetrics = useCallback(() => {
-    if (!filterValue && filterType === 'all') {
+    if (!filterValue && filterType === "all") {
       return metrics;
     }
 
     return metrics.filter((metric) => {
-      if (filterType === 'name') {
+      if (filterType === "name") {
         return metric.name.toLowerCase().includes(filterValue.toLowerCase());
-      } else if (filterType === 'unit') {
+      } else if (filterType === "unit") {
         return metric.unit.toLowerCase() === filterValue.toLowerCase();
-      } else if (filterType === 'value') {
-        const numValue = parseFloat(filterValue);
+      } else if (filterType === "value") {
+        const numValue = Number.parseFloat(filterValue);
         return !isNaN(numValue) && metric.value >= numValue;
       }
       return true;
@@ -83,7 +93,7 @@ const PerformanceDashboard: React.FC = () => {
     const grouped: Record<string, PerformanceMetric[]> = {};
 
     filteredMetrics().forEach((metric) => {
-      const key = groupBy === 'name' ? metric.name : metric.unit;
+      const key = groupBy === "name" ? metric.name : metric.unit;
       if (!grouped[key]) {
         grouped[key] = [];
       }
@@ -160,9 +170,9 @@ const PerformanceDashboard: React.FC = () => {
 
     const exportFileDefaultName = `performance-metrics-${new Date().toISOString()}.json`;
 
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", exportFileDefaultName);
     linkElement.click();
   };
 
@@ -220,18 +230,29 @@ const PerformanceDashboard: React.FC = () => {
                   Stop Monitoring
                 </Button>
               ) : (
-                <Button onClick={startMonitoring} className="flex items-center gap-2">
+                <Button
+                  onClick={startMonitoring}
+                  className="flex items-center gap-2"
+                >
                   <Play className="h-4 w-4" />
                   Start Monitoring
                 </Button>
               )}
 
-              <Button variant="outline" onClick={clearMetrics} className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={clearMetrics}
+                className="flex items-center gap-2"
+              >
                 <Trash2 className="h-4 w-4" />
                 Clear Metrics
               </Button>
 
-              <Button variant="outline" onClick={exportMetrics} className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={exportMetrics}
+                className="flex items-center gap-2"
+              >
                 <Download className="h-4 w-4" />
                 Export
               </Button>
@@ -241,54 +262,71 @@ const PerformanceDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Metrics</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Metrics
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metrics.length}</div>
                 <p className="text-xs text-muted-foreground">
-                  {isMonitoring ? 'Actively monitoring' : 'Monitoring paused'}
+                  {isMonitoring ? "Actively monitoring" : "Monitoring paused"}
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Unique Metrics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{uniqueMetricNames().length}</div>
-                <p className="text-xs text-muted-foreground">Distinct metric types</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Average FPS</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Unique Metrics
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {metrics.filter((m) => m.name === 'fps').length > 0
-                    ? Math.round(
-                        metrics
-                          .filter((m) => m.name === 'fps')
-                          .reduce((sum, m) => sum + m.value, 0) /
-                          Math.max(1, metrics.filter((m) => m.name === 'fps').length),
-                      )
-                    : 'N/A'}
+                  {uniqueMetricNames().length}
                 </div>
-                <p className="text-xs text-muted-foreground">Frames per second</p>
+                <p className="text-xs text-muted-foreground">
+                  Distinct metric types
+                </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Monitoring Duration</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Average FPS
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {metrics.filter((m) => m.name === "fps").length > 0
+                    ? Math.round(
+                        metrics
+                          .filter((m) => m.name === "fps")
+                          .reduce((sum, m) => sum + m.value, 0) /
+                          Math.max(
+                            1,
+                            metrics.filter((m) => m.name === "fps").length,
+                          ),
+                      )
+                    : "N/A"}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Frames per second
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Monitoring Duration
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {metrics.length > 0
                     ? `${Math.round((Date.now() - metrics[0].timestamp) / 1000)}s`
-                    : '0s'}
+                    : "0s"}
                 </div>
                 <p className="text-xs text-muted-foreground">Time elapsed</p>
               </CardContent>
@@ -299,7 +337,9 @@ const PerformanceDashboard: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Controls</CardTitle>
-                <CardDescription>Filter and manage performance metrics</CardDescription>
+                <CardDescription>
+                  Filter and manage performance metrics
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -325,13 +365,13 @@ const PerformanceDashboard: React.FC = () => {
                       value={filterValue}
                       onChange={(e) => setFilterValue(e.target.value)}
                       placeholder={
-                        filterType === 'name'
-                          ? 'Enter metric name...'
-                          : filterType === 'unit'
-                            ? 'Enter unit (ms, fps, MB)...'
-                            : filterType === 'value'
-                              ? 'Enter minimum value...'
-                              : 'Enter filter value...'
+                        filterType === "name"
+                          ? "Enter metric name..."
+                          : filterType === "unit"
+                            ? "Enter unit (ms, fps, MB)..."
+                            : filterType === "value"
+                              ? "Enter minimum value..."
+                              : "Enter filter value..."
                       }
                     />
                   </div>
@@ -340,7 +380,9 @@ const PerformanceDashboard: React.FC = () => {
                     <Label htmlFor="groupBy">Group By</Label>
                     <Select
                       value={groupBy}
-                      onValueChange={(value) => setGroupBy(value as 'name' | 'unit')}
+                      onValueChange={(value) =>
+                        setGroupBy(value as "name" | "unit")
+                      }
                     >
                       <SelectTrigger id="groupBy">
                         <SelectValue placeholder="Select grouping" />
@@ -354,7 +396,11 @@ const PerformanceDashboard: React.FC = () => {
                 </div>
 
                 <div className="flex items-center space-x-2 mt-4">
-                  <Switch id="autoRefresh" checked={autoRefresh} onCheckedChange={setAutoRefresh} />
+                  <Switch
+                    id="autoRefresh"
+                    checked={autoRefresh}
+                    onCheckedChange={setAutoRefresh}
+                  />
                   <Label htmlFor="autoRefresh">Auto-refresh metrics</Label>
 
                   <Button
@@ -385,7 +431,9 @@ const PerformanceDashboard: React.FC = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Average Metric Values</CardTitle>
-                    <CardDescription>Average values for each metric type</CardDescription>
+                    <CardDescription>
+                      Average values for each metric type
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[400px]">
@@ -401,19 +449,33 @@ const PerformanceDashboard: React.FC = () => {
                             }}
                           >
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+                            <XAxis
+                              dataKey="name"
+                              angle={-45}
+                              textAnchor="end"
+                              height={70}
+                            />
                             <YAxis />
                             <Tooltip
-                              formatter={(value) => [`${value}`, 'Average Value']}
+                              formatter={(value) => [
+                                `${value}`,
+                                "Average Value",
+                              ]}
                               labelFormatter={(name) => `Metric: ${name}`}
                             />
                             <Legend />
-                            <Bar dataKey="value" fill="#8884d8" name="Average Value" />
+                            <Bar
+                              dataKey="value"
+                              fill="#8884d8"
+                              name="Average Value"
+                            />
                           </BarChart>
                         </ResponsiveContainer>
                       ) : (
                         <div className="flex items-center justify-center h-full">
-                          <p className="text-muted-foreground">No metrics available</p>
+                          <p className="text-muted-foreground">
+                            No metrics available
+                          </p>
                         </div>
                       )}
                     </div>
@@ -439,10 +501,15 @@ const PerformanceDashboard: React.FC = () => {
                             }}
                           >
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+                            <XAxis
+                              dataKey="name"
+                              angle={-45}
+                              textAnchor="end"
+                              height={70}
+                            />
                             <YAxis />
                             <Tooltip
-                              formatter={(value) => [`${value}`, 'Count']}
+                              formatter={(value) => [`${value}`, "Count"]}
                               labelFormatter={(name) => `Metric: ${name}`}
                             />
                             <Legend />
@@ -451,7 +518,9 @@ const PerformanceDashboard: React.FC = () => {
                         </ResponsiveContainer>
                       ) : (
                         <div className="flex items-center justify-center h-full">
-                          <p className="text-muted-foreground">No metrics available</p>
+                          <p className="text-muted-foreground">
+                            No metrics available
+                          </p>
                         </div>
                       )}
                     </div>
@@ -464,19 +533,21 @@ const PerformanceDashboard: React.FC = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>FPS Over Time</CardTitle>
-                  <CardDescription>Frames per second performance</CardDescription>
+                  <CardDescription>
+                    Frames per second performance
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[400px]">
-                    {formatMetricsForChart('fps').length > 0 ? (
+                    {formatMetricsForChart("fps").length > 0 ? (
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart
-                          data={formatMetricsForChart('fps')}
+                          data={formatMetricsForChart("fps")}
                           margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
                         >
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="timestamp" />
-                          <YAxis domain={[0, 'dataMax + 10']} />
+                          <YAxis domain={[0, "dataMax + 10"]} />
                           <Tooltip />
                           <Legend />
                           <Line
@@ -492,7 +563,9 @@ const PerformanceDashboard: React.FC = () => {
                     ) : (
                       <div className="flex flex-col items-center justify-center h-full">
                         <BarChart2 className="h-16 w-16 text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">No FPS data available</p>
+                        <p className="text-muted-foreground">
+                          No FPS data available
+                        </p>
                         <p className="text-sm text-muted-foreground">
                           FPS metrics will appear as the application runs
                         </p>
@@ -507,19 +580,21 @@ const PerformanceDashboard: React.FC = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Memory Usage</CardTitle>
-                  <CardDescription>JavaScript heap memory usage over time</CardDescription>
+                  <CardDescription>
+                    JavaScript heap memory usage over time
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[400px]">
-                    {formatMetricsForChart('memory:used').length > 0 ? (
+                    {formatMetricsForChart("memory:used").length > 0 ? (
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart
-                          data={formatMetricsForChart('memory:used')}
+                          data={formatMetricsForChart("memory:used")}
                           margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
                         >
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="timestamp" />
-                          <YAxis domain={[0, 'dataMax + 10']} />
+                          <YAxis domain={[0, "dataMax + 10"]} />
                           <Tooltip />
                           <Legend />
                           <Line
@@ -534,7 +609,9 @@ const PerformanceDashboard: React.FC = () => {
                     ) : (
                       <div className="flex flex-col items-center justify-center h-full">
                         <AlertCircle className="h-16 w-16 text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">No memory data available</p>
+                        <p className="text-muted-foreground">
+                          No memory data available
+                        </p>
                         <p className="text-sm text-muted-foreground">
                           Memory metrics may not be available in all browsers
                         </p>
@@ -549,24 +626,35 @@ const PerformanceDashboard: React.FC = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Component Render Times</CardTitle>
-                  <CardDescription>Performance metrics for React components</CardDescription>
+                  <CardDescription>
+                    Performance metrics for React components
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
                     {Object.entries(groupedMetrics())
-                      .filter(([key]) => key.includes('component:') && key.includes(':render'))
+                      .filter(
+                        ([key]) =>
+                          key.includes("component:") && key.includes(":render"),
+                      )
                       .map(([key, componentMetrics]) => {
                         const avgRenderTime =
-                          componentMetrics.reduce((sum, m) => sum + m.value, 0) /
-                          componentMetrics.length;
+                          componentMetrics.reduce(
+                            (sum, m) => sum + m.value,
+                            0,
+                          ) / componentMetrics.length;
 
                         return (
                           <div key={key} className="border rounded-lg p-4">
                             <h3 className="text-lg font-medium mb-2">{key}</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                               <div className="bg-muted p-3 rounded-md text-center">
-                                <div className="text-2xl font-bold">{componentMetrics.length}</div>
-                                <div className="text-xs text-muted-foreground">Render Count</div>
+                                <div className="text-2xl font-bold">
+                                  {componentMetrics.length}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  Render Count
+                                </div>
                               </div>
                               <div className="bg-muted p-3 rounded-md text-center">
                                 <div className="text-2xl font-bold">
@@ -578,9 +666,14 @@ const PerformanceDashboard: React.FC = () => {
                               </div>
                               <div className="bg-muted p-3 rounded-md text-center">
                                 <div className="text-2xl font-bold">
-                                  {Math.max(...componentMetrics.map((m) => m.value)).toFixed(2)} ms
+                                  {Math.max(
+                                    ...componentMetrics.map((m) => m.value),
+                                  ).toFixed(2)}{" "}
+                                  ms
                                 </div>
-                                <div className="text-xs text-muted-foreground">Max Render Time</div>
+                                <div className="text-xs text-muted-foreground">
+                                  Max Render Time
+                                </div>
                               </div>
                             </div>
 
@@ -588,7 +681,9 @@ const PerformanceDashboard: React.FC = () => {
                               <ResponsiveContainer width="100%" height="100%">
                                 <LineChart
                                   data={componentMetrics.map((m) => ({
-                                    timestamp: new Date(m.timestamp).toLocaleTimeString(),
+                                    timestamp: new Date(
+                                      m.timestamp,
+                                    ).toLocaleTimeString(),
                                     value: m.value,
                                   }))}
                                   margin={{
@@ -616,13 +711,17 @@ const PerformanceDashboard: React.FC = () => {
                       })}
 
                     {Object.entries(groupedMetrics()).filter(
-                      ([key]) => key.includes('component:') && key.includes(':render'),
+                      ([key]) =>
+                        key.includes("component:") && key.includes(":render"),
                     ).length === 0 && (
                       <div className="flex flex-col items-center justify-center py-12">
                         <Clock className="h-16 w-16 text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">No component metrics available</p>
+                        <p className="text-muted-foreground">
+                          No component metrics available
+                        </p>
                         <p className="text-sm text-muted-foreground">
-                          Component metrics will appear as components are rendered
+                          Component metrics will appear as components are
+                          rendered
                         </p>
                       </div>
                     )}
@@ -635,7 +734,9 @@ const PerformanceDashboard: React.FC = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Raw Metrics Data</CardTitle>
-                  <CardDescription>All collected metrics in tabular format</CardDescription>
+                  <CardDescription>
+                    All collected metrics in tabular format
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {filteredMetrics().length > 0 ? (
@@ -654,10 +755,18 @@ const PerformanceDashboard: React.FC = () => {
                             {filteredMetrics().map((metric, index) => (
                               <tr
                                 key={index}
-                                className={index % 2 === 0 ? 'bg-background' : 'bg-muted/50'}
+                                className={
+                                  index % 2 === 0
+                                    ? "bg-background"
+                                    : "bg-muted/50"
+                                }
                               >
-                                <td className="px-4 py-2 font-mono text-sm">{metric.name}</td>
-                                <td className="px-4 py-2">{metric.value.toFixed(2)}</td>
+                                <td className="px-4 py-2 font-mono text-sm">
+                                  {metric.name}
+                                </td>
+                                <td className="px-4 py-2">
+                                  {metric.value.toFixed(2)}
+                                </td>
                                 <td className="px-4 py-2">{metric.unit}</td>
                                 <td className="px-4 py-2">
                                   {new Date(metric.timestamp).toLocaleString()}

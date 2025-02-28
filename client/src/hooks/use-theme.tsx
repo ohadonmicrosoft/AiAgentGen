@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import type React from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = 'dark' | 'light' | 'system' | 'custom';
+type Theme = "dark" | "light" | "system" | "custom";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -16,7 +17,7 @@ interface ThemeProviderState {
 }
 
 const initialState: ThemeProviderState = {
-  theme: 'system',
+  theme: "system",
   setTheme: () => null,
 };
 
@@ -24,8 +25,8 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'system',
-  storageKey = 'vite-ui-theme',
+  defaultTheme = "system",
+  storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
@@ -37,26 +38,27 @@ export function ThemeProvider({
     const root = window.document.documentElement;
 
     // Remove previous theme classes
-    root.classList.remove('light', 'dark');
+    root.classList.remove("light", "dark");
 
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light';
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
 
       root.classList.add(systemTheme);
       return;
     }
 
-    if (theme === 'custom') {
+    if (theme === "custom") {
       // For custom theme, we still need a base (light/dark)
       // to ensure proper color contrasts
       const baseTheme = customColors?.background
         ? // Check if background is light or dark
           isLightColor(customColors.background)
-          ? 'light'
-          : 'dark'
-        : 'light';
+          ? "light"
+          : "dark"
+        : "light";
 
       root.classList.add(baseTheme);
       return;
@@ -78,18 +80,18 @@ export function ThemeProvider({
   const isLightColor = (color: string): boolean => {
     // Simple implementation - more advanced would use relative luminance
     // Remove any leading #
-    color = color.replace(/^#/, '');
+    color = color.replace(/^#/, "");
 
     // Convert hex to RGB
     let r, g, b;
     if (color.length === 3) {
-      r = parseInt(color[0] + color[0], 16);
-      g = parseInt(color[1] + color[1], 16);
-      b = parseInt(color[2] + color[2], 16);
+      r = Number.parseInt(color[0] + color[0], 16);
+      g = Number.parseInt(color[1] + color[1], 16);
+      b = Number.parseInt(color[2] + color[2], 16);
     } else {
-      r = parseInt(color.substring(0, 2), 16);
-      g = parseInt(color.substring(2, 4), 16);
-      b = parseInt(color.substring(4, 6), 16);
+      r = Number.parseInt(color.substring(0, 2), 16);
+      g = Number.parseInt(color.substring(2, 4), 16);
+      b = Number.parseInt(color.substring(4, 6), 16);
     }
 
     // Calculate relative luminance (simplified)
@@ -125,7 +127,8 @@ export function ThemeProvider({
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
 
-  if (context === undefined) throw new Error('useTheme must be used within a ThemeProvider');
+  if (context === undefined)
+    throw new Error("useTheme must be used within a ThemeProvider");
 
   return context;
 };

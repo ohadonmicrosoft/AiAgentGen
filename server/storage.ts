@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   type Agent,
   type Conversation,
@@ -19,14 +20,20 @@ import {
   messages,
   prompts,
   users,
-} from '@shared/schema';
-import connectPg from 'connect-pg-simple';
-import { and, eq } from 'drizzle-orm';
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import session from 'express-session';
-import createMemoryStore from 'memorystore';
-import { db } from './db'; // Import the shared db instance directly
-import { agentCache, conversationCache, getOrCompute, promptCache, userCache } from './lib/cache';
+} from "@shared/schema";
+import connectPg from "connect-pg-simple";
+import { and, eq } from "drizzle-orm";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import session from "express-session";
+import createMemoryStore from "memorystore";
+import { db } from "./db"; // Import the shared db instance directly
+import {
+  agentCache,
+  conversationCache,
+  getOrCompute,
+  promptCache,
+  userCache,
+} from "./lib/cache";
 
 const MemoryStore = createMemoryStore(session);
 // Create a simpler type definition that avoids complications
@@ -34,13 +41,13 @@ type SessionStore = any;
 
 // Create a separate table for API keys
 // We'll define this inside storage.ts since it's internal implementation detail
-import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
-export const apiKeys = pgTable('api_keys', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id')
+import { integer, pgTable, serial, text } from "drizzle-orm/pg-core";
+export const apiKeys = pgTable("api_keys", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
     .references(() => users.id)
     .notNull(),
-  apiKey: text('api_key').notNull(),
+  apiKey: text("api_key").notNull(),
 });
 
 export interface IStorage {
@@ -56,7 +63,11 @@ export interface IStorage {
   getApiKey(userId: number): Promise<string | null>;
 
   // Role and permission methods
-  updateUserRole(userId: number, role: Role, customPermissions?: string[]): Promise<User>;
+  updateUserRole(
+    userId: number,
+    role: Role,
+    customPermissions?: string[],
+  ): Promise<User>;
   getUserPermissions(userId: number): Promise<Permission[]>;
   hasPermission(userId: number, permission: Permission): Promise<boolean>;
 
@@ -81,7 +92,10 @@ export interface IStorage {
   getConversationsByUserId(userId: number): Promise<Conversation[]>;
   getConversationsByAgentId(agentId: number): Promise<Conversation[]>;
   createConversation(conversation: InsertConversation): Promise<Conversation>;
-  updateConversation(id: number, conversation: Partial<Conversation>): Promise<Conversation>;
+  updateConversation(
+    id: number,
+    conversation: Partial<Conversation>,
+  ): Promise<Conversation>;
   deleteConversation(id: number): Promise<void>;
 
   // Message methods
@@ -110,7 +124,9 @@ export class PostgresStorage implements IStorage {
       stale: true, // Allow retrieval of expired sessions
     });
 
-    console.log('[Storage] Using in-memory session store to reduce database load');
+    console.log(
+      "[Storage] Using in-memory session store to reduce database load",
+    );
   }
 
   // User methods
@@ -118,7 +134,11 @@ export class PostgresStorage implements IStorage {
     const cacheKey = `user:id:${id}`;
 
     return getOrCompute(userCache, cacheKey, async () => {
-      const results = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
+      const results = await this.db
+        .select()
+        .from(users)
+        .where(eq(users.id, id))
+        .limit(1);
       return results.length ? results[0] : undefined;
     });
   }
@@ -145,7 +165,7 @@ export class PostgresStorage implements IStorage {
       if (Array.isArray(insertUser.customPermissions)) {
         for (let i = 0; i < insertUser.customPermissions.length; i++) {
           const item = insertUser.customPermissions[i];
-          if (typeof item === 'string') {
+          if (typeof item === "string") {
             safePermissions.push(item);
           }
         }
@@ -168,7 +188,11 @@ export class PostgresStorage implements IStorage {
   }
 
   async updateUser(id: number, updates: Partial<User>): Promise<User> {
-    const result = await this.db.update(users).set(updates).where(eq(users.id, id)).returning();
+    const result = await this.db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
 
     if (result.length === 0) {
       throw new Error(`User with id ${id} not found`);
@@ -183,11 +207,17 @@ export class PostgresStorage implements IStorage {
 
   async saveApiKey(userId: number, apiKey: string): Promise<void> {
     // Check if key already exists
-    const existing = await this.db.select().from(apiKeys).where(eq(apiKeys.userId, userId));
+    const existing = await this.db
+      .select()
+      .from(apiKeys)
+      .where(eq(apiKeys.userId, userId));
 
     if (existing.length > 0) {
       // Update existing key
-      await this.db.update(apiKeys).set({ apiKey }).where(eq(apiKeys.userId, userId));
+      await this.db
+        .update(apiKeys)
+        .set({ apiKey })
+        .where(eq(apiKeys.userId, userId));
     } else {
       // For serial ID columns, we don't need to specify the ID as it's auto-generated
       const query = this.db.insert(apiKeys).values({
@@ -201,17 +231,26 @@ export class PostgresStorage implements IStorage {
   }
 
   async getApiKey(userId: number): Promise<string | null> {
-    const results = await this.db.select().from(apiKeys).where(eq(apiKeys.userId, userId));
+    const results = await this.db
+      .select()
+      .from(apiKeys)
+      .where(eq(apiKeys.userId, userId));
 
     return results.length > 0 ? results[0].apiKey : null;
   }
 
   // Role and permission methods
-  async updateUserRole(userId: number, role: Role, customPermissions?: string[]): Promise<User> {
+  async updateUserRole(
+    userId: number,
+    role: Role,
+    customPermissions?: string[],
+  ): Promise<User> {
     // Process customPermissions to ensure it's a valid string array or null
     let safeCustomPermissions: string[] | null = null;
     if (customPermissions && Array.isArray(customPermissions)) {
-      const filteredPermissions = customPermissions.filter((p) => typeof p === 'string');
+      const filteredPermissions = customPermissions.filter(
+        (p) => typeof p === "string",
+      );
 
       if (filteredPermissions.length > 0) {
         safeCustomPermissions = filteredPermissions;
@@ -244,7 +283,9 @@ export class PostgresStorage implements IStorage {
     const rolePermissions = ROLE_PERMISSIONS[user.role as Role] || [];
 
     // Add any custom permissions (ensure it's an array)
-    const customPermissions = Array.isArray(user.customPermissions) ? user.customPermissions : [];
+    const customPermissions = Array.isArray(user.customPermissions)
+      ? user.customPermissions
+      : [];
 
     // Combine permissions
     const allPermissions = [...rolePermissions, ...customPermissions];
@@ -255,12 +296,15 @@ export class PostgresStorage implements IStorage {
     return uniquePermissions as Permission[];
   }
 
-  async hasPermission(userId: number, permission: Permission): Promise<boolean> {
+  async hasPermission(
+    userId: number,
+    permission: Permission,
+  ): Promise<boolean> {
     try {
       const permissions = await this.getUserPermissions(userId);
       return permissions.includes(permission);
     } catch (error) {
-      console.error('Error checking permission:', error);
+      console.error("Error checking permission:", error);
       return false;
     }
   }
@@ -270,7 +314,11 @@ export class PostgresStorage implements IStorage {
     const cacheKey = `agent:${id}`;
 
     return getOrCompute(agentCache, cacheKey, async () => {
-      const results = await this.db.select().from(agents).where(eq(agents.id, id)).limit(1);
+      const results = await this.db
+        .select()
+        .from(agents)
+        .where(eq(agents.id, id))
+        .limit(1);
       return results.length ? results[0] : undefined;
     });
   }
@@ -301,7 +349,11 @@ export class PostgresStorage implements IStorage {
     agentCache.delete(`agent:${id}`);
 
     // Update in database
-    const result = await this.db.update(agents).set(updates).where(eq(agents.id, id)).returning();
+    const result = await this.db
+      .update(agents)
+      .set(updates)
+      .where(eq(agents.id, id))
+      .returning();
 
     if (result.length === 0) {
       throw new Error(`Agent with id ${id} not found`);
@@ -319,13 +371,20 @@ export class PostgresStorage implements IStorage {
     const cacheKey = `prompt:${id}`;
 
     return getOrCompute(promptCache, cacheKey, async () => {
-      const results = await this.db.select().from(prompts).where(eq(prompts.id, id)).limit(1);
+      const results = await this.db
+        .select()
+        .from(prompts)
+        .where(eq(prompts.id, id))
+        .limit(1);
       return results.length ? results[0] : undefined;
     });
   }
 
   async getPromptsByUserId(userId: number): Promise<Prompt[]> {
-    return await this.db.select().from(prompts).where(eq(prompts.userId, userId));
+    return await this.db
+      .select()
+      .from(prompts)
+      .where(eq(prompts.userId, userId));
   }
 
   async getAllPrompts(): Promise<Prompt[]> {
@@ -349,7 +408,11 @@ export class PostgresStorage implements IStorage {
     promptCache.delete(`prompt:${id}`);
 
     // Update in database
-    const result = await this.db.update(prompts).set(updates).where(eq(prompts.id, id)).returning();
+    const result = await this.db
+      .update(prompts)
+      .set(updates)
+      .where(eq(prompts.id, id))
+      .returning();
 
     if (result.length === 0) {
       throw new Error(`Prompt with id ${id} not found`);
@@ -364,12 +427,18 @@ export class PostgresStorage implements IStorage {
 
   // Conversation methods
   async getConversation(id: number): Promise<Conversation | undefined> {
-    const results = await this.db.select().from(conversations).where(eq(conversations.id, id));
+    const results = await this.db
+      .select()
+      .from(conversations)
+      .where(eq(conversations.id, id));
     return results[0];
   }
 
   async getAllConversations(): Promise<Conversation[]> {
-    return await this.db.select().from(conversations).orderBy(conversations.updatedAt);
+    return await this.db
+      .select()
+      .from(conversations)
+      .orderBy(conversations.updatedAt);
   }
 
   async getConversationsByUserId(userId: number): Promise<Conversation[]> {
@@ -388,18 +457,26 @@ export class PostgresStorage implements IStorage {
       .orderBy(conversations.updatedAt);
   }
 
-  async createConversation(insertConversation: InsertConversation): Promise<Conversation> {
+  async createConversation(
+    insertConversation: InsertConversation,
+  ): Promise<Conversation> {
     const conversation = {
       ...insertConversation,
       title: insertConversation.title || null,
       // createdAt and updatedAt will be set by the database defaultNow()
     };
 
-    const result = await this.db.insert(conversations).values(conversation).returning();
+    const result = await this.db
+      .insert(conversations)
+      .values(conversation)
+      .returning();
     return result[0];
   }
 
-  async updateConversation(id: number, updates: Partial<Conversation>): Promise<Conversation> {
+  async updateConversation(
+    id: number,
+    updates: Partial<Conversation>,
+  ): Promise<Conversation> {
     // Remove any timestamps from updates as they're handled by the database
     const { createdAt, updatedAt, ...safeUpdates } = updates;
 
@@ -428,11 +505,16 @@ export class PostgresStorage implements IStorage {
 
   // Message methods
   async getMessage(id: number): Promise<Message | undefined> {
-    const results = await this.db.select().from(messages).where(eq(messages.id, id));
+    const results = await this.db
+      .select()
+      .from(messages)
+      .where(eq(messages.id, id));
     return results[0];
   }
 
-  async getMessagesByConversationId(conversationId: number): Promise<Message[]> {
+  async getMessagesByConversationId(
+    conversationId: number,
+  ): Promise<Message[]> {
     return await this.db
       .select()
       .from(messages)
@@ -518,7 +600,7 @@ export class MemStorage implements IStorage {
       stale: true, // Allow retrieval of expired sessions
     });
 
-    console.log('[Storage] Using in-memory session store for MemStorage');
+    console.log("[Storage] Using in-memory session store for MemStorage");
   }
 
   // User methods
@@ -527,7 +609,9 @@ export class MemStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.usersMap.values()).find((user) => user.username === username);
+    return Array.from(this.usersMap.values()).find(
+      (user) => user.username === username,
+    );
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -543,7 +627,7 @@ export class MemStorage implements IStorage {
         // Convert each item to string and filter out non-strings
         for (let i = 0; i < insertUser.customPermissions.length; i++) {
           const item = insertUser.customPermissions[i];
-          if (typeof item === 'string') {
+          if (typeof item === "string") {
             safePermissions.push(item);
           }
         }
@@ -590,7 +674,11 @@ export class MemStorage implements IStorage {
   }
 
   // Role and permission methods
-  async updateUserRole(userId: number, role: Role, customPermissions?: string[]): Promise<User> {
+  async updateUserRole(
+    userId: number,
+    role: Role,
+    customPermissions?: string[],
+  ): Promise<User> {
     const user = await this.getUser(userId);
     if (!user) {
       throw new Error(`User with id ${userId} not found`);
@@ -600,7 +688,9 @@ export class MemStorage implements IStorage {
     let safeCustomPermissions: string[] | null = null;
     if (customPermissions && Array.isArray(customPermissions)) {
       // Filter to only keep string values
-      const filteredPermissions = customPermissions.filter((p) => typeof p === 'string');
+      const filteredPermissions = customPermissions.filter(
+        (p) => typeof p === "string",
+      );
 
       if (filteredPermissions.length > 0) {
         safeCustomPermissions = filteredPermissions;
@@ -625,7 +715,9 @@ export class MemStorage implements IStorage {
     const rolePermissions = ROLE_PERMISSIONS[user.role as Role] || [];
 
     // Add any custom permissions (ensure it's an array)
-    const customPermissions = Array.isArray(user.customPermissions) ? user.customPermissions : [];
+    const customPermissions = Array.isArray(user.customPermissions)
+      ? user.customPermissions
+      : [];
 
     // Combine permissions
     const allPermissions = [...rolePermissions, ...customPermissions];
@@ -636,12 +728,15 @@ export class MemStorage implements IStorage {
     return uniquePermissions as Permission[];
   }
 
-  async hasPermission(userId: number, permission: Permission): Promise<boolean> {
+  async hasPermission(
+    userId: number,
+    permission: Permission,
+  ): Promise<boolean> {
     try {
       const permissions = await this.getUserPermissions(userId);
       return permissions.includes(permission);
     } catch (error) {
-      console.error('Error checking permission:', error);
+      console.error("Error checking permission:", error);
       return false;
     }
   }
@@ -662,7 +757,9 @@ export class MemStorage implements IStorage {
   }
 
   async getAgentsByUserId(userId: number): Promise<Agent[]> {
-    return Array.from(this.agentsMap.values()).filter((agent) => agent.userId === userId);
+    return Array.from(this.agentsMap.values()).filter(
+      (agent) => agent.userId === userId,
+    );
   }
 
   async createAgent(insertAgent: InsertAgent): Promise<Agent> {
@@ -709,7 +806,9 @@ export class MemStorage implements IStorage {
   }
 
   async getPromptsByUserId(userId: number): Promise<Prompt[]> {
-    return Array.from(this.promptsMap.values()).filter((prompt) => prompt.userId === userId);
+    return Array.from(this.promptsMap.values()).filter(
+      (prompt) => prompt.userId === userId,
+    );
   }
 
   async createPrompt(insertPrompt: InsertPrompt): Promise<Prompt> {
@@ -772,7 +871,9 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   }
 
-  async createConversation(insertConversation: InsertConversation): Promise<Conversation> {
+  async createConversation(
+    insertConversation: InsertConversation,
+  ): Promise<Conversation> {
     const id = this.conversationIdCounter++;
     const now = new Date();
 
@@ -787,7 +888,10 @@ export class MemStorage implements IStorage {
     return conversation;
   }
 
-  async updateConversation(id: number, updates: Partial<Conversation>): Promise<Conversation> {
+  async updateConversation(
+    id: number,
+    updates: Partial<Conversation>,
+  ): Promise<Conversation> {
     const conversation = this.conversationsMap.get(id);
     if (!conversation) {
       throw new Error(`Conversation with id ${id} not found`);
@@ -823,7 +927,9 @@ export class MemStorage implements IStorage {
     return this.messagesMap.get(id);
   }
 
-  async getMessagesByConversationId(conversationId: number): Promise<Message[]> {
+  async getMessagesByConversationId(
+    conversationId: number,
+  ): Promise<Message[]> {
     const messages = Array.from(this.messagesMap.values())
       .filter((message) => message.conversationId === conversationId)
       .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
@@ -862,17 +968,17 @@ class MockStorage implements IStorage {
   private mockMessageIdCounter = 1;
 
   constructor() {
-    console.log('[Storage] Using in-memory storage for testing');
+    console.log("[Storage] Using in-memory storage for testing");
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000, // prune expired entries every 24h
     });
 
     // Pre-create a developer account for testing (with simplified password)
     this.createUser({
-      username: 'developer',
-      password: 'password123mocktestsalt.mocktestsalt', // Matches our simplified hashing in auth.ts
-      email: 'dev@example.com',
-      role: 'ADMIN',
+      username: "developer",
+      password: "password123mocktestsalt.mocktestsalt", // Matches our simplified hashing in auth.ts
+      email: "dev@example.com",
+      role: "ADMIN",
     });
   }
 
@@ -893,13 +999,13 @@ class MockStorage implements IStorage {
       updatedAt: new Date(),
     };
     mockUsers.push(newUser);
-    console.log('[Storage] Created mock user:', newUser.username);
+    console.log("[Storage] Created mock user:", newUser.username);
     return newUser;
   }
 
   async updateUser(id: number, userData: Partial<User>): Promise<User> {
     const userIndex = mockUsers.findIndex((u) => u.id === id);
-    if (userIndex === -1) throw new Error('User not found');
+    if (userIndex === -1) throw new Error("User not found");
 
     mockUsers[userIndex] = {
       ...mockUsers[userIndex],
@@ -920,12 +1026,16 @@ class MockStorage implements IStorage {
   }
 
   async getApiKey(userId: number): Promise<string | null> {
-    return 'mock-api-key-for-testing';
+    return "mock-api-key-for-testing";
   }
 
-  async updateUserRole(userId: number, role: Role, customPermissions?: string[]): Promise<User> {
+  async updateUserRole(
+    userId: number,
+    role: Role,
+    customPermissions?: string[],
+  ): Promise<User> {
     const user = await this.getUser(userId);
-    if (!user) throw new Error('User not found');
+    if (!user) throw new Error("User not found");
 
     return this.updateUser(userId, { role });
   }
@@ -938,7 +1048,10 @@ class MockStorage implements IStorage {
     return Object.values(PERMISSIONS);
   }
 
-  async hasPermission(userId: number, permission: Permission): Promise<boolean> {
+  async hasPermission(
+    userId: number,
+    permission: Permission,
+  ): Promise<boolean> {
     // Allow all permissions in testing
     return true;
   }
@@ -949,7 +1062,9 @@ class MockStorage implements IStorage {
   }
 
   async getAgentsByUserId(userId: number): Promise<Agent[]> {
-    return Array.from(this.mockAgents.values()).filter((agent) => agent.userId === userId);
+    return Array.from(this.mockAgents.values()).filter(
+      (agent) => agent.userId === userId,
+    );
   }
 
   async getAllAgents(): Promise<Agent[]> {
@@ -998,7 +1113,9 @@ class MockStorage implements IStorage {
   }
 
   async getPromptsByUserId(userId: number): Promise<Prompt[]> {
-    return Array.from(this.mockPrompts.values()).filter((prompt) => prompt.userId === userId);
+    return Array.from(this.mockPrompts.values()).filter(
+      (prompt) => prompt.userId === userId,
+    );
   }
 
   async getAllPrompts(): Promise<Prompt[]> {
@@ -1057,7 +1174,9 @@ class MockStorage implements IStorage {
       .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   }
 
-  async createConversation(conversation: InsertConversation): Promise<Conversation> {
+  async createConversation(
+    conversation: InsertConversation,
+  ): Promise<Conversation> {
     const id = this.mockConversationIdCounter++;
     const now = new Date();
 
@@ -1073,9 +1192,13 @@ class MockStorage implements IStorage {
     return newConversation;
   }
 
-  async updateConversation(id: number, conversation: Partial<Conversation>): Promise<Conversation> {
+  async updateConversation(
+    id: number,
+    conversation: Partial<Conversation>,
+  ): Promise<Conversation> {
     const existingConversation = this.mockConversations.get(id);
-    if (!existingConversation) throw new Error(`Conversation with id ${id} not found`);
+    if (!existingConversation)
+      throw new Error(`Conversation with id ${id} not found`);
 
     const updatedConversation: Conversation = {
       ...existingConversation,
@@ -1102,7 +1225,9 @@ class MockStorage implements IStorage {
     return this.mockMessages.get(id);
   }
 
-  async getMessagesByConversationId(conversationId: number): Promise<Message[]> {
+  async getMessagesByConversationId(
+    conversationId: number,
+  ): Promise<Message[]> {
     return Array.from(this.mockMessages.values())
       .filter((message) => message.conversationId === conversationId)
       .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
@@ -1136,7 +1261,10 @@ class MockStorage implements IStorage {
 }
 
 // Determine whether to use the mock or real storage
-const isDevelopmentTesting = !process.env.DATABASE_URL || process.env.USE_MOCK_STORAGE === 'true';
+const isDevelopmentTesting =
+  !process.env.DATABASE_URL || process.env.USE_MOCK_STORAGE === "true";
 
 // Export the appropriate storage implementation
-export const storage = isDevelopmentTesting ? new MockStorage() : new PostgresStorage();
+export const storage = isDevelopmentTesting
+  ? new MockStorage()
+  : new PostgresStorage();

@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from 'express';
-import { logger } from '../api/logs';
-import { MemoryCache } from './cache';
+import type { NextFunction, Request, Response } from "express";
+import { logger } from "../api/logs";
+import { MemoryCache } from "./cache";
 
 interface RateLimitOptions {
   windowMs: number; // Time window in milliseconds
@@ -16,15 +16,15 @@ interface RateLimitOptions {
 const defaultOptions: RateLimitOptions = {
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 60, // 60 requests per minute
-  message: 'Too many requests, please try again later',
+  message: "Too many requests, please try again later",
   statusCode: 429, // Too Many Requests
   keyGenerator: (req) => {
     // Default: IP address
     return (
       req.ip ||
       req.connection.remoteAddress ||
-      (req.headers['x-forwarded-for'] as string) ||
-      'unknown'
+      (req.headers["x-forwarded-for"] as string) ||
+      "unknown"
     );
   },
   skip: () => false, // Don't skip any requests by default
@@ -32,7 +32,9 @@ const defaultOptions: RateLimitOptions = {
 };
 
 // Cache to store rate limit info
-const cache = new MemoryCache<{ count: number; resetTime: number }>(60 * 60 * 1000); // 1 hour TTL
+const cache = new MemoryCache<{ count: number; resetTime: number }>(
+  60 * 60 * 1000,
+); // 1 hour TTL
 
 /**
  * Create a rate limiter middleware
@@ -87,15 +89,18 @@ export function rateLimiter(options: Partial<RateLimitOptions> = {}) {
 
     // Add rate limit headers if enabled
     if (opts.headers) {
-      res.setHeader('X-RateLimit-Limit', opts.maxRequests.toString());
-      res.setHeader('X-RateLimit-Remaining', remaining.toString());
-      res.setHeader('X-RateLimit-Reset', Math.ceil(resetTime / 1000).toString());
+      res.setHeader("X-RateLimit-Limit", opts.maxRequests.toString());
+      res.setHeader("X-RateLimit-Remaining", remaining.toString());
+      res.setHeader(
+        "X-RateLimit-Reset",
+        Math.ceil(resetTime / 1000).toString(),
+      );
     }
 
     // If rate limit is exceeded, return error
     if (rateInfo.count > opts.maxRequests) {
       // Log rate limit exceeded
-      logger.warn('Rate limit exceeded', {
+      logger.warn("Rate limit exceeded", {
         ip: req.ip,
         path: req.path,
         method: req.method,
@@ -105,7 +110,10 @@ export function rateLimiter(options: Partial<RateLimitOptions> = {}) {
       });
 
       // Set retry-after header
-      res.setHeader('Retry-After', Math.ceil((resetTime - now) / 1000).toString());
+      res.setHeader(
+        "Retry-After",
+        Math.ceil((resetTime - now) / 1000).toString(),
+      );
 
       // Return error
       return res.status(opts.statusCode!).json({
@@ -140,13 +148,13 @@ export function adaptiveRateLimiter(
       const ip =
         req.ip ||
         req.connection.remoteAddress ||
-        (req.headers['x-forwarded-for'] as string) ||
-        'unknown';
+        (req.headers["x-forwarded-for"] as string) ||
+        "unknown";
 
       return userId ? `user:${userId}` : `ip:${ip}`;
     },
     headers: true,
-    message: 'Rate limit exceeded. Please slow down your requests.',
+    message: "Rate limit exceeded. Please slow down your requests.",
 
     // Override maxRequests based on authentication status
     skip: (req) => {
@@ -156,8 +164,8 @@ export function adaptiveRateLimiter(
         const key = `ip:${
           req.ip ||
           req.connection.remoteAddress ||
-          (req.headers['x-forwarded-for'] as string) ||
-          'unknown'
+          (req.headers["x-forwarded-for"] as string) ||
+          "unknown"
         }`;
 
         // Store the lower limit for this key

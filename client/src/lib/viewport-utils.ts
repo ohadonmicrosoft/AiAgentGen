@@ -12,22 +12,22 @@
  */
 export function setupViewportHeight(): void {
   // Only run in the browser
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   // Function to set the CSS variable
   const setViewportHeight = () => {
     // Get the actual viewport height
     const vh = window.innerHeight * 0.01;
     // Set the CSS variable
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
   };
 
   // Set the height initially
   setViewportHeight();
 
   // Update the height on resize and orientation change
-  window.addEventListener('resize', setViewportHeight);
-  window.addEventListener('orientationchange', setViewportHeight);
+  window.addEventListener("resize", setViewportHeight);
+  window.addEventListener("orientationchange", setViewportHeight);
 }
 
 /**
@@ -35,18 +35,19 @@ export function setupViewportHeight(): void {
  */
 export function preventIOSOverscroll(): void {
   // Only run in the browser
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   // Check if the device is iOS
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  const isIOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
 
   if (isIOS) {
     // Prevent touchmove events on the body when at the edge
     document.body.addEventListener(
-      'touchmove',
+      "touchmove",
       (e) => {
         // Allow scrolling in elements that should scroll
-        if ((e.target as HTMLElement).closest('.allow-scroll')) {
+        if ((e.target as HTMLElement).closest(".allow-scroll")) {
           return;
         }
 
@@ -62,7 +63,7 @@ export function preventIOSOverscroll(): void {
  */
 export function handleVirtualKeyboard(): void {
   // Only run in the browser
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   // Function to handle focus on input elements
   const handleFocus = (e: FocusEvent) => {
@@ -72,13 +73,13 @@ export function handleVirtualKeyboard(): void {
       e.target instanceof HTMLSelectElement
     ) {
       // Add a class to the body when the keyboard is likely visible
-      document.body.classList.add('keyboard-visible');
+      document.body.classList.add("keyboard-visible");
 
       // On iOS, scroll the element into view with a delay
       setTimeout(() => {
         (e.target as HTMLElement).scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
+          behavior: "smooth",
+          block: "center",
         });
       }, 300);
     }
@@ -87,12 +88,12 @@ export function handleVirtualKeyboard(): void {
   // Function to handle blur on input elements
   const handleBlur = () => {
     // Remove the class when the keyboard is likely hidden
-    document.body.classList.remove('keyboard-visible');
+    document.body.classList.remove("keyboard-visible");
   };
 
   // Add event listeners
-  document.addEventListener('focus', handleFocus, true);
-  document.addEventListener('blur', handleBlur, true);
+  document.addEventListener("focus", handleFocus, true);
+  document.addEventListener("blur", handleBlur, true);
 }
 
 /**
@@ -100,10 +101,10 @@ export function handleVirtualKeyboard(): void {
  */
 export function isTouchDevice(): boolean {
   // Only run in the browser
-  if (typeof window === 'undefined') return false;
+  if (typeof window === "undefined") return false;
 
   return (
-    'ontouchstart' in window ||
+    "ontouchstart" in window ||
     navigator.maxTouchPoints > 0 ||
     (navigator as any).msMaxTouchPoints > 0
   );
@@ -123,5 +124,5 @@ export function initViewportUtils(): void {
  * Usage: height: calc(var(--vh, 1vh) * 100);
  */
 export function useViewportHeight(): string {
-  return 'calc(var(--vh, 1vh) * 100)';
+  return "calc(var(--vh, 1vh) * 100)";
 }

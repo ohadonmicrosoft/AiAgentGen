@@ -1,17 +1,17 @@
-import { useToast } from '@/components/ui/use-toast';
-import { useAuth } from '@/hooks/use-auth';
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 import {
   ApiError,
   ErrorCategory,
   checkResponse,
   createNetworkError,
   formatErrorForLogging,
-} from '@/lib/api-error';
-import { logger } from '@/lib/logger';
-import { useCallback, useEffect, useRef, useState } from 'react';
+} from "@/lib/api-error";
+import { logger } from "@/lib/logger";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // Create a dedicated logger for API calls
-const logger = new Logger('APIClient');
+const logger = new Logger("APIClient");
 
 interface ApiOptions extends RequestInit {
   hideErrorToast?: boolean;
@@ -29,7 +29,10 @@ interface ApiState<T> {
   isValidating: boolean;
 }
 
-type ApiHookResult<T> = [(endpoint: string, options?: ApiOptions) => Promise<T>, ApiState<T>];
+type ApiHookResult<T> = [
+  (endpoint: string, options?: ApiOptions) => Promise<T>,
+  ApiState<T>,
+];
 
 /**
  * A hook for making API calls with built-in error handling and retry capability
@@ -93,26 +96,28 @@ export function useApi<T = any>(): ApiHookResult<T> {
       // Function to perform the actual fetch with retry logic
       async function performFetchWithRetry(attempt: number): Promise<T> {
         try {
-          logger.debug(`API Request [${attempt}/${retryCount + 1}]: ${endpoint}`);
+          logger.debug(
+            `API Request [${attempt}/${retryCount + 1}]: ${endpoint}`,
+          );
 
           // Add authorization header if needed
           const headers = new Headers(fetchOptions.headers);
 
           if (useAuthToken && user?.token) {
-            headers.set('Authorization', `Bearer ${user.token}`);
+            headers.set("Authorization", `Bearer ${user.token}`);
           }
 
           // Set content type to JSON if not already set and there's a body
           if (
             fetchOptions.body &&
-            !headers.has('Content-Type') &&
+            !headers.has("Content-Type") &&
             !(fetchOptions.body instanceof FormData)
           ) {
-            headers.set('Content-Type', 'application/json');
+            headers.set("Content-Type", "application/json");
           }
 
           // Add a client request ID for tracking
-          headers.set('X-Client-Request-ID', requestId);
+          headers.set("X-Client-Request-ID", requestId);
 
           // Make the request
           const startTime = Date.now();
@@ -132,9 +137,9 @@ export function useApi<T = any>(): ApiHookResult<T> {
 
           // Parse the response
           let data: T;
-          const contentType = response.headers.get('content-type');
+          const contentType = response.headers.get("content-type");
 
-          if (contentType?.includes('application/json')) {
+          if (contentType?.includes("application/json")) {
             data = await response.json();
           } else {
             // Handle non-JSON responses
@@ -164,8 +169,13 @@ export function useApi<T = any>(): ApiHookResult<T> {
           return data;
         } catch (error) {
           // Handle abort errors
-          if (error instanceof DOMException && error.name === 'AbortError') {
-            const abortError = new ApiError('Request timed out', 408, 'Request Timeout', endpoint);
+          if (error instanceof DOMException && error.name === "AbortError") {
+            const abortError = new ApiError(
+              "Request timed out",
+              408,
+              "Request Timeout",
+              endpoint,
+            );
             throw abortError;
           }
 
@@ -190,7 +200,9 @@ export function useApi<T = any>(): ApiHookResult<T> {
 
           if (shouldRetry) {
             // Log retry attempt
-            logger.debug(`Retrying API call (${attempt}/${retryCount}): ${endpoint}`);
+            logger.debug(
+              `Retrying API call (${attempt}/${retryCount}): ${endpoint}`,
+            );
 
             // Wait before retry using exponential backoff
             const delay = retryDelay * Math.pow(2, attempt - 1);
@@ -211,7 +223,7 @@ export function useApi<T = any>(): ApiHookResult<T> {
         return await performFetchWithRetry(1);
       } catch (error) {
         // Handle errors after all retries exhausted
-        console.error('API Error:', formatErrorForLogging(error));
+        console.error("API Error:", formatErrorForLogging(error)); // eslint-disable-line no-console
 
         // Check for auth errors
         if (error instanceof ApiError && error.isAuthError()) {
@@ -221,9 +233,12 @@ export function useApi<T = any>(): ApiHookResult<T> {
         // Show toast for errors
         if (!hideErrorToast) {
           toast({
-            title: 'Error',
-            description: error instanceof Error ? error.message : 'An unexpected error occurred',
-            variant: 'destructive',
+            title: "Error",
+            description:
+              error instanceof Error
+                ? error.message
+                : "An unexpected error occurred",
+            variant: "destructive",
           });
         }
 
@@ -262,7 +277,7 @@ function composeAbortSignals(...signals: AbortSignal[]): AbortSignal {
     }
 
     signal.addEventListener(
-      'abort',
+      "abort",
       () => {
         controller.abort(signal.reason);
       },

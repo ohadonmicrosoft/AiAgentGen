@@ -1,4 +1,4 @@
-import { hexToRgb, rgbToHex } from './color-utils';
+import { hexToRgb, rgbToHex } from "./color-utils";
 
 /**
  * Interface for color contrast check results
@@ -36,7 +36,7 @@ export interface ContrastResult {
  */
 export function getLuminance(color: string): number {
   // Convert hex to rgb if needed
-  const rgb = color.startsWith('#') ? hexToRgb(color) : color;
+  const rgb = color.startsWith("#") ? hexToRgb(color) : color;
 
   // Extract RGB values
   const rgbMatch = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
@@ -65,7 +65,10 @@ export function getLuminance(color: string): number {
  * Calculate the contrast ratio between two colors
  * @see https://www.w3.org/TR/WCAG20/#contrast-ratiodef
  */
-export function getContrastRatio(foreground: string, background: string): number {
+export function getContrastRatio(
+  foreground: string,
+  background: string,
+): number {
   const foregroundLuminance = getLuminance(foreground);
   const backgroundLuminance = getLuminance(background);
 
@@ -79,7 +82,10 @@ export function getContrastRatio(foreground: string, background: string): number
 /**
  * Check if two colors have sufficient contrast according to WCAG guidelines
  */
-export function checkContrast(foreground: string, background: string): ContrastResult {
+export function checkContrast(
+  foreground: string,
+  background: string,
+): ContrastResult {
   const ratio = getContrastRatio(foreground, background);
 
   return {
@@ -115,7 +121,7 @@ export function suggestBetterContrast(
   const bgMatch = bgRgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 
   if (!fgMatch || !bgMatch) {
-    throw new Error('Invalid color format');
+    throw new Error("Invalid color format");
   }
 
   const [, fR, fG, fB] = fgMatch.map(Number);
@@ -160,13 +166,13 @@ export function suggestBetterContrast(
  */
 export function getContrastLevel(ratio: number): string {
   if (ratio >= 7) {
-    return 'AAA (Excellent)';
+    return "AAA (Excellent)";
   } else if (ratio >= 4.5) {
-    return 'AA (Good)';
+    return "AA (Good)";
   } else if (ratio >= 3) {
-    return 'AA Large (Moderate)';
+    return "AA Large (Moderate)";
   } else {
-    return 'Insufficient';
+    return "Insufficient";
   }
 }
 
@@ -181,5 +187,5 @@ export function isLightColor(color: string): boolean {
  * Get a recommended text color (black or white) based on background
  */
 export function getRecommendedTextColor(backgroundColor: string): string {
-  return isLightColor(backgroundColor) ? '#000000' : '#FFFFFF';
+  return isLightColor(backgroundColor) ? "#000000" : "#FFFFFF";
 }

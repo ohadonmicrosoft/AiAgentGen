@@ -1,27 +1,31 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { exec } from "child_process";
+import path from "path";
+import { promisify } from "util";
+import fs from "fs/promises";
 
 const execAsync = promisify(exec);
 
 // Files to be removed
 const REDUNDANT_FILES = [
-  'test-memory-cache.js',
-  'setup-db.js',
+  "test-memory-cache.js",
+  "setup-db.js",
   // Add any other redundant files here
 ];
 
 async function removeRedundantFiles() {
   try {
     const projectRoot = process.cwd();
-    console.log('Starting removal of redundant files...');
+    console.log("Starting removal of redundant files...");
 
     // Create a backup first
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const backupDir = path.join(projectRoot, '..', `AI-Aget-Gen-backup-${timestamp}`);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const backupDir = path.join(
+      projectRoot,
+      "..",
+      `AI-Aget-Gen-backup-${timestamp}`,
+    );
 
-    console.log('Creating backup...');
+    console.log("Creating backup...");
     await execAsync(`cp -r "${projectRoot}/." "${backupDir}/"`);
     console.log(`Backup created at: ${backupDir}`);
 
@@ -37,7 +41,7 @@ async function removeRedundantFiles() {
         removedCount++;
         console.log(`Removed: ${file}`);
       } catch (error) {
-        if (error.code === 'ENOENT') {
+        if (error.code === "ENOENT") {
           console.log(`File not found: ${file}`);
         } else {
           console.error(`Error removing ${file}:`, error);
@@ -46,13 +50,13 @@ async function removeRedundantFiles() {
       }
     }
 
-    console.log('\nRedundant file removal completed!');
+    console.log("\nRedundant file removal completed!");
     console.log(`Successfully removed ${removedCount} files`);
     if (errorCount > 0) {
       console.log(`Failed to remove ${errorCount} files`);
     }
   } catch (error) {
-    console.error('Error during file removal:', error);
+    console.error("Error during file removal:", error);
     process.exit(1);
   }
 }

@@ -1,23 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useReducedMotion } from '../hooks/animations/useReducedMotion';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "../hooks/animations/useReducedMotion";
 
 /**
  * Types of announcements
  */
-export type AnnouncementType = 'polite' | 'assertive';
+export type AnnouncementType = "polite" | "assertive";
 
 /**
  * Announces messages to screen readers
  * @param message The message to announce
  * @param type The type of announcement ('polite' or 'assertive')
  */
-export function announce(message: string, type: AnnouncementType = 'polite') {
+export function announce(message: string, type: AnnouncementType = "polite") {
   const announcer = getAnnouncer(type);
 
   // Update the content to trigger screen reader announcement
   if (announcer) {
     // Clear it first to ensure the announcement happens even if the same text is announced twice
-    announcer.textContent = '';
+    announcer.textContent = "";
 
     // Use setTimeout to ensure the change is announced
     setTimeout(() => {
@@ -34,22 +34,22 @@ function getAnnouncer(type: AnnouncementType): HTMLElement {
   let announcer = document.getElementById(id);
 
   if (!announcer) {
-    announcer = document.createElement('div');
+    announcer = document.createElement("div");
     announcer.id = id;
-    announcer.setAttribute('aria-live', type);
-    announcer.setAttribute('role', 'status');
-    announcer.setAttribute('aria-atomic', 'true');
+    announcer.setAttribute("aria-live", type);
+    announcer.setAttribute("role", "status");
+    announcer.setAttribute("aria-atomic", "true");
 
     // Hide it visually but keep it accessible to screen readers
     Object.assign(announcer.style, {
-      position: 'absolute',
-      width: '1px',
-      height: '1px',
-      padding: '0',
-      overflow: 'hidden',
-      clip: 'rect(0, 0, 0, 0)',
-      whiteSpace: 'nowrap',
-      border: '0',
+      position: "absolute",
+      width: "1px",
+      height: "1px",
+      padding: "0",
+      overflow: "hidden",
+      clip: "rect(0, 0, 0, 0)",
+      whiteSpace: "nowrap",
+      border: "0",
     });
 
     document.body.appendChild(announcer);
@@ -64,7 +64,10 @@ function getAnnouncer(type: AnnouncementType): HTMLElement {
  * @param type The type of announcement
  * @returns An object with the current message and a function to set a new message
  */
-export function useAnnouncer(initialMessage = '', type: AnnouncementType = 'polite') {
+export function useAnnouncer(
+  initialMessage = "",
+  type: AnnouncementType = "polite",
+) {
   const [message, setMessage] = useState(initialMessage);
 
   useEffect(() => {
@@ -111,14 +114,14 @@ export function useFocusTrap(active = true, onEscape?: () => void) {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Handle Escape key
-      if (e.key === 'Escape' && onEscape) {
+      if (e.key === "Escape" && onEscape) {
         e.preventDefault();
         onEscape();
         return;
       }
 
       // Only handle Tab key if active
-      if (e.key !== 'Tab' || !active) return;
+      if (e.key !== "Tab" || !active) return;
 
       const focusableElements = getFocusableElements(ref.current);
       if (focusableElements.length === 0) return;
@@ -142,8 +145,8 @@ export function useFocusTrap(active = true, onEscape?: () => void) {
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [active, onEscape]);
 
   // Set focus on the first focusable element when activated
@@ -165,22 +168,24 @@ export function useFocusTrap(active = true, onEscape?: () => void) {
 /**
  * Get all focusable elements within a container
  */
-export function getFocusableElements(container: HTMLElement | null): HTMLElement[] {
+export function getFocusableElements(
+  container: HTMLElement | null,
+): HTMLElement[] {
   if (!container) return [];
 
   const selector = [
-    'a[href]',
-    'button:not([disabled])',
-    'input:not([disabled])',
-    'select:not([disabled])',
-    'textarea:not([disabled])',
+    "a[href]",
+    "button:not([disabled])",
+    "input:not([disabled])",
+    "select:not([disabled])",
+    "textarea:not([disabled])",
     '[tabindex]:not([tabindex="-1"])',
-    'area[href]',
-    'iframe',
-    'object',
-    'embed',
+    "area[href]",
+    "iframe",
+    "object",
+    "embed",
     '[contenteditable="true"]',
-  ].join(',');
+  ].join(",");
 
   return Array.from(container.querySelectorAll(selector)).filter(
     (el): el is HTMLElement => el instanceof HTMLElement && el.tabIndex !== -1,
@@ -254,10 +259,10 @@ export function useKeyboardNavigation({
 
       // Vertical navigation
       if (vertical) {
-        if (event.key === 'ArrowUp') {
+        if (event.key === "ArrowUp") {
           event.preventDefault();
           newIndex = currentIndex - 1;
-        } else if (event.key === 'ArrowDown') {
+        } else if (event.key === "ArrowDown") {
           event.preventDefault();
           newIndex = currentIndex + 1;
         }
@@ -265,26 +270,26 @@ export function useKeyboardNavigation({
 
       // Horizontal navigation
       if (horizontal) {
-        if (event.key === 'ArrowLeft') {
+        if (event.key === "ArrowLeft") {
           event.preventDefault();
           newIndex = currentIndex - 1;
-        } else if (event.key === 'ArrowRight') {
+        } else if (event.key === "ArrowRight") {
           event.preventDefault();
           newIndex = currentIndex + 1;
         }
       }
 
       // Home and End keys
-      if (event.key === 'Home') {
+      if (event.key === "Home") {
         event.preventDefault();
         newIndex = 0;
-      } else if (event.key === 'End') {
+      } else if (event.key === "End") {
         event.preventDefault();
         newIndex = itemCount - 1;
       }
 
       // Enter and Space to select
-      if ((event.key === 'Enter' || event.key === ' ') && onSelect) {
+      if ((event.key === "Enter" || event.key === " ") && onSelect) {
         event.preventDefault();
         onSelect(currentIndex);
         return;
@@ -340,8 +345,8 @@ export interface SkipLinkProps {
  * @returns Boolean indicating if a11y test mode is active
  */
 export function isA11yTestMode(): boolean {
-  if (typeof window === 'undefined') return false;
-  return new URLSearchParams(window.location.search).has('a11y');
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).has("a11y");
 }
 
 /**

@@ -1,23 +1,25 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
 /**
  * Detects if the device is likely a low-power device based on
  * user agent and hardware concurrency
  */
 export function isLowPowerDevice(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === "undefined") return false;
 
   // Check for hardware concurrency (CPU cores)
-  const lowConcurrency = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+  const lowConcurrency =
+    navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
 
   // Check for mobile devices
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent,
-  );
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent,
+    );
 
   // Check for battery status if available
   let isBatterySaving = false;
-  if ('getBattery' in navigator) {
+  if ("getBattery" in navigator) {
     // @ts-ignore - getBattery is not in the standard navigator type
     navigator.getBattery().then((battery) => {
       isBatterySaving = battery.level <= 0.2 && !battery.charging;
@@ -41,7 +43,7 @@ export function useReducedMotion(forceReduce?: boolean) {
 
   useEffect(() => {
     // Check if the browser supports matchMedia
-    const mediaQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const mediaQuery = window.matchMedia?.("(prefers-reduced-motion: reduce)");
 
     // Set the initial value
     setPrefersReducedMotion(mediaQuery?.matches ?? false);
@@ -55,11 +57,11 @@ export function useReducedMotion(forceReduce?: boolean) {
     };
 
     // Add event listener
-    mediaQuery?.addEventListener('change', handleChange);
+    mediaQuery?.addEventListener("change", handleChange);
 
     // Clean up
     return () => {
-      mediaQuery?.removeEventListener('change', handleChange);
+      mediaQuery?.removeEventListener("change", handleChange);
     };
   }, []);
 
@@ -96,7 +98,9 @@ export interface AnimationConfig {
  * @param customConfig - Optional custom animation configuration
  * @returns Animation configuration object
  */
-export function useAnimationConfig(customConfig?: Partial<AnimationConfig>): AnimationConfig {
+export function useAnimationConfig(
+  customConfig?: Partial<AnimationConfig>,
+): AnimationConfig {
   const prefersReducedMotion = useReducedMotion();
 
   return useMemo(() => {
@@ -114,11 +118,11 @@ export function useAnimationConfig(customConfig?: Partial<AnimationConfig>): Ani
       entrance: {
         opacity: [0, 1],
         y: [20, 0],
-        transition: { duration: 0.4, ease: 'easeOut' },
+        transition: { duration: 0.4, ease: "easeOut" },
       },
       exit: {
         opacity: [1, 0],
-        transition: { duration: 0.2, ease: 'easeIn' },
+        transition: { duration: 0.2, ease: "easeIn" },
       },
       enabled: true,
     };
@@ -126,7 +130,7 @@ export function useAnimationConfig(customConfig?: Partial<AnimationConfig>): Ani
     // If reduced motion is preferred, create an accessible version
     if (prefersReducedMotion) {
       return {
-        transition: { duration: 0.1, ease: 'linear', delay: 0 },
+        transition: { duration: 0.1, ease: "linear", delay: 0 },
         hover: {},
         entrance: { opacity: 1, y: 0 },
         exit: { opacity: 0 },
@@ -154,7 +158,7 @@ export function useAnimationPresets() {
         ? { opacity: 1 }
         : {
             opacity: [0, 1],
-            transition: { duration: 0.3, ease: 'easeOut' },
+            transition: { duration: 0.3, ease: "easeOut" },
           },
 
       // Slide in from bottom
@@ -163,7 +167,7 @@ export function useAnimationPresets() {
         : {
             opacity: [0, 1],
             y: [20, 0],
-            transition: { duration: 0.4, ease: 'easeOut' },
+            transition: { duration: 0.4, ease: "easeOut" },
           },
 
       // Slide in from left
@@ -172,7 +176,7 @@ export function useAnimationPresets() {
         : {
             opacity: [0, 1],
             x: [-20, 0],
-            transition: { duration: 0.4, ease: 'easeOut' },
+            transition: { duration: 0.4, ease: "easeOut" },
           },
 
       // Slide in from right
@@ -181,7 +185,7 @@ export function useAnimationPresets() {
         : {
             opacity: [0, 1],
             x: [20, 0],
-            transition: { duration: 0.4, ease: 'easeOut' },
+            transition: { duration: 0.4, ease: "easeOut" },
           },
 
       // Scale up animation
@@ -190,7 +194,7 @@ export function useAnimationPresets() {
         : {
             opacity: [0, 1],
             scale: [0.95, 1],
-            transition: { duration: 0.3, ease: 'easeOut' },
+            transition: { duration: 0.3, ease: "easeOut" },
           },
 
       // Stagger children animations
@@ -214,7 +218,7 @@ export function useAnimationPresets() {
         ? {}
         : {
             y: -5,
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
             transition: { duration: 0.2 },
           },
     }),

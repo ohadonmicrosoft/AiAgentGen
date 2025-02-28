@@ -22,10 +22,10 @@ interface HSL {
  */
 export function hexToRgb(hex: string): RGB {
   // Remove the # if present
-  hex = hex.replace(/^#/, '');
+  hex = hex.replace(/^#/, "");
 
   // Parse the hex values
-  const bigint = parseInt(hex, 16);
+  const bigint = Number.parseInt(hex, 16);
 
   // Extract RGB components
   const r = (bigint >> 16) & 255;
@@ -170,7 +170,7 @@ export function getAnalogousColors(hex: string): [string, string, string] {
 /**
  * Generate shades (darker variations) of a color
  */
-export function getShades(hex: string, count: number = 5): string[] {
+export function getShades(hex: string, count = 5): string[] {
   const hsl = hexToHsl(hex);
   const shades: string[] = [];
 
@@ -190,7 +190,7 @@ export function getShades(hex: string, count: number = 5): string[] {
 /**
  * Generate tints (lighter variations) of a color
  */
-export function getTints(hex: string, count: number = 5): string[] {
+export function getTints(hex: string, count = 5): string[] {
   const hsl = hexToHsl(hex);
   const tints: string[] = [];
 
@@ -210,7 +210,7 @@ export function getTints(hex: string, count: number = 5): string[] {
 /**
  * Generate tones (saturation variations) of a color
  */
-export function getTones(hex: string, count: number = 5): string[] {
+export function getTones(hex: string, count = 5): string[] {
   const hsl = hexToHsl(hex);
   const tones: string[] = [];
 
@@ -282,9 +282,12 @@ function calculateRelativeLuminance(rgb: RGB): number {
   const gsrgb = rgb.g / 255;
   const bsrgb = rgb.b / 255;
 
-  const r = rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
-  const g = gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
-  const b = bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
+  const r =
+    rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
+  const g =
+    gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
+  const b =
+    bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
 
   // Calculate luminance using the formula: L = 0.2126 * R + 0.7152 * G + 0.0722 * B
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
@@ -295,10 +298,10 @@ function calculateRelativeLuminance(rgb: RGB): number {
  * Returns "#000000" or "#FFFFFF"
  */
 export function getAccessibleTextColor(backgroundColor: string): string {
-  const whiteContrast = getContrastRatio(backgroundColor, '#FFFFFF');
-  const blackContrast = getContrastRatio(backgroundColor, '#000000');
+  const whiteContrast = getContrastRatio(backgroundColor, "#FFFFFF");
+  const blackContrast = getContrastRatio(backgroundColor, "#000000");
 
-  return whiteContrast > blackContrast ? '#FFFFFF' : '#000000';
+  return whiteContrast > blackContrast ? "#FFFFFF" : "#000000";
 }
 
 /**
@@ -356,13 +359,13 @@ export function generateThemeColors(primaryColor: string) {
 
   // Adjustments for primary foreground
   const primaryForeground =
-    getAccessibleTextColor(hslToHex(primary)) === '#FFFFFF'
+    getAccessibleTextColor(hslToHex(primary)) === "#FFFFFF"
       ? { h: primary.h, s: primary.s, l: 98 }
       : { h: primary.h, s: primary.s, l: 10 };
 
   // Adjustments for accent foreground
   const accentForeground =
-    getAccessibleTextColor(hslToHex(accent)) === '#FFFFFF'
+    getAccessibleTextColor(hslToHex(accent)) === "#FFFFFF"
       ? { h: accent.h, s: accent.s, l: 98 }
       : { h: accent.h, s: accent.s, l: 10 };
 
@@ -373,7 +376,7 @@ export function generateThemeColors(primaryColor: string) {
     l: isDark ? 30 : 70,
   };
   const secondaryForeground =
-    getAccessibleTextColor(hslToHex(secondary)) === '#FFFFFF'
+    getAccessibleTextColor(hslToHex(secondary)) === "#FFFFFF"
       ? { h: secondary.h, s: secondary.s, l: 98 }
       : { h: secondary.h, s: secondary.s, l: 10 };
 

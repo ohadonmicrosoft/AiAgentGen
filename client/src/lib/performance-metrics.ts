@@ -64,7 +64,8 @@ class PerformanceMonitor {
   private markers: Record<string, PerformanceMarker> = {};
   private listeners: Array<(metric: PerformanceMetric) => void> = [];
   private isMonitoring = false;
-  private frameCounters: Record<string, { count: number; lastTime: number }> = {};
+  private frameCounters: Record<string, { count: number; lastTime: number }> =
+    {};
   private memoryUsageInterval: number | null = null;
 
   /**
@@ -87,7 +88,7 @@ class PerformanceMonitor {
     // Record initial page load metrics
     this.recordPageLoadMetrics();
 
-    console.log('Performance monitoring started');
+    console.log("Performance monitoring started"); // eslint-disable-line no-console
   }
 
   /**
@@ -104,13 +105,18 @@ class PerformanceMonitor {
       this.memoryUsageInterval = null;
     }
 
-    console.log('Performance monitoring stopped');
+    console.log("Performance monitoring stopped"); // eslint-disable-line no-console
   }
 
   /**
    * Record a performance metric
    */
-  recordMetric(name: string, value: number, unit: string, metadata?: Record<string, any>): void {
+  recordMetric(
+    name: string,
+    value: number,
+    unit: string,
+    metadata?: Record<string, any>,
+  ): void {
     const metric: PerformanceMetric = {
       name,
       value,
@@ -125,8 +131,8 @@ class PerformanceMonitor {
     this.listeners.forEach((listener) => listener(metric));
 
     // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Performance metric: ${name} = ${value}${unit}`, metadata);
+    if (process.env.NODE_ENV === "development") {
+      console.log(`Performance metric: ${name} = ${value}${unit}`, metadata); // eslint-disable-line no-console
     }
   }
 
@@ -144,11 +150,14 @@ class PerformanceMonitor {
   /**
    * End a performance marker and record its duration
    */
-  endMarker(name: string, additionalMetadata?: Record<string, any>): number | undefined {
+  endMarker(
+    name: string,
+    additionalMetadata?: Record<string, any>,
+  ): number | undefined {
     const marker = this.markers[name];
 
     if (!marker) {
-      console.warn(`No marker found with name: ${name}`);
+      console.warn(`No marker found with name: ${name}`); // eslint-disable-line no-console
       return undefined;
     }
 
@@ -160,7 +169,7 @@ class PerformanceMonitor {
     }
 
     // Record as a metric
-    this.recordMetric(`marker:${name}`, marker.duration, 'ms', marker.metadata);
+    this.recordMetric(`marker:${name}`, marker.duration, "ms", marker.metadata);
 
     return marker.duration;
   }
@@ -201,7 +210,11 @@ class PerformanceMonitor {
   /**
    * Measure the execution time of a function
    */
-  measureFunction<T>(name: string, fn: () => T, metadata?: Record<string, any>): T {
+  measureFunction<T>(
+    name: string,
+    fn: () => T,
+    metadata?: Record<string, any>,
+  ): T {
     this.startMarker(name, metadata);
     const result = fn();
     this.endMarker(name);
@@ -244,7 +257,7 @@ class PerformanceMonitor {
       // Calculate FPS every second
       if (elapsed >= 1000) {
         const fps = Math.round((frames * 1000) / elapsed);
-        this.recordMetric('fps', fps, 'fps');
+        this.recordMetric("fps", fps, "fps");
 
         frames = 0;
         lastTime = now;
@@ -268,9 +281,21 @@ class PerformanceMonitor {
         const memory = (performance as any).memory;
 
         if (memory) {
-          this.recordMetric('memory:used', memory.usedJSHeapSize / (1024 * 1024), 'MB');
-          this.recordMetric('memory:total', memory.totalJSHeapSize / (1024 * 1024), 'MB');
-          this.recordMetric('memory:limit', memory.jsHeapSizeLimit / (1024 * 1024), 'MB');
+          this.recordMetric(
+            "memory:used",
+            memory.usedJSHeapSize / (1024 * 1024),
+            "MB",
+          );
+          this.recordMetric(
+            "memory:total",
+            memory.totalJSHeapSize / (1024 * 1024),
+            "MB",
+          );
+          this.recordMetric(
+            "memory:limit",
+            memory.jsHeapSizeLimit / (1024 * 1024),
+            "MB",
+          );
         }
       }, 5000) as unknown as number;
     }
@@ -281,11 +306,11 @@ class PerformanceMonitor {
    */
   private startLongTaskMonitoring(): void {
     // Check if PerformanceObserver is available
-    if (typeof PerformanceObserver !== 'undefined') {
+    if (typeof PerformanceObserver !== "undefined") {
       try {
         const observer = new PerformanceObserver((list) => {
           list.getEntries().forEach((entry) => {
-            this.recordMetric('long-task', entry.duration, 'ms', {
+            this.recordMetric("long-task", entry.duration, "ms", {
               startTime: entry.startTime,
               name: entry.name,
               entryType: entry.entryType,
@@ -293,9 +318,9 @@ class PerformanceMonitor {
           });
         });
 
-        observer.observe({ entryTypes: ['longtask'] });
+        observer.observe({ entryTypes: ["longtask"] });
       } catch (e) {
-        console.warn('Long task monitoring not supported', e);
+        console.warn("Long task monitoring not supported", e); // eslint-disable-line no-console
       }
     }
   }
@@ -305,10 +330,10 @@ class PerformanceMonitor {
    */
   private recordPageLoadMetrics(): void {
     // Wait for the page to be fully loaded
-    if (document.readyState === 'complete') {
+    if (document.readyState === "complete") {
       this.capturePageLoadMetrics();
     } else {
-      window.addEventListener('load', () => this.capturePageLoadMetrics());
+      window.addEventListener("load", () => this.capturePageLoadMetrics());
     }
   }
 
@@ -329,23 +354,23 @@ class PerformanceMonitor {
       const loadTime = timing.loadEventEnd - timing.navigationStart;
 
       // Record metrics
-      this.recordMetric('page:dns', dnsTime, 'ms');
-      this.recordMetric('page:tcp', tcpTime, 'ms');
-      this.recordMetric('page:ttfb', ttfb, 'ms');
-      this.recordMetric('page:domInteractive', domInteractive, 'ms');
-      this.recordMetric('page:domComplete', domComplete, 'ms');
-      this.recordMetric('page:load', loadTime, 'ms');
+      this.recordMetric("page:dns", dnsTime, "ms");
+      this.recordMetric("page:tcp", tcpTime, "ms");
+      this.recordMetric("page:ttfb", ttfb, "ms");
+      this.recordMetric("page:domInteractive", domInteractive, "ms");
+      this.recordMetric("page:domComplete", domComplete, "ms");
+      this.recordMetric("page:load", loadTime, "ms");
     }
 
     // Capture paint metrics
-    if (performance && typeof performance.getEntriesByType === 'function') {
-      const paintMetrics = performance.getEntriesByType('paint');
+    if (performance && typeof performance.getEntriesByType === "function") {
+      const paintMetrics = performance.getEntriesByType("paint");
 
       paintMetrics.forEach((metric) => {
-        if (metric.name === 'first-paint') {
-          this.recordMetric('paint:first', metric.startTime, 'ms');
-        } else if (metric.name === 'first-contentful-paint') {
-          this.recordMetric('paint:firstContentful', metric.startTime, 'ms');
+        if (metric.name === "first-paint") {
+          this.recordMetric("paint:first", metric.startTime, "ms");
+        } else if (metric.name === "first-contentful-paint") {
+          this.recordMetric("paint:firstContentful", metric.startTime, "ms");
         }
       });
     }
@@ -371,7 +396,7 @@ class PerformanceMonitor {
 
       if (elapsed >= 1000) {
         const fps = Math.round((counter.count * 1000) / elapsed);
-        this.recordMetric(`component:${componentName}:fps`, fps, 'fps');
+        this.recordMetric(`component:${componentName}:fps`, fps, "fps");
 
         counter.count = 0;
         counter.lastTime = now;
@@ -401,7 +426,10 @@ export const performanceMonitor = new PerformanceMonitor();
  */
 export function usePerformanceMonitoring(componentName: string): {
   measureRender: (renderName: string) => void;
-  measureEffect: (effectName: string, fn: () => void | (() => void)) => void | (() => void);
+  measureEffect: (
+    effectName: string,
+    fn: () => void | (() => void),
+  ) => void | (() => void);
   measureAsyncEffect: (
     effectName: string,
     fn: () => Promise<void | (() => void)>,
@@ -411,7 +439,7 @@ export function usePerformanceMonitoring(componentName: string): {
     performanceMonitor.recordMetric(
       `component:${componentName}:render:${renderName}`,
       performance.now(),
-      'ms',
+      "ms",
     );
   };
 

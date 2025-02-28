@@ -1,6 +1,6 @@
-import { SkipLinkProps } from '@/lib/accessibility';
-import { cn } from '@/lib/utils';
-import React from 'react';
+import type { SkipLinkProps } from "@/lib/accessibility";
+import { cn } from "@/lib/utils";
+import type React from "react";
 
 /**
  * A skip link that allows keyboard users to bypass navigation
@@ -13,23 +13,23 @@ export function SkipLink({ targetId, children, className }: SkipLinkProps) {
 
     if (target) {
       // Set tabindex temporarily to ensure focusability
-      if (!target.hasAttribute('tabindex')) {
-        target.setAttribute('tabindex', '-1');
+      if (!target.hasAttribute("tabindex")) {
+        target.setAttribute("tabindex", "-1");
 
         // Remove it after blur to maintain proper semantics
         const handleBlur = () => {
-          target.removeAttribute('tabindex');
-          target.removeEventListener('blur', handleBlur);
+          target.removeAttribute("tabindex");
+          target.removeEventListener("blur", handleBlur);
         };
 
-        target.addEventListener('blur', handleBlur);
+        target.addEventListener("blur", handleBlur);
       }
 
       // Focus the element
       target.focus();
 
       // Also scroll to it
-      target.scrollIntoView({ behavior: 'smooth' });
+      target.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -39,9 +39,9 @@ export function SkipLink({ targetId, children, className }: SkipLinkProps) {
       onClick={handleClick}
       className={cn(
         // Only visible when focused
-        'sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50',
-        'focus:bg-primary focus:text-primary-foreground focus:p-3 focus:m-2 focus:rounded',
-        'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+        "sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50",
+        "focus:bg-primary focus:text-primary-foreground focus:p-3 focus:m-2 focus:rounded",
+        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
         className,
       )}
     >

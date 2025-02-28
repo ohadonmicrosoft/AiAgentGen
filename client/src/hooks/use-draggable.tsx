@@ -1,13 +1,17 @@
-import { useDragContext } from '@/contexts/drag-context';
+import { useDragContext } from "@/contexts/drag-context";
 import {
   createDragGhost,
   getCursorPosition,
   removeDragGhost,
   updateDragAnimation,
-} from '@/lib/drag-and-drop';
-import { DraggableConfig, DraggableItem, Position } from '@/types/drag-types';
-import { motion, useAnimation } from 'framer-motion';
-import { useCallback, useEffect, useRef, useState } from 'react';
+} from "@/lib/drag-and-drop";
+import {
+  type DraggableConfig,
+  type DraggableItem,
+  Position,
+} from "@/types/drag-types";
+import { motion, useAnimation } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Hook to make an element draggable
@@ -95,7 +99,8 @@ export function useDraggable(item: DraggableItem, config: DraggableConfig) {
   }, [isDragging, dragState.isDragging, controls, prefersReducedMotion]);
 
   // Check if this item is currently being dragged
-  const isThisItemDragging = dragState.isDragging && dragState.draggedId === item.id;
+  const isThisItemDragging =
+    dragState.isDragging && dragState.draggedId === item.id;
 
   return {
     ref: elementRef,
@@ -104,20 +109,20 @@ export function useDraggable(item: DraggableItem, config: DraggableConfig) {
       onMouseDown: !config.dragHandleSelector ? handleDragStart : undefined,
       onTouchStart: !config.dragHandleSelector ? handleDragStart : undefined,
       style: {
-        cursor: config.dragDisabled ? 'default' : 'grab',
-        touchAction: 'none', // Prevents browser handling of touch gestures
+        cursor: config.dragDisabled ? "default" : "grab",
+        touchAction: "none", // Prevents browser handling of touch gestures
       },
-      'data-draggable': 'true',
-      'data-draggable-id': item.id,
-      'aria-grabbed': isThisItemDragging,
+      "data-draggable": "true",
+      "data-draggable-id": item.id,
+      "aria-grabbed": isThisItemDragging,
     },
     dragHandleProps: config.dragHandleSelector
       ? {
           onMouseDown: handleDragStart,
           onTouchStart: handleDragStart,
           style: {
-            cursor: config.dragDisabled ? 'default' : 'grab',
-            touchAction: 'none',
+            cursor: config.dragDisabled ? "default" : "grab",
+            touchAction: "none",
           },
         }
       : {},

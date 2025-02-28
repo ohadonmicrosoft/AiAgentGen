@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { AlertTriangle } from 'lucide-react';
-import React from 'react';
+import { Button } from "@/components/ui/button";
+import { AlertTriangle } from "lucide-react";
+import React from "react";
 
 interface ErrorFallbackProps {
   error?: Error | null;
@@ -15,12 +15,14 @@ interface ErrorFallbackProps {
 export function ErrorFallback({
   error,
   resetErrorBoundary,
-  message = 'Something went wrong',
+  message = "Something went wrong",
 }: ErrorFallbackProps) {
   return (
     <div className="flex flex-col items-center justify-center p-6 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 text-center space-y-4 min-h-[200px] w-full">
       <AlertTriangle className="h-10 w-10 text-red-500 dark:text-red-400" />
-      <h2 className="text-lg font-semibold text-red-700 dark:text-red-300">{message}</h2>
+      <h2 className="text-lg font-semibold text-red-700 dark:text-red-300">
+        {message}
+      </h2>
 
       {error && (
         <div className="max-w-full overflow-auto text-sm text-red-600 dark:text-red-400 p-2 bg-red-100 dark:bg-red-900/30 rounded border border-red-200 dark:border-red-800">
@@ -46,8 +48,8 @@ export function ErrorFallback({
  */
 export function CompactErrorFallback({
   resetErrorBoundary,
-  message = 'Component Error',
-}: Omit<ErrorFallbackProps, 'error'>) {
+  message = "Component Error",
+}: Omit<ErrorFallbackProps, "error">) {
   return (
     <div className="flex items-center justify-between p-3 rounded border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 text-sm w-full">
       <div className="flex items-center space-x-2">

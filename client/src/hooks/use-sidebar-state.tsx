@@ -1,6 +1,12 @@
-import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
-import { useLocalStorage } from './use-local-storage';
-import { useIsMobile } from './use-mobile';
+import {
+  type ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useLocalStorage } from "./use-local-storage";
+import { useIsMobile } from "./use-mobile";
 
 interface SidebarState {
   isCollapsed: boolean;
@@ -18,7 +24,10 @@ interface SidebarProviderProps {
 
 export function SidebarProvider({ children }: SidebarProviderProps) {
   const isMobile = useIsMobile();
-  const [isCollapsed, setIsCollapsed] = useLocalStorage<boolean>('sidebar-collapsed', false);
+  const [isCollapsed, setIsCollapsed] = useLocalStorage<boolean>(
+    "sidebar-collapsed",
+    false,
+  );
   const [isHovering, setIsHovering] = useState(false);
 
   // Always expand sidebar on mobile
@@ -55,7 +64,7 @@ export function useSidebarState() {
   const context = useContext(SidebarContext);
 
   if (context === undefined) {
-    throw new Error('useSidebarState must be used within a SidebarProvider');
+    throw new Error("useSidebarState must be used within a SidebarProvider");
   }
 
   return context;

@@ -1,74 +1,104 @@
-import { Switch, Route, useLocation } from 'wouter';
-import { queryClient } from './lib/queryClient';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from '@/components/ui/toaster';
-import { ProtectedRoute } from './lib/protected-route';
-import { AuthProvider } from '@/context/auth-context';
-import { ThemeProvider } from '@/hooks/use-theme';
-import { SidebarProvider } from '@/hooks/use-sidebar-state';
-import { DragProvider } from '@/contexts/drag-context';
-import { PageTransition } from './lib/page-transition';
-import { AnimatePresence } from 'framer-motion';
-import { lazy, Suspense, useEffect, useState } from 'react';
-import { Spinner } from '@/components/ui/spinner';
-import { ErrorBoundary } from '@/components/ui/error-boundary';
-import { ErrorFallback } from '@/components/ui/error-fallback';
-import { Logger } from '@/lib/logger';
-import { useReducedMotion } from '@/hooks/animations/useReducedMotion';
-import { initOfflineSupport } from './lib/offline-plugin';
-import { OfflineIndicator } from '@/components/ui/offline-indicator';
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { ErrorFallback } from "@/components/ui/error-fallback";
+import { OfflineIndicator } from "@/components/ui/offline-indicator";
+import { Spinner } from "@/components/ui/spinner";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/context/auth-context";
+import { DragProvider } from "@/contexts/drag-context";
+import { useReducedMotion } from "@/hooks/animations/useReducedMotion";
+import { SidebarProvider } from "@/hooks/use-sidebar-state";
+import { ThemeProvider } from "@/hooks/use-theme";
+import { Logger } from "@/lib/logger";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { AnimatePresence } from "framer-motion";
+import { Suspense, lazy, useEffect, useState } from "react";
+import { Route, Switch, useLocation } from "wouter";
+import { initOfflineSupport } from "./lib/offline-plugin";
+import { PageTransition } from "./lib/page-transition";
+import { ProtectedRoute } from "./lib/protected-route";
+import { queryClient } from "./lib/queryClient";
 
 // Initialize logger
-const logger = new Logger('App');
+const logger = new Logger("App");
 
 // Initialize offline support
 initOfflineSupport(queryClient);
 
 // Define route groups for code splitting
 const ROUTE_GROUPS = {
-  AUTH: 'auth',
-  MAIN: 'main',
-  ADMIN: 'admin',
-  DEMO: 'demo',
+  AUTH: "auth",
+  MAIN: "main",
+  ADMIN: "admin",
+  DEMO: "demo",
 };
 
 // Lazy load page components with route-based code splitting
 // Auth routes
-const AuthPage = lazy(() => import(/* webpackChunkName: "auth" */ '@/pages/auth-page'));
+const AuthPage = lazy(
+  () => import(/* webpackChunkName: "auth" */ "@/pages/auth-page"),
+);
 
 // Main app routes
-const Dashboard = lazy(() => import(/* webpackChunkName: "main" */ '@/pages/dashboard'));
-const Agents = lazy(() => import(/* webpackChunkName: "main" */ '@/pages/agents'));
-const CreateAgent = lazy(() => import(/* webpackChunkName: "main" */ '@/pages/create-agent'));
-const TestAgent = lazy(() => import(/* webpackChunkName: "main" */ '@/pages/test-agent'));
-const Prompts = lazy(() => import(/* webpackChunkName: "main" */ '@/pages/prompts-new'));
-const Settings = lazy(() => import(/* webpackChunkName: "main" */ '@/pages/settings'));
+const Dashboard = lazy(
+  () => import(/* webpackChunkName: "main" */ "@/pages/dashboard"),
+);
+const Agents = lazy(
+  () => import(/* webpackChunkName: "main" */ "@/pages/agents"),
+);
+const CreateAgent = lazy(
+  () => import(/* webpackChunkName: "main" */ "@/pages/create-agent"),
+);
+const TestAgent = lazy(
+  () => import(/* webpackChunkName: "main" */ "@/pages/test-agent"),
+);
+const Prompts = lazy(
+  () => import(/* webpackChunkName: "main" */ "@/pages/prompts-new"),
+);
+const Settings = lazy(
+  () => import(/* webpackChunkName: "main" */ "@/pages/settings"),
+);
 
 // Admin routes
-const AdminAgents = lazy(() => import(/* webpackChunkName: "admin" */ '@/pages/admin-agents'));
-const AdminUsers = lazy(() => import(/* webpackChunkName: "admin" */ '@/pages/admin-users'));
+const AdminAgents = lazy(
+  () => import(/* webpackChunkName: "admin" */ "@/pages/admin-agents"),
+);
+const AdminUsers = lazy(
+  () => import(/* webpackChunkName: "admin" */ "@/pages/admin-users"),
+);
 
 // Demo routes
-const FormDemo = lazy(() => import(/* webpackChunkName: "demo" */ '@/pages/form-demo'));
-const TypographyDemo = lazy(() => import(/* webpackChunkName: "demo" */ '@/pages/typography-demo'));
-const PaletteDemo = lazy(() => import(/* webpackChunkName: "demo" */ '@/pages/palette-demo'));
-const SpacingDemo = lazy(() => import(/* webpackChunkName: "demo" */ '@/pages/spacing-demo'));
-const DragDropDemo = lazy(() => import(/* webpackChunkName: "demo" */ '@/pages/drag-drop-demo'));
+const FormDemo = lazy(
+  () => import(/* webpackChunkName: "demo" */ "@/pages/form-demo"),
+);
+const TypographyDemo = lazy(
+  () => import(/* webpackChunkName: "demo" */ "@/pages/typography-demo"),
+);
+const PaletteDemo = lazy(
+  () => import(/* webpackChunkName: "demo" */ "@/pages/palette-demo"),
+);
+const SpacingDemo = lazy(
+  () => import(/* webpackChunkName: "demo" */ "@/pages/spacing-demo"),
+);
+const DragDropDemo = lazy(
+  () => import(/* webpackChunkName: "demo" */ "@/pages/drag-drop-demo"),
+);
 const InfiniteScrollDemo = lazy(
-  () => import(/* webpackChunkName: "demo" */ '@/pages/infinite-scroll-demo'),
+  () => import(/* webpackChunkName: "demo" */ "@/pages/infinite-scroll-demo"),
 );
 const ContrastCheckerDemo = lazy(
-  () => import(/* webpackChunkName: "demo" */ '@/pages/contrast-checker-demo'),
+  () => import(/* webpackChunkName: "demo" */ "@/pages/contrast-checker-demo"),
 );
 const PerformanceDashboard = lazy(
-  () => import(/* webpackChunkName: "demo" */ '@/pages/performance-dashboard'),
+  () => import(/* webpackChunkName: "demo" */ "@/pages/performance-dashboard"),
 );
 const ErrorHandlingDemo = lazy(
-  () => import(/* webpackChunkName: "demo" */ '@/pages/error-handling-demo'),
+  () => import(/* webpackChunkName: "demo" */ "@/pages/error-handling-demo"),
 );
 
 // Common routes
-const NotFound = lazy(() => import(/* webpackChunkName: "common" */ '@/pages/not-found'));
+const NotFound = lazy(
+  () => import(/* webpackChunkName: "common" */ "@/pages/not-found"),
+);
 
 // Enhanced loading fallback component with progress indicator
 const LoadingFallback = () => {
@@ -117,7 +147,7 @@ const GlobalErrorFallback = ({
 }) => {
   // Log the error when it occurs
   useEffect(() => {
-    logger.error('Global application error:', {
+    logger.error("Global application error:", {
       name: error.name,
       message: error.message,
       stack: error.stack,
@@ -134,7 +164,8 @@ const GlobalErrorFallback = ({
         />
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Please try refreshing the page or contact support if the problem persists.
+            Please try refreshing the page or contact support if the problem
+            persists.
           </p>
         </div>
       </div>
@@ -145,12 +176,12 @@ const GlobalErrorFallback = ({
 // Preload critical routes
 function preloadRoutes() {
   // Preload auth routes
-  import('@/pages/auth-page');
+  import("@/pages/auth-page");
 
   // Preload main routes
   setTimeout(() => {
-    import('@/pages/dashboard');
-    import('@/pages/agents');
+    import("@/pages/dashboard");
+    import("@/pages/agents");
   }, 1000);
 }
 
@@ -164,19 +195,19 @@ function Router() {
 
   // Determine which route group is active
   const getRouteGroup = (path: string): string => {
-    if (path.startsWith('/auth')) return ROUTE_GROUPS.AUTH;
-    if (path.startsWith('/admin')) return ROUTE_GROUPS.ADMIN;
+    if (path.startsWith("/auth")) return ROUTE_GROUPS.AUTH;
+    if (path.startsWith("/admin")) return ROUTE_GROUPS.ADMIN;
     if (
       [
-        '/form-demo',
-        '/typography-demo',
-        '/palette-demo',
-        '/spacing-demo',
-        '/drag-drop-demo',
-        '/infinite-scroll-demo',
-        '/contrast-checker-demo',
-        '/performance-dashboard',
-        '/error-handling-demo',
+        "/form-demo",
+        "/typography-demo",
+        "/palette-demo",
+        "/spacing-demo",
+        "/drag-drop-demo",
+        "/infinite-scroll-demo",
+        "/contrast-checker-demo",
+        "/performance-dashboard",
+        "/error-handling-demo",
       ].some((demo) => path.startsWith(demo))
     ) {
       return ROUTE_GROUPS.DEMO;
@@ -190,14 +221,14 @@ function Router() {
   useEffect(() => {
     // When accessing main routes, preload other main routes
     if (currentRouteGroup === ROUTE_GROUPS.MAIN) {
-      import('@/pages/prompts-new');
-      import('@/pages/settings');
+      import("@/pages/prompts-new");
+      import("@/pages/settings");
     }
 
     // When accessing admin routes, preload other admin routes
     if (currentRouteGroup === ROUTE_GROUPS.ADMIN) {
-      import('@/pages/admin-agents');
-      import('@/pages/admin-users');
+      import("@/pages/admin-agents");
+      import("@/pages/admin-users");
     }
   }, [currentRouteGroup]);
 
@@ -206,7 +237,10 @@ function Router() {
       <PageTransition location={location}>
         <ErrorBoundary
           fallback={({ error, resetErrorBoundary }) => (
-            <GlobalErrorFallback error={error!} resetErrorBoundary={resetErrorBoundary} />
+            <GlobalErrorFallback
+              error={error!}
+              resetErrorBoundary={resetErrorBoundary}
+            />
           )}
           name="RouterErrorBoundary"
         >
@@ -224,14 +258,29 @@ function Router() {
               <ProtectedRoute path="/admin/agents" component={AdminAgents} />
               <ProtectedRoute path="/admin/users" component={AdminUsers} />
               <ProtectedRoute path="/form-demo" component={FormDemo} />
-              <ProtectedRoute path="/typography-demo" component={TypographyDemo} />
+              <ProtectedRoute
+                path="/typography-demo"
+                component={TypographyDemo}
+              />
               <ProtectedRoute path="/palette-demo" component={PaletteDemo} />
               <ProtectedRoute path="/spacing-demo" component={SpacingDemo} />
               <ProtectedRoute path="/drag-drop-demo" component={DragDropDemo} />
-              <ProtectedRoute path="/infinite-scroll-demo" component={InfiniteScrollDemo} />
-              <ProtectedRoute path="/contrast-checker-demo" component={ContrastCheckerDemo} />
-              <ProtectedRoute path="/performance-dashboard" component={PerformanceDashboard} />
-              <ProtectedRoute path="/error-handling-demo" component={ErrorHandlingDemo} />
+              <ProtectedRoute
+                path="/infinite-scroll-demo"
+                component={InfiniteScrollDemo}
+              />
+              <ProtectedRoute
+                path="/contrast-checker-demo"
+                component={ContrastCheckerDemo}
+              />
+              <ProtectedRoute
+                path="/performance-dashboard"
+                component={PerformanceDashboard}
+              />
+              <ProtectedRoute
+                path="/error-handling-demo"
+                component={ErrorHandlingDemo}
+              />
               <Route component={NotFound} />
             </Switch>
           </Suspense>
@@ -245,7 +294,7 @@ function App() {
   // Register global error handlers for unhandled errors and promise rejections
   useEffect(() => {
     const handleGlobalError = (event: ErrorEvent) => {
-      logger.error('Unhandled global error:', {
+      logger.error("Unhandled global error:", {
         message: event.message,
         filename: event.filename,
         lineno: event.lineno,
@@ -258,7 +307,7 @@ function App() {
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      logger.error('Unhandled promise rejection:', {
+      logger.error("Unhandled promise rejection:", {
         reason: event.reason,
         stack: event.reason?.stack,
       });
@@ -268,23 +317,29 @@ function App() {
     };
 
     // Register the handlers
-    window.addEventListener('error', handleGlobalError);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    window.addEventListener("error", handleGlobalError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
 
     // Log application startup
-    logger.info('Application initialized');
+    logger.info("Application initialized");
 
     // Clean up the handlers when the component unmounts
     return () => {
-      window.removeEventListener('error', handleGlobalError);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener("error", handleGlobalError);
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection,
+      );
     };
   }, []);
 
   return (
     <ErrorBoundary
       fallback={({ error, resetErrorBoundary }) => (
-        <GlobalErrorFallback error={error!} resetErrorBoundary={resetErrorBoundary} />
+        <GlobalErrorFallback
+          error={error!}
+          resetErrorBoundary={resetErrorBoundary}
+        />
       )}
       name="AppErrorBoundary"
     >

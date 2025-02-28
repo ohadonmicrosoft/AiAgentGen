@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from "react";
 
 // Navigation item interface for sidebar
 export interface NavItem {

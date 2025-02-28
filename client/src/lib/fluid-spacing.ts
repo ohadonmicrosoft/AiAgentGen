@@ -10,23 +10,26 @@ interface FluidSpacingOptions {
   maxSize: number;
   minWidth?: number; // Viewport width at which minSize applies
   maxWidth?: number; // Viewport width at which maxSize applies
-  unit?: 'px' | 'rem' | 'em' | 'vh' | 'vw';
+  unit?: "px" | "rem" | "em" | "vh" | "vw";
 }
 
 /**
  * Convert pixel value to specified unit
  */
-export function convertToUnit(value: number, unit: 'px' | 'rem' | 'em' | 'vh' | 'vw'): string {
+export function convertToUnit(
+  value: number,
+  unit: "px" | "rem" | "em" | "vh" | "vw",
+): string {
   switch (unit) {
-    case 'rem':
+    case "rem":
       return `${value / 16}rem`;
-    case 'em':
+    case "em":
       return `${value / 16}em`;
-    case 'vh':
+    case "vh":
       return `${value / 10}vh`;
-    case 'vw':
+    case "vw":
       return `${value / 10}vw`;
-    case 'px':
+    case "px":
     default:
       return `${value}px`;
   }
@@ -41,7 +44,7 @@ export function fluidSpace({
   maxSize,
   minWidth = 320,
   maxWidth = 1200,
-  unit = 'px',
+  unit = "px",
 }: FluidSpacingOptions): string {
   // Safety checks to prevent negative or invalid values
   if (minSize < 0) minSize = 0;
@@ -80,22 +83,22 @@ export function fluidSpace({
  * This uses a more refined spacing scale with better progression
  */
 export const fluidSpaceScale = {
-  '3xs': fluidSpace({ minSize: 2, maxSize: 4 }), // Tiny spaces (borders, thin lines)
-  '2xs': fluidSpace({ minSize: 4, maxSize: 8 }), // Very small spaces
+  "3xs": fluidSpace({ minSize: 2, maxSize: 4 }), // Tiny spaces (borders, thin lines)
+  "2xs": fluidSpace({ minSize: 4, maxSize: 8 }), // Very small spaces
   xs: fluidSpace({ minSize: 8, maxSize: 12 }), // Small spaces (compact UI elements)
   sm: fluidSpace({ minSize: 12, maxSize: 16 }), // Medium-small spaces
   md: fluidSpace({ minSize: 16, maxSize: 24 }), // Medium spaces (standard spacing)
   lg: fluidSpace({ minSize: 24, maxSize: 32 }), // Large spaces
   xl: fluidSpace({ minSize: 32, maxSize: 48 }), // Extra large spaces
-  '2xl': fluidSpace({ minSize: 48, maxSize: 64 }), // Double extra large spaces
-  '3xl': fluidSpace({ minSize: 64, maxSize: 96 }), // Triple extra large spaces
-  '4xl': fluidSpace({ minSize: 96, maxSize: 128 }), // Quadruple extra large spaces
+  "2xl": fluidSpace({ minSize: 48, maxSize: 64 }), // Double extra large spaces
+  "3xl": fluidSpace({ minSize: 64, maxSize: 96 }), // Triple extra large spaces
+  "4xl": fluidSpace({ minSize: 96, maxSize: 128 }), // Quadruple extra large spaces
 
   // Common UI-specific spacing values with better descriptive names
-  'form-gap': fluidSpace({ minSize: 16, maxSize: 24 }), // Space between form elements
-  'card-padding': fluidSpace({ minSize: 16, maxSize: 24 }), // Card internal padding
-  'section-gap': fluidSpace({ minSize: 32, maxSize: 64 }), // Gap between sections
-  'container-padding': fluidSpace({ minSize: 16, maxSize: 32 }), // Container padding
+  "form-gap": fluidSpace({ minSize: 16, maxSize: 24 }), // Space between form elements
+  "card-padding": fluidSpace({ minSize: 16, maxSize: 24 }), // Card internal padding
+  "section-gap": fluidSpace({ minSize: 32, maxSize: 64 }), // Gap between sections
+  "container-padding": fluidSpace({ minSize: 16, maxSize: 32 }), // Container padding
 };
 
 /**
@@ -106,7 +109,7 @@ export function containerPadding({
   maxPadding = 40,
   minWidth = 320,
   maxWidth = 1200,
-  unit = 'px',
+  unit = "px",
 }: Partial<FluidSpacingOptions>): string {
   return fluidSpace({
     minSize: minPadding,
@@ -125,7 +128,7 @@ export function responsiveGap({
   maxGap = 40,
   minWidth = 320,
   maxWidth = 1200,
-  unit = 'px',
+  unit = "px",
 }: Partial<FluidSpacingOptions>): string {
   return fluidSpace({
     minSize: minGap,
@@ -159,13 +162,15 @@ export function contentAwareSpace(
 /**
  * Calculate optimal spacing between related elements based on hierarchy
  */
-export function hierarchicalSpacing(importance: 'primary' | 'secondary' | 'tertiary'): string {
+export function hierarchicalSpacing(
+  importance: "primary" | "secondary" | "tertiary",
+): string {
   switch (importance) {
-    case 'primary':
+    case "primary":
       return fluidSpace({ minSize: 24, maxSize: 48 });
-    case 'secondary':
+    case "secondary":
       return fluidSpace({ minSize: 16, maxSize: 32 });
-    case 'tertiary':
+    case "tertiary":
       return fluidSpace({ minSize: 8, maxSize: 16 });
     default:
       return fluidSpace({ minSize: 16, maxSize: 32 });
@@ -192,17 +197,17 @@ export function fluidSymmetricSpace(size: keyof typeof fluidSpaceScale): {
 /**
  * Responsive container max-width based on content type
  */
-export function contentMaxWidth(contentType: 'text' | 'ui' | 'full'): string {
+export function contentMaxWidth(contentType: "text" | "ui" | "full"): string {
   switch (contentType) {
-    case 'text':
+    case "text":
       // Optimal reading width (65ch ≈ 65 characters)
-      return 'min(65ch, 100%)';
-    case 'ui':
+      return "min(65ch, 100%)";
+    case "ui":
       // Standard UI container
       return fluidSpace({ minSize: 640, maxSize: 1200 });
-    case 'full':
+    case "full":
       // Full width with padding
-      return '100%';
+      return "100%";
     default:
       return fluidSpace({ minSize: 640, maxSize: 1200 });
   }
@@ -213,30 +218,30 @@ export function contentMaxWidth(contentType: 'text' | 'ui' | 'full'): string {
  * Useful for consistent spacing values within specific breakpoints
  */
 export function deviceSpecificSpace(
-  device: 'mobile' | 'tablet' | 'desktop',
-  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl',
+  device: "mobile" | "tablet" | "desktop",
+  size: "xs" | "sm" | "md" | "lg" | "xl",
 ): string {
   const spacingValues = {
     mobile: {
-      xs: '8px',
-      sm: '12px',
-      md: '16px',
-      lg: '24px',
-      xl: '32px',
+      xs: "8px",
+      sm: "12px",
+      md: "16px",
+      lg: "24px",
+      xl: "32px",
     },
     tablet: {
-      xs: '8px',
-      sm: '12px',
-      md: '20px',
-      lg: '28px',
-      xl: '40px',
+      xs: "8px",
+      sm: "12px",
+      md: "20px",
+      lg: "28px",
+      xl: "40px",
     },
     desktop: {
-      xs: '8px',
-      sm: '16px',
-      md: '24px',
-      lg: '32px',
-      xl: '48px',
+      xs: "8px",
+      sm: "16px",
+      md: "24px",
+      lg: "32px",
+      xl: "48px",
     },
   };
 

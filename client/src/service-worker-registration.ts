@@ -4,12 +4,16 @@
  * Register the service worker
  */
 export function registerServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
       navigator.serviceWorker
-        .register('/service-worker.js')
+        .register("/service-worker.js")
         .then((registration) => {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          console.log(
+            // eslint-disable-line no-console
+            "ServiceWorker registration successful with scope: ",
+            registration.scope,
+          );
 
           // Check for updates when the page loads
           registration.update();
@@ -23,7 +27,7 @@ export function registerServiceWorker() {
           ); // Check for updates every hour
         })
         .catch((error) => {
-          console.error('ServiceWorker registration failed: ', error);
+          console.error("ServiceWorker registration failed: ", error); // eslint-disable-line no-console
         });
     });
   }
@@ -33,21 +37,24 @@ export function registerServiceWorker() {
  * Check if a service worker update is available and prompt user to refresh
  */
 export function setupServiceWorkerUpdateFlow() {
-  if ('serviceWorker' in navigator) {
+  if ("serviceWorker" in navigator) {
     // Add listener for when a new service worker is installed but waiting
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
       // When the service worker controlling this page changes, refresh the page
       window.location.reload();
     });
 
     // Detect when a new service worker is installed but waiting
     navigator.serviceWorker.ready.then((registration) => {
-      registration.addEventListener('updatefound', () => {
+      registration.addEventListener("updatefound", () => {
         const newWorker = registration.installing;
 
         if (newWorker) {
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          newWorker.addEventListener("statechange", () => {
+            if (
+              newWorker.state === "installed" &&
+              navigator.serviceWorker.controller
+            ) {
               // New service worker is installed but waiting
               // Show notification to the user
               notifyUserOfUpdate();
@@ -64,9 +71,9 @@ export function setupServiceWorkerUpdateFlow() {
  */
 function notifyUserOfUpdate() {
   // Create a notification element
-  const notification = document.createElement('div');
+  const notification = document.createElement("div");
   notification.className =
-    'fixed bottom-4 right-4 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg z-50 flex flex-col';
+    "fixed bottom-4 right-4 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg z-50 flex flex-col";
   notification.innerHTML = `
     <div class="flex items-center justify-between mb-2">
       <strong>Update Available</strong>
@@ -83,10 +90,10 @@ function notifyUserOfUpdate() {
   document.body.appendChild(notification);
 
   // Handle update action
-  document.getElementById('update-now')?.addEventListener('click', () => {
+  document.getElementById("update-now")?.addEventListener("click", () => {
     // Skip the waiting service worker
     navigator.serviceWorker.ready.then((registration) => {
-      registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
+      registration.waiting?.postMessage({ type: "SKIP_WAITING" });
     });
 
     // Remove the notification
@@ -94,12 +101,14 @@ function notifyUserOfUpdate() {
   });
 
   // Handle close action
-  document.getElementById('close-update-notification')?.addEventListener('click', () => {
-    notification.remove();
-  });
+  document
+    .getElementById("close-update-notification")
+    ?.addEventListener("click", () => {
+      notification.remove();
+    });
 
   // Handle later action
-  document.getElementById('update-later')?.addEventListener('click', () => {
+  document.getElementById("update-later")?.addEventListener("click", () => {
     notification.remove();
   });
 }
@@ -108,11 +117,11 @@ function notifyUserOfUpdate() {
  * Install event - this is called when the app is installed
  */
 export function handleAppInstalled() {
-  window.addEventListener('appinstalled', (event) => {
-    console.log('AI Agent Generator was installed', event);
+  window.addEventListener("appinstalled", (event) => {
+    console.log("AI Agent Generator was installed", event); // eslint-disable-line no-console
     // Track app installation
     if (window.gtag) {
-      window.gtag('event', 'app_installed');
+      window.gtag("event", "app_installed");
     }
   });
 }
@@ -120,6 +129,6 @@ export function handleAppInstalled() {
 // Declare global gtag function
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
+    gtag?: (...args: any[]) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 }

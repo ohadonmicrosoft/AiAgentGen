@@ -1,6 +1,12 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -16,14 +22,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -31,19 +37,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { useAuth } from '@/hooks/use-auth';
-import { useToast } from '@/hooks/use-toast';
-import MainLayout from '@/layouts/MainLayout';
-import { apiRequest, getQueryFn, queryClient } from '@/lib/queryClient';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { PERMISSIONS, Permission, ROLES, Role } from '@shared/schema';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { Loader2, Shield, User } from 'lucide-react';
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Redirect } from 'wouter';
-import { z } from 'zod';
+} from "@/components/ui/table";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import MainLayout from "@/layouts/MainLayout";
+import { apiRequest, getQueryFn, queryClient } from "@/lib/queryClient";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { PERMISSIONS, Permission, ROLES, Role } from "@shared/schema";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Loader2, Shield, User } from "lucide-react";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Redirect } from "wouter";
+import { z } from "zod";
 
 // Form schema for user role update
 const userRoleUpdateSchema = z.object({
@@ -77,43 +83,49 @@ export default function AdminUsersPage() {
     isLoading,
     error,
   } = useQuery<ApiUser[]>({
-    queryKey: ['/api/admin/users'],
-    queryFn: getQueryFn({ on401: 'throw' }),
+    queryKey: ["/api/admin/users"],
+    queryFn: getQueryFn({ on401: "throw" }),
   });
 
   // Fetch roles
   const { data: roles, isLoading: rolesLoading } = useQuery<string[]>({
-    queryKey: ['/api/admin/roles'],
-    queryFn: getQueryFn({ on401: 'throw' }),
+    queryKey: ["/api/admin/roles"],
+    queryFn: getQueryFn({ on401: "throw" }),
   });
 
   // Fetch permissions
-  const { data: permissions, isLoading: permissionsLoading } = useQuery<string[]>({
-    queryKey: ['/api/admin/permissions'],
-    queryFn: getQueryFn({ on401: 'throw' }),
+  const { data: permissions, isLoading: permissionsLoading } = useQuery<
+    string[]
+  >({
+    queryKey: ["/api/admin/permissions"],
+    queryFn: getQueryFn({ on401: "throw" }),
   });
 
   // Update user role mutation
   const updateRoleMutation = useMutation({
     mutationFn: async (data: UserRoleFormValues) => {
-      const res = await apiRequest('PUT', `/api/admin/users/${data.userId}/role`, {
-        role: data.role,
-      });
+      const res = await apiRequest(
+        "PUT",
+        `/api/admin/users/${data.userId}/role`,
+        {
+          role: data.role,
+        },
+      );
       return await res.json();
     },
     onSuccess: () => {
       toast({
-        title: 'Role updated',
-        description: 'User role has been updated successfully',
+        title: "Role updated",
+        description: "User role has been updated successfully",
       });
       setIsRoleDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
     },
     onError: (error: Error) => {
       toast({
-        title: 'Failed to update role',
+        title: "Failed to update role",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
@@ -123,7 +135,7 @@ export default function AdminUsersPage() {
     resolver: zodResolver(userRoleUpdateSchema),
     defaultValues: {
       userId: -1,
-      role: '',
+      role: "",
     },
   });
 
@@ -160,10 +172,14 @@ export default function AdminUsersPage() {
       <MainLayout title="User Management">
         <div className="flex flex-col items-center justify-center h-64">
           <h2 className="text-xl font-semibold mb-2">Error</h2>
-          <p className="text-muted-foreground">Could not load users. Please try again.</p>
+          <p className="text-muted-foreground">
+            Could not load users. Please try again.
+          </p>
           <Button
             className="mt-4"
-            onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] })}
+            onClick={() =>
+              queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] })
+            }
           >
             Retry
           </Button>
@@ -178,7 +194,9 @@ export default function AdminUsersPage() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold">User Management</h1>
-            <p className="text-muted-foreground">Manage user roles and permissions</p>
+            <p className="text-muted-foreground">
+              Manage user roles and permissions
+            </p>
           </div>
           <Badge variant="outline" className="bg-primary/10 text-primary">
             Admin Area
@@ -188,7 +206,9 @@ export default function AdminUsersPage() {
         <Card>
           <CardHeader>
             <CardTitle>User List</CardTitle>
-            <CardDescription>Manage user roles and access control</CardDescription>
+            <CardDescription>
+              Manage user roles and access control
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -204,16 +224,18 @@ export default function AdminUsersPage() {
                 {users && users.length > 0 ? (
                   users.map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.username}</TableCell>
-                      <TableCell>{user.email || '-'}</TableCell>
+                      <TableCell className="font-medium">
+                        {user.username}
+                      </TableCell>
+                      <TableCell>{user.email || "-"}</TableCell>
                       <TableCell>
                         <Badge
                           variant={
                             user.role === ROLES.ADMIN
-                              ? 'default'
+                              ? "default"
                               : user.role === ROLES.MANAGER
-                                ? 'outline'
-                                : 'secondary'
+                                ? "outline"
+                                : "secondary"
                           }
                         >
                           {user.role}
@@ -235,7 +257,10 @@ export default function AdminUsersPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
+                    <TableCell
+                      colSpan={4}
+                      className="text-center py-6 text-muted-foreground"
+                    >
                       No users found
                     </TableCell>
                   </TableRow>
@@ -256,17 +281,21 @@ export default function AdminUsersPage() {
           {selectedUser && (
             <div className="mb-4">
               <p>
-                <span className="font-semibold">Username:</span> {selectedUser.username}
+                <span className="font-semibold">Username:</span>{" "}
+                {selectedUser.username}
               </p>
               <p>
-                <span className="font-semibold">Current Role:</span>{' '}
+                <span className="font-semibold">Current Role:</span>{" "}
                 <Badge variant="outline">{selectedUser.role}</Badge>
               </p>
             </div>
           )}
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmitRoleForm)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmitRoleForm)}
+              className="space-y-4"
+            >
               <FormField
                 control={form.control}
                 name="role"
@@ -313,7 +342,7 @@ export default function AdminUsersPage() {
                       Updating...
                     </>
                   ) : (
-                    'Save Changes'
+                    "Save Changes"
                   )}
                 </Button>
               </DialogFooter>

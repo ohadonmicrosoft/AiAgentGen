@@ -10,7 +10,7 @@
     - 📄 manifest.json (2.7 KB)
     - 📄 service-worker.js (7.1 KB)
   - 📁 **src/**
-    - 📁 ****tests**/**
+    - 📁 \***\*tests**/\*\*
       - 📁 **integration/**
         - 📄 login-flow.test.tsx (6.5 KB)
     - 📁 **components/**
@@ -19,7 +19,7 @@
         - 📄 swipe-container.tsx (6.3 KB)
         - 📄 touch-list.tsx (8.5 KB)
       - 📁 **ui/**
-        - 📁 ****tests**/**
+        - 📁 \***\*tests**/\*\*
           - 📄 button.test.tsx (2.0 KB)
           - 📄 offline-indicator.test.tsx (6.1 KB)
           - 📄 touch-button.test.tsx (3.6 KB)
@@ -140,7 +140,7 @@
     - 📁 **layouts/**
       - 📄 MainLayout.tsx (8.1 KB)
     - 📁 **lib/**
-      - 📁 ****tests**/**
+      - 📁 \***\*tests**/\*\*
         - 📄 fluid-spacing.test.ts (2.4 KB)
         - 📄 offline-forms.test.ts (9.1 KB)
         - 📄 offline-plugin.test.ts (7.1 KB)
@@ -242,7 +242,7 @@
   - 📄 remove-redundant.ts (1.8 KB)
   - 📄 setup-db.ts (2.7 KB)
 - 📁 **server/**
-  - 📁 ****tests**/**
+  - 📁 \***\*tests**/\*\*
     - 📄 auth.test.ts (3.0 KB)
     - 📄 cache.test.ts (9.6 KB)
     - 📄 db.test.ts (5.7 KB)

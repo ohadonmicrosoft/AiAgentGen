@@ -8,10 +8,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -19,8 +25,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -28,17 +34,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '@/hooks/use-auth';
-import { useToast } from '@/hooks/use-toast';
-import MainLayout from '@/layouts/MainLayout';
-import { apiRequest, getQueryFn, queryClient } from '@/lib/queryClient';
-import { Agent, ROLES } from '@shared/schema';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { Activity, Bot, Edit, Eye, Loader2, Trash2 } from 'lucide-react';
-import React, { useState } from 'react';
-import { Redirect } from 'wouter';
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import MainLayout from "@/layouts/MainLayout";
+import { apiRequest, getQueryFn, queryClient } from "@/lib/queryClient";
+import { type Agent, ROLES } from "@shared/schema";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Activity, Bot, Edit, Eye, Loader2, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import { Redirect } from "wouter";
 
 interface ExtendedAgent extends Agent {
   createdBy: {
@@ -51,12 +57,14 @@ interface ExtendedAgent extends Agent {
 export default function AdminAgentsPage() {
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [viewAgent, setViewAgent] = useState<ExtendedAgent | null>(null);
-  const [agentToDelete, setAgentToDelete] = useState<ExtendedAgent | null>(null);
+  const [agentToDelete, setAgentToDelete] = useState<ExtendedAgent | null>(
+    null,
+  );
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState("all");
 
   // Fetch all agents (admin can see all)
   const {
@@ -64,29 +72,29 @@ export default function AdminAgentsPage() {
     isLoading,
     error,
   } = useQuery<ExtendedAgent[]>({
-    queryKey: ['/api/admin/agents'],
-    queryFn: getQueryFn({ on401: 'throw' }),
+    queryKey: ["/api/admin/agents"],
+    queryFn: getQueryFn({ on401: "throw" }),
   });
 
   // Delete agent mutation
   const deleteAgentMutation = useMutation({
     mutationFn: async (agentId: number) => {
-      return await apiRequest('DELETE', `/api/admin/agents/${agentId}`);
+      return await apiRequest("DELETE", `/api/admin/agents/${agentId}`);
     },
     onSuccess: () => {
       toast({
-        title: 'Agent Deleted',
-        description: 'The agent has been permanently deleted.',
+        title: "Agent Deleted",
+        description: "The agent has been permanently deleted.",
       });
       setAgentToDelete(null);
       setIsDeleteDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/agents'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/agents"] });
     },
     onError: (error: Error) => {
       toast({
-        title: 'Failed to delete agent',
+        title: "Failed to delete agent",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
@@ -119,21 +127,22 @@ export default function AdminAgentsPage() {
         : false) ||
       agent.createdBy.username.toLowerCase().includes(searchTerm.toLowerCase());
 
-    if (activeTab === 'all') return matchesSearch;
-    if (activeTab === 'active') return matchesSearch && agent.status === 'active';
-    if (activeTab === 'draft') return matchesSearch && agent.status === 'draft';
+    if (activeTab === "all") return matchesSearch;
+    if (activeTab === "active")
+      return matchesSearch && agent.status === "active";
+    if (activeTab === "draft") return matchesSearch && agent.status === "draft";
 
     return matchesSearch;
   });
 
   // Format date for display
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -157,10 +166,14 @@ export default function AdminAgentsPage() {
       <MainLayout title="Agent Management">
         <div className="flex flex-col items-center justify-center h-64">
           <h2 className="text-xl font-semibold mb-2">Error</h2>
-          <p className="text-muted-foreground">Could not load agents. Please try again.</p>
+          <p className="text-muted-foreground">
+            Could not load agents. Please try again.
+          </p>
           <Button
             className="mt-4"
-            onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/agents'] })}
+            onClick={() =>
+              queryClient.invalidateQueries({ queryKey: ["/api/admin/agents"] })
+            }
           >
             Retry
           </Button>
@@ -175,7 +188,9 @@ export default function AdminAgentsPage() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold">Agent Management</h1>
-            <p className="text-muted-foreground">View and manage all agents in the system</p>
+            <p className="text-muted-foreground">
+              View and manage all agents in the system
+            </p>
           </div>
           <Badge variant="outline" className="bg-primary/10 text-primary">
             Admin Area
@@ -187,7 +202,9 @@ export default function AdminAgentsPage() {
             <div className="flex justify-between items-center">
               <div>
                 <CardTitle>Agent List</CardTitle>
-                <CardDescription>All agents created in the system</CardDescription>
+                <CardDescription>
+                  All agents created in the system
+                </CardDescription>
               </div>
               <div className="flex items-center gap-2">
                 <Input
@@ -227,14 +244,22 @@ export default function AdminAgentsPage() {
                 {filteredAgents && filteredAgents.length > 0 ? (
                   filteredAgents.map((agent) => (
                     <TableRow key={agent.id}>
-                      <TableCell className="font-medium">{agent.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {agent.name}
+                      </TableCell>
                       <TableCell>{agent.createdBy.username}</TableCell>
                       <TableCell>
-                        <Badge variant={agent.status === 'active' ? 'default' : 'secondary'}>
-                          {agent.status === 'active' ? 'Active' : 'Draft'}
+                        <Badge
+                          variant={
+                            agent.status === "active" ? "default" : "secondary"
+                          }
+                        >
+                          {agent.status === "active" ? "Active" : "Draft"}
                         </Badge>
                       </TableCell>
-                      <TableCell>{formatDate(agent.updatedAt || agent.createdAt)}</TableCell>
+                      <TableCell>
+                        {formatDate(agent.updatedAt || agent.createdAt)}
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Button
@@ -269,8 +294,13 @@ export default function AdminAgentsPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                      {searchTerm ? 'No agents match your search' : 'No agents found'}
+                    <TableCell
+                      colSpan={5}
+                      className="text-center py-6 text-muted-foreground"
+                    >
+                      {searchTerm
+                        ? "No agents match your search"
+                        : "No agents found"}
                     </TableCell>
                   </TableRow>
                 )}
@@ -288,53 +318,73 @@ export default function AdminAgentsPage() {
               <Bot className="h-5 w-5" />
               {viewAgent?.name}
             </DialogTitle>
-            <DialogDescription>Agent details and configuration</DialogDescription>
+            <DialogDescription>
+              Agent details and configuration
+            </DialogDescription>
           </DialogHeader>
 
           {viewAgent && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Status</h3>
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    Status
+                  </h3>
                   <Badge
-                    variant={viewAgent.status === 'active' ? 'default' : 'secondary'}
+                    variant={
+                      viewAgent.status === "active" ? "default" : "secondary"
+                    }
                     className="mt-1"
                   >
-                    {viewAgent.status === 'active' ? 'Active' : 'Draft'}
+                    {viewAgent.status === "active" ? "Active" : "Draft"}
                   </Badge>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Created By</h3>
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    Created By
+                  </h3>
                   <p>{viewAgent.createdBy.username}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Created At</h3>
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    Created At
+                  </h3>
                   <p>{formatDate(viewAgent.createdAt)}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Last Updated</h3>
-                  <p>{formatDate(viewAgent.updatedAt || viewAgent.createdAt)}</p>
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    Last Updated
+                  </h3>
+                  <p>
+                    {formatDate(viewAgent.updatedAt || viewAgent.createdAt)}
+                  </p>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Description</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  Description
+                </h3>
                 <p className="mt-1">{viewAgent.description}</p>
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground">System Prompt</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  System Prompt
+                </h3>
                 <div className="mt-1 p-3 bg-muted rounded-md whitespace-pre-wrap text-sm">
                   {viewAgent.systemPrompt}
                 </div>
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Model Configuration</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  Model Configuration
+                </h3>
                 <div className="mt-1 grid grid-cols-2 gap-2">
                   <div>
                     <span className="text-xs font-medium">Model:</span>
-                    <p>{viewAgent.model || 'gpt-4'}</p>
+                    <p>{viewAgent.model || "gpt-4"}</p>
                   </div>
                   <div>
                     <span className="text-xs font-medium">Temperature:</span>
@@ -354,7 +404,11 @@ export default function AdminAgentsPage() {
           )}
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsViewDialogOpen(false)}
+            >
               Close
             </Button>
             <Button
@@ -372,13 +426,16 @@ export default function AdminAgentsPage() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the agent "
-              {agentToDelete?.name}" and all of its associated data.
+              This action cannot be undone. This will permanently delete the
+              agent "{agentToDelete?.name}" and all of its associated data.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -394,7 +451,7 @@ export default function AdminAgentsPage() {
                   Deleting...
                 </>
               ) : (
-                'Delete'
+                "Delete"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

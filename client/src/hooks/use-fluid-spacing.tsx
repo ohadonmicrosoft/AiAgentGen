@@ -5,9 +5,9 @@ import {
   fluidSpaceScale,
   hierarchicalSpacing,
   responsiveGap,
-} from '@/lib/fluid-spacing';
-import { useMemo } from 'react';
-import { useActiveBreakpoint } from './use-mobile';
+} from "@/lib/fluid-spacing";
+import { useMemo } from "react";
+import { useActiveBreakpoint } from "./use-mobile";
 
 export type SpaceScaleKey = keyof typeof fluidSpaceScale;
 
@@ -16,12 +16,12 @@ interface FluidSpacingOptions {
   gap?: SpaceScaleKey;
   padding?: SpaceScaleKey | { x?: SpaceScaleKey; y?: SpaceScaleKey };
   margin?: SpaceScaleKey | { x?: SpaceScaleKey; y?: SpaceScaleKey };
-  maxWidth?: 'text' | 'ui' | 'full' | number;
-  hierarchy?: 'primary' | 'secondary' | 'tertiary';
+  maxWidth?: "text" | "ui" | "full" | number;
+  hierarchy?: "primary" | "secondary" | "tertiary";
   deviceSpecific?: boolean;
 }
 
-type DeviceType = 'mobile' | 'tablet' | 'desktop';
+type DeviceType = "mobile" | "tablet" | "desktop";
 
 /**
  * Hook to provide fluid spacing values for components
@@ -34,25 +34,33 @@ type DeviceType = 'mobile' | 'tablet' | 'desktop';
  * });
  */
 export function useFluidSpacing(options: FluidSpacingOptions = {}) {
-  const { space, gap, padding, margin, maxWidth, hierarchy, deviceSpecific = false } = options;
+  const {
+    space,
+    gap,
+    padding,
+    margin,
+    maxWidth,
+    hierarchy,
+    deviceSpecific = false,
+  } = options;
 
   const activeBreakpoint = useActiveBreakpoint();
 
   // Determine current device type based on active breakpoint
   const currentDevice = useMemo((): DeviceType => {
-    if (activeBreakpoint === 'sm' || activeBreakpoint === 'xs') return 'mobile';
-    if (activeBreakpoint === 'md') return 'tablet';
-    return 'desktop';
+    if (activeBreakpoint === "sm" || activeBreakpoint === "xs") return "mobile";
+    if (activeBreakpoint === "md") return "tablet";
+    return "desktop";
   }, [activeBreakpoint]);
 
   // Function to get device-specific spacing
   const getDeviceSpacing = useMemo(() => {
     return (deviceSizes: {
-      mobile?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-      tablet?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-      desktop?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+      mobile?: "xs" | "sm" | "md" | "lg" | "xl";
+      tablet?: "xs" | "sm" | "md" | "lg" | "xl";
+      desktop?: "xs" | "sm" | "md" | "lg" | "xl";
     }): string => {
-      const size = deviceSizes[currentDevice] || 'md';
+      const size = deviceSizes[currentDevice] || "md";
       return deviceSpecificSpace(currentDevice, size);
     };
   }, [currentDevice]);
@@ -70,27 +78,27 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
     if (space) {
       if (
         deviceSpecific &&
-        space !== 'form-gap' &&
-        space !== 'card-padding' &&
-        space !== 'section-gap' &&
-        space !== 'container-padding'
+        space !== "form-gap" &&
+        space !== "card-padding" &&
+        space !== "section-gap" &&
+        space !== "container-padding"
       ) {
         // For standard sizes, map to device-specific spacing when deviceSpecific is true
-        const sizeMap: Record<string, 'xs' | 'sm' | 'md' | 'lg' | 'xl'> = {
-          '3xs': 'xs',
-          '2xs': 'xs',
-          xs: 'xs',
-          sm: 'sm',
-          md: 'md',
-          lg: 'lg',
-          xl: 'xl',
-          '2xl': 'xl',
-          '3xl': 'xl',
-          '4xl': 'xl',
+        const sizeMap: Record<string, "xs" | "sm" | "md" | "lg" | "xl"> = {
+          "3xs": "xs",
+          "2xs": "xs",
+          xs: "xs",
+          sm: "sm",
+          md: "md",
+          lg: "lg",
+          xl: "xl",
+          "2xl": "xl",
+          "3xl": "xl",
+          "4xl": "xl",
         };
 
         // Use the translated size if available, otherwise use 'md'
-        const translatedSize = sizeMap[space] || 'md';
+        const translatedSize = sizeMap[space] || "md";
         result.gap = deviceSpecificSpace(currentDevice, translatedSize);
       } else {
         result.gap = fluidSpaceScale[space];
@@ -101,27 +109,27 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
     if (gap) {
       if (
         deviceSpecific &&
-        gap !== 'form-gap' &&
-        gap !== 'card-padding' &&
-        gap !== 'section-gap' &&
-        gap !== 'container-padding'
+        gap !== "form-gap" &&
+        gap !== "card-padding" &&
+        gap !== "section-gap" &&
+        gap !== "container-padding"
       ) {
         // For standard sizes, map to device-specific spacing when deviceSpecific is true
-        const sizeMap: Record<string, 'xs' | 'sm' | 'md' | 'lg' | 'xl'> = {
-          '3xs': 'xs',
-          '2xs': 'xs',
-          xs: 'xs',
-          sm: 'sm',
-          md: 'md',
-          lg: 'lg',
-          xl: 'xl',
-          '2xl': 'xl',
-          '3xl': 'xl',
-          '4xl': 'xl',
+        const sizeMap: Record<string, "xs" | "sm" | "md" | "lg" | "xl"> = {
+          "3xs": "xs",
+          "2xs": "xs",
+          xs: "xs",
+          sm: "sm",
+          md: "md",
+          lg: "lg",
+          xl: "xl",
+          "2xl": "xl",
+          "3xl": "xl",
+          "4xl": "xl",
         };
 
         // Use the translated size if available, otherwise use 'md'
-        const translatedSize = sizeMap[gap] || 'md';
+        const translatedSize = sizeMap[gap] || "md";
         result.gap = deviceSpecificSpace(currentDevice, translatedSize);
       } else {
         result.gap = fluidSpaceScale[gap];
@@ -130,27 +138,27 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
 
     // Handle padding (can be string or object with x/y)
     if (padding) {
-      if (typeof padding === 'string') {
+      if (typeof padding === "string") {
         if (
           deviceSpecific &&
-          padding !== 'form-gap' &&
-          padding !== 'card-padding' &&
-          padding !== 'section-gap' &&
-          padding !== 'container-padding'
+          padding !== "form-gap" &&
+          padding !== "card-padding" &&
+          padding !== "section-gap" &&
+          padding !== "container-padding"
         ) {
-          const sizeMap: Record<string, 'xs' | 'sm' | 'md' | 'lg' | 'xl'> = {
-            '3xs': 'xs',
-            '2xs': 'xs',
-            xs: 'xs',
-            sm: 'sm',
-            md: 'md',
-            lg: 'lg',
-            xl: 'xl',
-            '2xl': 'xl',
-            '3xl': 'xl',
-            '4xl': 'xl',
+          const sizeMap: Record<string, "xs" | "sm" | "md" | "lg" | "xl"> = {
+            "3xs": "xs",
+            "2xs": "xs",
+            xs: "xs",
+            sm: "sm",
+            md: "md",
+            lg: "lg",
+            xl: "xl",
+            "2xl": "xl",
+            "3xl": "xl",
+            "4xl": "xl",
           };
-          const translatedSize = sizeMap[padding] || 'md';
+          const translatedSize = sizeMap[padding] || "md";
           result.padding = deviceSpecificSpace(currentDevice, translatedSize);
         } else {
           result.padding = fluidSpaceScale[padding];
@@ -159,60 +167,62 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
         if (padding.x) {
           if (
             deviceSpecific &&
-            padding.x !== 'form-gap' &&
-            padding.x !== 'card-padding' &&
-            padding.x !== 'section-gap' &&
-            padding.x !== 'container-padding'
+            padding.x !== "form-gap" &&
+            padding.x !== "card-padding" &&
+            padding.x !== "section-gap" &&
+            padding.x !== "container-padding"
           ) {
-            const sizeMap: Record<string, 'xs' | 'sm' | 'md' | 'lg' | 'xl'> = {
-              '3xs': 'xs',
-              '2xs': 'xs',
-              xs: 'xs',
-              sm: 'sm',
-              md: 'md',
-              lg: 'lg',
-              xl: 'xl',
-              '2xl': 'xl',
-              '3xl': 'xl',
-              '4xl': 'xl',
+            const sizeMap: Record<string, "xs" | "sm" | "md" | "lg" | "xl"> = {
+              "3xs": "xs",
+              "2xs": "xs",
+              xs: "xs",
+              sm: "sm",
+              md: "md",
+              lg: "lg",
+              xl: "xl",
+              "2xl": "xl",
+              "3xl": "xl",
+              "4xl": "xl",
             };
-            const translatedSize = sizeMap[padding.x] || 'md';
+            const translatedSize = sizeMap[padding.x] || "md";
             result.paddingLeft = result.paddingRight = deviceSpecificSpace(
               currentDevice,
               translatedSize,
             );
           } else {
-            result.paddingLeft = result.paddingRight = fluidSpaceScale[padding.x];
+            result.paddingLeft = result.paddingRight =
+              fluidSpaceScale[padding.x];
           }
         }
 
         if (padding.y) {
           if (
             deviceSpecific &&
-            padding.y !== 'form-gap' &&
-            padding.y !== 'card-padding' &&
-            padding.y !== 'section-gap' &&
-            padding.y !== 'container-padding'
+            padding.y !== "form-gap" &&
+            padding.y !== "card-padding" &&
+            padding.y !== "section-gap" &&
+            padding.y !== "container-padding"
           ) {
-            const sizeMap: Record<string, 'xs' | 'sm' | 'md' | 'lg' | 'xl'> = {
-              '3xs': 'xs',
-              '2xs': 'xs',
-              xs: 'xs',
-              sm: 'sm',
-              md: 'md',
-              lg: 'lg',
-              xl: 'xl',
-              '2xl': 'xl',
-              '3xl': 'xl',
-              '4xl': 'xl',
+            const sizeMap: Record<string, "xs" | "sm" | "md" | "lg" | "xl"> = {
+              "3xs": "xs",
+              "2xs": "xs",
+              xs: "xs",
+              sm: "sm",
+              md: "md",
+              lg: "lg",
+              xl: "xl",
+              "2xl": "xl",
+              "3xl": "xl",
+              "4xl": "xl",
             };
-            const translatedSize = sizeMap[padding.y] || 'md';
+            const translatedSize = sizeMap[padding.y] || "md";
             result.paddingTop = result.paddingBottom = deviceSpecificSpace(
               currentDevice,
               translatedSize,
             );
           } else {
-            result.paddingTop = result.paddingBottom = fluidSpaceScale[padding.y];
+            result.paddingTop = result.paddingBottom =
+              fluidSpaceScale[padding.y];
           }
         }
       }
@@ -220,27 +230,27 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
 
     // Handle margin (can be string or object with x/y)
     if (margin) {
-      if (typeof margin === 'string') {
+      if (typeof margin === "string") {
         if (
           deviceSpecific &&
-          margin !== 'form-gap' &&
-          margin !== 'card-padding' &&
-          margin !== 'section-gap' &&
-          margin !== 'container-padding'
+          margin !== "form-gap" &&
+          margin !== "card-padding" &&
+          margin !== "section-gap" &&
+          margin !== "container-padding"
         ) {
-          const sizeMap: Record<string, 'xs' | 'sm' | 'md' | 'lg' | 'xl'> = {
-            '3xs': 'xs',
-            '2xs': 'xs',
-            xs: 'xs',
-            sm: 'sm',
-            md: 'md',
-            lg: 'lg',
-            xl: 'xl',
-            '2xl': 'xl',
-            '3xl': 'xl',
-            '4xl': 'xl',
+          const sizeMap: Record<string, "xs" | "sm" | "md" | "lg" | "xl"> = {
+            "3xs": "xs",
+            "2xs": "xs",
+            xs: "xs",
+            sm: "sm",
+            md: "md",
+            lg: "lg",
+            xl: "xl",
+            "2xl": "xl",
+            "3xl": "xl",
+            "4xl": "xl",
           };
-          const translatedSize = sizeMap[margin] || 'md';
+          const translatedSize = sizeMap[margin] || "md";
           result.margin = deviceSpecificSpace(currentDevice, translatedSize);
         } else {
           result.margin = fluidSpaceScale[margin];
@@ -249,24 +259,24 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
         if (margin.x) {
           if (
             deviceSpecific &&
-            margin.x !== 'form-gap' &&
-            margin.x !== 'card-padding' &&
-            margin.x !== 'section-gap' &&
-            margin.x !== 'container-padding'
+            margin.x !== "form-gap" &&
+            margin.x !== "card-padding" &&
+            margin.x !== "section-gap" &&
+            margin.x !== "container-padding"
           ) {
-            const sizeMap: Record<string, 'xs' | 'sm' | 'md' | 'lg' | 'xl'> = {
-              '3xs': 'xs',
-              '2xs': 'xs',
-              xs: 'xs',
-              sm: 'sm',
-              md: 'md',
-              lg: 'lg',
-              xl: 'xl',
-              '2xl': 'xl',
-              '3xl': 'xl',
-              '4xl': 'xl',
+            const sizeMap: Record<string, "xs" | "sm" | "md" | "lg" | "xl"> = {
+              "3xs": "xs",
+              "2xs": "xs",
+              xs: "xs",
+              sm: "sm",
+              md: "md",
+              lg: "lg",
+              xl: "xl",
+              "2xl": "xl",
+              "3xl": "xl",
+              "4xl": "xl",
             };
-            const translatedSize = sizeMap[margin.x] || 'md';
+            const translatedSize = sizeMap[margin.x] || "md";
             result.marginLeft = result.marginRight = deviceSpecificSpace(
               currentDevice,
               translatedSize,
@@ -279,24 +289,24 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
         if (margin.y) {
           if (
             deviceSpecific &&
-            margin.y !== 'form-gap' &&
-            margin.y !== 'card-padding' &&
-            margin.y !== 'section-gap' &&
-            margin.y !== 'container-padding'
+            margin.y !== "form-gap" &&
+            margin.y !== "card-padding" &&
+            margin.y !== "section-gap" &&
+            margin.y !== "container-padding"
           ) {
-            const sizeMap: Record<string, 'xs' | 'sm' | 'md' | 'lg' | 'xl'> = {
-              '3xs': 'xs',
-              '2xs': 'xs',
-              xs: 'xs',
-              sm: 'sm',
-              md: 'md',
-              lg: 'lg',
-              xl: 'xl',
-              '2xl': 'xl',
-              '3xl': 'xl',
-              '4xl': 'xl',
+            const sizeMap: Record<string, "xs" | "sm" | "md" | "lg" | "xl"> = {
+              "3xs": "xs",
+              "2xs": "xs",
+              xs: "xs",
+              sm: "sm",
+              md: "md",
+              lg: "lg",
+              xl: "xl",
+              "2xl": "xl",
+              "3xl": "xl",
+              "4xl": "xl",
             };
-            const translatedSize = sizeMap[margin.y] || 'md';
+            const translatedSize = sizeMap[margin.y] || "md";
             result.marginTop = result.marginBottom = deviceSpecificSpace(
               currentDevice,
               translatedSize,
@@ -310,7 +320,7 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
 
     // Handle maxWidth
     if (maxWidth) {
-      if (typeof maxWidth === 'number') {
+      if (typeof maxWidth === "number") {
         result.maxWidth = `${maxWidth}px`;
       } else {
         result.maxWidth = contentMaxWidth(maxWidth);
@@ -318,36 +328,49 @@ export function useFluidSpacing(options: FluidSpacingOptions = {}) {
     }
 
     return result;
-  }, [space, gap, padding, margin, maxWidth, hierarchy, deviceSpecific, currentDevice]);
+  }, [
+    space,
+    gap,
+    padding,
+    margin,
+    maxWidth,
+    hierarchy,
+    deviceSpecific,
+    currentDevice,
+  ]);
 
   // Size mapping for consistent class names
   const sizeMap = useMemo(() => {
     return {
-      '3xs': 'xs',
-      '2xs': 'xs',
-      xs: 'xs',
-      sm: 'sm',
-      md: 'md',
-      lg: 'lg',
-      xl: 'xl',
-      '2xl': 'xl',
-      '3xl': 'xl',
-      '4xl': 'xl',
+      "3xs": "xs",
+      "2xs": "xs",
+      xs: "xs",
+      sm: "sm",
+      md: "md",
+      lg: "lg",
+      xl: "xl",
+      "2xl": "xl",
+      "3xl": "xl",
+      "4xl": "xl",
     };
   }, []);
 
   // Generate spacing classes for use with Tailwind
   const getSpacingClass = useMemo(() => {
-    return (type: 'gap' | 'p' | 'px' | 'py' | 'm' | 'mx' | 'my', size: SpaceScaleKey): string => {
+    return (
+      type: "gap" | "p" | "px" | "py" | "m" | "mx" | "my",
+      size: SpaceScaleKey,
+    ): string => {
       // For device-specific spacing, use a different prefix
       if (
         deviceSpecific &&
-        size !== 'form-gap' &&
-        size !== 'card-padding' &&
-        size !== 'section-gap' &&
-        size !== 'container-padding'
+        size !== "form-gap" &&
+        size !== "card-padding" &&
+        size !== "section-gap" &&
+        size !== "container-padding"
       ) {
-        const translatedSize = (sizeMap as Record<string, string>)[size] || 'md';
+        const translatedSize =
+          (sizeMap as Record<string, string>)[size] || "md";
         return `${currentDevice}-${type}-${translatedSize}`;
       }
       return `fluid-${type}-${size}`;
@@ -372,7 +395,12 @@ export function useContainerPadding(
     return {
       padding: containerPadding(options),
     };
-  }, [options.minPadding, options.maxPadding, options.minWidth, options.maxWidth]);
+  }, [
+    options.minPadding,
+    options.maxPadding,
+    options.minWidth,
+    options.maxWidth,
+  ]);
 }
 
 /**
@@ -403,50 +431,52 @@ export function useResponsiveGap(
  * });
  * // Result: "fluid-px-lg fluid-py-md fluid-my-sm"
  */
-export function fluidSpacingToClassName(options: FluidSpacingOptions = {}): string {
+export function fluidSpacingToClassName(
+  options: FluidSpacingOptions = {},
+): string {
   const classes: string[] = [];
   const { space, gap, padding, margin, deviceSpecific } = options;
 
   // Get current device type for device-specific classes
   const getDeviceType = (): DeviceType => {
-    const width = typeof window !== 'undefined' ? window.innerWidth : 1200;
-    if (width < 640) return 'mobile';
-    if (width < 1024) return 'tablet';
-    return 'desktop';
+    const width = typeof window !== "undefined" ? window.innerWidth : 1200;
+    if (width < 640) return "mobile";
+    if (width < 1024) return "tablet";
+    return "desktop";
   };
 
   const currentDevice = deviceSpecific ? getDeviceType() : null;
 
   // Size mapping for consistent class names
-  const sizeMap: Record<string, 'xs' | 'sm' | 'md' | 'lg' | 'xl'> = {
-    '3xs': 'xs',
-    '2xs': 'xs',
-    xs: 'xs',
-    sm: 'sm',
-    md: 'md',
-    lg: 'lg',
-    xl: 'xl',
-    '2xl': 'xl',
-    '3xl': 'xl',
-    '4xl': 'xl',
-    'form-gap': 'md',
-    'card-padding': 'md',
-    'section-gap': 'lg',
-    'container-padding': 'md',
+  const sizeMap: Record<string, "xs" | "sm" | "md" | "lg" | "xl"> = {
+    "3xs": "xs",
+    "2xs": "xs",
+    xs: "xs",
+    sm: "sm",
+    md: "md",
+    lg: "lg",
+    xl: "xl",
+    "2xl": "xl",
+    "3xl": "xl",
+    "4xl": "xl",
+    "form-gap": "md",
+    "card-padding": "md",
+    "section-gap": "lg",
+    "container-padding": "md",
   };
 
   // Helper to get the correct class prefix based on deviceSpecific flag
   const getPrefix = (size: SpaceScaleKey): string => {
-    if (!deviceSpecific || !currentDevice) return 'fluid';
+    if (!deviceSpecific || !currentDevice) return "fluid";
 
     // Special named spacings always use fluid prefix
     if (
-      size === 'form-gap' ||
-      size === 'card-padding' ||
-      size === 'section-gap' ||
-      size === 'container-padding'
+      size === "form-gap" ||
+      size === "card-padding" ||
+      size === "section-gap" ||
+      size === "container-padding"
     ) {
-      return 'fluid';
+      return "fluid";
     }
 
     return currentDevice;
@@ -456,12 +486,12 @@ export function fluidSpacingToClassName(options: FluidSpacingOptions = {}): stri
   const getSizeName = (size: SpaceScaleKey): string => {
     if (
       deviceSpecific &&
-      size !== 'form-gap' &&
-      size !== 'card-padding' &&
-      size !== 'section-gap' &&
-      size !== 'container-padding'
+      size !== "form-gap" &&
+      size !== "card-padding" &&
+      size !== "section-gap" &&
+      size !== "container-padding"
     ) {
-      return sizeMap[size] || 'md';
+      return sizeMap[size] || "md";
     }
     return size;
   };
@@ -479,7 +509,7 @@ export function fluidSpacingToClassName(options: FluidSpacingOptions = {}): stri
   }
 
   if (padding) {
-    if (typeof padding === 'string') {
+    if (typeof padding === "string") {
       const prefix = getPrefix(padding);
       const sizeName = getSizeName(padding);
       classes.push(`${prefix}-p-${sizeName}`);
@@ -498,7 +528,7 @@ export function fluidSpacingToClassName(options: FluidSpacingOptions = {}): stri
   }
 
   if (margin) {
-    if (typeof margin === 'string') {
+    if (typeof margin === "string") {
       const prefix = getPrefix(margin);
       const sizeName = getSizeName(margin);
       classes.push(`${prefix}-m-${sizeName}`);
@@ -516,5 +546,5 @@ export function fluidSpacingToClassName(options: FluidSpacingOptions = {}): stri
     }
   }
 
-  return classes.join(' ');
+  return classes.join(" ");
 }

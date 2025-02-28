@@ -1,16 +1,35 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { glob } from 'glob';
+import path from "path";
+import fs from "fs/promises";
+import { glob } from "glob";
 
 // Directories to exclude from the mapping
-const EXCLUDE_DIRS = ['node_modules', 'dist', 'build', '.git', 'coverage', 'tmp', 'temp', '.cache'];
+const EXCLUDE_DIRS = [
+  "node_modules",
+  "dist",
+  "build",
+  ".git",
+  "coverage",
+  "tmp",
+  "temp",
+  ".cache",
+];
 
 // File extensions to include in the mapping
-const INCLUDE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json', '.md', '.css', '.scss', '.html'];
+const INCLUDE_EXTENSIONS = [
+  ".ts",
+  ".tsx",
+  ".js",
+  ".jsx",
+  ".json",
+  ".md",
+  ".css",
+  ".scss",
+  ".html",
+];
 
 interface FileInfo {
   path: string;
-  type: 'file' | 'directory';
+  type: "file" | "directory";
   size?: number;
   children?: FileInfo[];
 }
@@ -22,9 +41,9 @@ async function getFileSize(filePath: string): Promise<number> {
 
 async function mapDirectory(
   dirPath: string,
-  relativePath: string = '',
-  depth: number = 0,
-  maxDepth: number = 5,
+  relativePath = "",
+  depth = 0,
+  maxDepth = 5,
 ): Promise<FileInfo[]> {
   if (depth > maxDepth) {
     return [];
@@ -46,11 +65,16 @@ async function mapDirectory(
       const stats = await fs.stat(fullPath);
 
       if (stats.isDirectory()) {
-        const children = await mapDirectory(fullPath, entryRelativePath, depth + 1, maxDepth);
+        const children = await mapDirectory(
+          fullPath,
+          entryRelativePath,
+          depth + 1,
+          maxDepth,
+        );
 
         result.push({
           path: entryRelativePath,
-          type: 'directory',
+          type: "directory",
           children,
         });
       } else if (stats.isFile()) {
@@ -59,7 +83,7 @@ async function mapDirectory(
         if (INCLUDE_EXTENSIONS.includes(ext)) {
           result.push({
             path: entryRelativePath,
-            type: 'file',
+            type: "file",
             size: stats.size,
           });
         }
@@ -71,14 +95,14 @@ async function mapDirectory(
 
   // Sort directories first, then files
   return result.sort((a, b) => {
-    if (a.type === 'directory' && b.type === 'file') return -1;
-    if (a.type === 'file' && b.type === 'directory') return 1;
+    if (a.type === "directory" && b.type === "file") return -1;
+    if (a.type === "file" && b.type === "directory") return 1;
     return a.path.localeCompare(b.path);
   });
 }
 
 function formatSize(bytes: number): string {
-  const units = ['B', 'KB', 'MB', 'GB'];
+  const units = ["B", "KB", "MB", "GB"];
   let size = bytes;
   let unitIndex = 0;
 
@@ -90,15 +114,15 @@ function formatSize(bytes: number): string {
   return `${size.toFixed(1)} ${units[unitIndex]}`;
 }
 
-function printStructure(structure: FileInfo[], indent: string = ''): void {
+function printStructure(structure: FileInfo[], indent = ""): void {
   for (const item of structure) {
-    if (item.type === 'directory') {
+    if (item.type === "directory") {
       console.log(`${indent}📁 ${item.path}`);
       if (item.children && item.children.length > 0) {
         printStructure(item.children, `${indent}  `);
       }
     } else {
-      const sizeStr = item.size ? ` (${formatSize(item.size)})` : '';
+      const sizeStr = item.size ? ` (${formatSize(item.size)})` : "";
       console.log(`${indent}📄 ${item.path}${sizeStr}`);
     }
   }
@@ -106,18 +130,21 @@ function printStructure(structure: FileInfo[], indent: string = ''): void {
 
 async function generateMarkdownStructure(
   structure: FileInfo[],
-  indent: string = '',
+  indent = "",
 ): Promise<string> {
-  let markdown = '';
+  let markdown = "";
 
   for (const item of structure) {
-    if (item.type === 'directory') {
+    if (item.type === "directory") {
       markdown += `${indent}- 📁 **${path.basename(item.path)}/**\n`;
       if (item.children && item.children.length > 0) {
-        markdown += await generateMarkdownStructure(item.children, `${indent}  `);
+        markdown += await generateMarkdownStructure(
+          item.children,
+          `${indent}  `,
+        );
       }
     } else {
-      const sizeStr = item.size ? ` (${formatSize(item.size)})` : '';
+      const sizeStr = item.size ? ` (${formatSize(item.size)})` : "";
       markdown += `${indent}- 📄 ${path.basename(item.path)}${sizeStr}\n`;
     }
   }
@@ -133,19 +160,19 @@ async function mapProject() {
     const structure = await mapDirectory(projectRoot);
 
     // Print to console
-    console.log('\nProject Structure:');
+    console.log("\nProject Structure:");
     printStructure(structure);
 
     // Generate markdown
     const markdown = `# Project Structure\n\n${await generateMarkdownStructure(structure)}`;
 
     // Write to file
-    const outputPath = path.join(projectRoot, 'project-structure.md');
+    const outputPath = path.join(projectRoot, "project-structure.md");
     await fs.writeFile(outputPath, markdown);
 
     console.log(`\nProject structure map saved to: ${outputPath}`);
   } catch (error) {
-    console.error('Error mapping project:', error);
+    console.error("Error mapping project:", error);
     process.exit(1);
   }
 }

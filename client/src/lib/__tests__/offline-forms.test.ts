@@ -1,4 +1,9 @@
-import { getPendingForms, isOnline, submitForm, syncOfflineForms } from '../offline-forms';
+import {
+  getPendingForms,
+  isOnline,
+  submitForm,
+  syncOfflineForms,
+} from "../offline-forms";
 
 // Mock fetch
 global.fetch = jest.fn(() =>
@@ -9,7 +14,7 @@ global.fetch = jest.fn(() =>
 ) as jest.Mock;
 
 // Mock navigator.onLine
-Object.defineProperty(navigator, 'onLine', {
+Object.defineProperty(navigator, "onLine", {
   configurable: true,
   value: true,
 });
@@ -36,17 +41,17 @@ const mockIDBTransaction = {
 
 // Mock IndexedDB request results
 const mockRequestSuccess = {
-  onsuccess: null as null | ((event: any) => void),
-  onerror: null as null | ((event: any) => void),
+  onsuccess: null as null | ((event: any) => void), // eslint-disable-line @typescript-eslint/no-explicit-any
+  onerror: null as null | ((event: any) => void), // eslint-disable-line @typescript-eslint/no-explicit-any
   result: [],
   error: null,
 };
 
 // Mock IndexedDB open request
 const mockOpenDBRequest = {
-  onupgradeneeded: null as null | ((event: any) => void),
-  onsuccess: null as null | ((event: any) => void),
-  onerror: null as null | ((event: any) => void),
+  onupgradeneeded: null as null | ((event: any) => void), // eslint-disable-line @typescript-eslint/no-explicit-any
+  onsuccess: null as null | ((event: any) => void), // eslint-disable-line @typescript-eslint/no-explicit-any
+  onerror: null as null | ((event: any) => void), // eslint-disable-line @typescript-eslint/no-explicit-any
   result: mockIDBDatabase,
   error: null,
 };
@@ -72,7 +77,7 @@ global.navigator.serviceWorker = {
   }),
 } as any;
 
-describe('Offline Forms Utility', () => {
+describe("Offline Forms Utility", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -107,7 +112,7 @@ describe('Offline Forms Utility', () => {
     });
 
     // Reset online status
-    Object.defineProperty(navigator, 'onLine', {
+    Object.defineProperty(navigator, "onLine", {
       configurable: true,
       value: true,
     });
@@ -119,9 +124,9 @@ describe('Offline Forms Utility', () => {
     });
   });
 
-  describe('isOnline', () => {
-    it('returns true when navigator.onLine is true', () => {
-      Object.defineProperty(navigator, 'onLine', {
+  describe("isOnline", () => {
+    it("returns true when navigator.onLine is true", () => {
+      Object.defineProperty(navigator, "onLine", {
         configurable: true,
         value: true,
       });
@@ -129,8 +134,8 @@ describe('Offline Forms Utility', () => {
       expect(isOnline()).toBe(true);
     });
 
-    it('returns false when navigator.onLine is false', () => {
-      Object.defineProperty(navigator, 'onLine', {
+    it("returns false when navigator.onLine is false", () => {
+      Object.defineProperty(navigator, "onLine", {
         configurable: true,
         value: false,
       });
@@ -139,30 +144,30 @@ describe('Offline Forms Utility', () => {
     });
   });
 
-  describe('submitForm', () => {
-    it('submits form data when online', async () => {
+  describe("submitForm", () => {
+    it("submits form data when online", async () => {
       const formData = {
-        url: '/api/test',
-        method: 'POST' as const,
-        data: { name: 'Test' },
+        url: "/api/test",
+        method: "POST" as const,
+        data: { name: "Test" },
       };
 
       const result = await submitForm(formData);
 
       expect(fetch).toHaveBeenCalledWith(
-        '/api/test',
+        "/api/test",
         expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({ name: 'Test' }),
+          method: "POST",
+          body: JSON.stringify({ name: "Test" }),
         }),
       );
 
       expect(result).toEqual({ success: true });
     });
 
-    it('saves form data for later when offline', async () => {
+    it("saves form data for later when offline", async () => {
       // Mock being offline
-      Object.defineProperty(navigator, 'onLine', {
+      Object.defineProperty(navigator, "onLine", {
         configurable: true,
         value: false,
       });
@@ -179,9 +184,9 @@ describe('Offline Forms Utility', () => {
       });
 
       const formData = {
-        url: '/api/test',
-        method: 'POST' as const,
-        data: { name: 'Test' },
+        url: "/api/test",
+        method: "POST" as const,
+        data: { name: "Test" },
       };
 
       const result = await submitForm(formData);
@@ -193,18 +198,20 @@ describe('Offline Forms Utility', () => {
       expect(mockIDBObjectStore.add).toHaveBeenCalled();
 
       // Verify correct result format
-      expect(result).toHaveProperty('_offlineSubmitted', true);
-      expect(result).toHaveProperty('_formId');
+      expect(result).toHaveProperty("_offlineSubmitted", true);
+      expect(result).toHaveProperty("_formId");
     });
 
-    it('saves form data for later when fetch fails with network error', async () => {
+    it("saves form data for later when fetch fails with network error", async () => {
       // Mock fetch failing
-      (global.fetch as jest.Mock).mockRejectedValue(new TypeError('Failed to fetch'));
+      (global.fetch as jest.Mock).mockRejectedValue(
+        new TypeError("Failed to fetch"),
+      );
 
       const formData = {
-        url: '/api/test',
-        method: 'POST' as const,
-        data: { name: 'Test' },
+        url: "/api/test",
+        method: "POST" as const,
+        data: { name: "Test" },
       };
 
       const result = await submitForm(formData);
@@ -213,13 +220,13 @@ describe('Offline Forms Utility', () => {
       expect(mockIDBObjectStore.add).toHaveBeenCalled();
 
       // Verify correct result format
-      expect(result).toHaveProperty('_offlineSubmitted', true);
-      expect(result).toHaveProperty('_formId');
+      expect(result).toHaveProperty("_offlineSubmitted", true);
+      expect(result).toHaveProperty("_formId");
     });
   });
 
-  describe('getPendingForms', () => {
-    it('returns an empty array if no pending forms', async () => {
+  describe("getPendingForms", () => {
+    it("returns an empty array if no pending forms", async () => {
       // Setup mock response
       mockIDBObjectStore.getAll.mockImplementation(() => {
         setTimeout(() => {
@@ -237,14 +244,14 @@ describe('Offline Forms Utility', () => {
       expect(mockIDBObjectStore.getAll).toHaveBeenCalled();
     });
 
-    it('returns pending forms if available', async () => {
+    it("returns pending forms if available", async () => {
       // Setup mock pending forms
       const pendingForms = [
         {
-          id: '1',
-          url: '/api/test',
-          method: 'POST',
-          body: '{}',
+          id: "1",
+          url: "/api/test",
+          method: "POST",
+          body: "{}",
           headers: {},
           timestamp: Date.now(),
           retries: 0,
@@ -267,8 +274,8 @@ describe('Offline Forms Utility', () => {
     });
   });
 
-  describe('syncOfflineForms', () => {
-    it('returns no syncs if no pending forms', async () => {
+  describe("syncOfflineForms", () => {
+    it("returns no syncs if no pending forms", async () => {
       // Setup mock response
       mockIDBObjectStore.getAll.mockImplementation(() => {
         setTimeout(() => {
@@ -286,23 +293,23 @@ describe('Offline Forms Utility', () => {
       expect(fetch).not.toHaveBeenCalled();
     });
 
-    it('syncs pending forms and deletes successful ones', async () => {
+    it("syncs pending forms and deletes successful ones", async () => {
       // Setup mock pending forms
       const pendingForms = [
         {
-          id: '1',
-          url: '/api/test',
-          method: 'POST',
-          body: '{}',
+          id: "1",
+          url: "/api/test",
+          method: "POST",
+          body: "{}",
           headers: {},
           timestamp: Date.now(),
           retries: 0,
         },
         {
-          id: '2',
-          url: '/api/test2',
-          method: 'POST',
-          body: '{}',
+          id: "2",
+          url: "/api/test2",
+          method: "POST",
+          body: "{}",
           headers: {},
           timestamp: Date.now(),
           retries: 0,
@@ -330,8 +337,8 @@ describe('Offline Forms Utility', () => {
       expect(fetch).toHaveBeenCalledTimes(2);
 
       // Should have tried to delete only the successful form
-      expect(mockIDBObjectStore.delete).toHaveBeenCalledWith('1');
-      expect(mockIDBObjectStore.delete).not.toHaveBeenCalledWith('2');
+      expect(mockIDBObjectStore.delete).toHaveBeenCalledWith("1");
+      expect(mockIDBObjectStore.delete).not.toHaveBeenCalledWith("2");
 
       // Should report the sync results
       expect(result).toEqual({ success: 1, failed: 1 });

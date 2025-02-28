@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -14,21 +14,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '@/hooks/use-auth';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { insertUserSchema } from '@shared/schema';
-import { Bot } from 'lucide-react';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { useLocation } from 'wouter';
-import { z } from 'zod';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/use-auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertUserSchema } from "@shared/schema";
+import { Bot } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useLocation } from "wouter";
+import { z } from "zod";
 
 const loginSchema = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 const registerSchema = insertUserSchema
@@ -37,7 +37,7 @@ const registerSchema = insertUserSchema
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ['confirmPassword'],
+    path: ["confirmPassword"],
   });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -50,24 +50,24 @@ export default function AuthPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate("/");
     }
   }, [user, navigate]);
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
-      password: '',
+      username: "",
+      password: "",
     },
   });
 
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: '',
-      password: '',
-      confirmPassword: '',
+      username: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
@@ -105,11 +105,16 @@ export default function AuthPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Login</CardTitle>
-                  <CardDescription>Enter your credentials to access your account</CardDescription>
+                  <CardDescription>
+                    Enter your credentials to access your account
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Form {...loginForm}>
-                    <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                    <form
+                      onSubmit={loginForm.handleSubmit(onLoginSubmit)}
+                      className="space-y-4"
+                    >
                       <FormField
                         control={loginForm.control}
                         name="username"
@@ -117,7 +122,10 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                              <Input placeholder="Enter your username" {...field} />
+                              <Input
+                                placeholder="Enter your username"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -131,15 +139,23 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="Enter your password" {...field} />
+                              <Input
+                                type="password"
+                                placeholder="Enter your password"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
 
-                      <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
-                        {loginMutation.isPending ? 'Logging in...' : 'Login'}
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={loginMutation.isPending}
+                      >
+                        {loginMutation.isPending ? "Logging in..." : "Login"}
                       </Button>
                     </form>
                   </Form>
@@ -154,8 +170,8 @@ export default function AuthPage() {
                       size="sm"
                       className="flex-1 text-xs h-8"
                       onClick={() => {
-                        loginForm.setValue('username', 'developer');
-                        loginForm.setValue('password', 'developer123');
+                        loginForm.setValue("username", "developer");
+                        loginForm.setValue("password", "developer123");
                         loginForm.handleSubmit(onLoginSubmit)();
                       }}
                     >
@@ -167,12 +183,12 @@ export default function AuthPage() {
                       className="flex-1 text-xs h-8"
                       onClick={() => {
                         registerForm.setValue(
-                          'username',
-                          'developer' + Math.floor(Math.random() * 1000),
+                          "username",
+                          "developer" + Math.floor(Math.random() * 1000),
                         );
-                        const password = 'developer123';
-                        registerForm.setValue('password', password);
-                        registerForm.setValue('confirmPassword', password);
+                        const password = "developer123";
+                        registerForm.setValue("password", password);
+                        registerForm.setValue("confirmPassword", password);
                         registerForm.handleSubmit(onRegisterSubmit)();
                       }}
                     >
@@ -184,19 +200,19 @@ export default function AuthPage() {
                       className="flex-1 text-xs h-8"
                       onClick={async () => {
                         try {
-                          const response = await fetch('/api/devlogin', {
-                            method: 'POST',
+                          const response = await fetch("/api/devlogin", {
+                            method: "POST",
                             headers: {
-                              'Content-Type': 'application/json',
+                              "Content-Type": "application/json",
                             },
-                            credentials: 'include',
+                            credentials: "include",
                           });
 
                           if (response.ok) {
-                            window.location.href = '/'; // Force reload to update auth state
+                            window.location.href = "/"; // Force reload to update auth state
                           }
                         } catch (error) {
-                          console.error('Dev quick login failed:', error);
+                          console.error("Dev quick login failed:", error); // eslint-disable-line no-console
                         }
                       }}
                     >
@@ -211,7 +227,9 @@ export default function AuthPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Create an account</CardTitle>
-                  <CardDescription>Enter your details to create a new account</CardDescription>
+                  <CardDescription>
+                    Enter your details to create a new account
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Form {...registerForm}>
@@ -226,7 +244,10 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                              <Input placeholder="Choose a username" {...field} />
+                              <Input
+                                placeholder="Choose a username"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -240,7 +261,11 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="Choose a password" {...field} />
+                              <Input
+                                type="password"
+                                placeholder="Choose a password"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -270,7 +295,9 @@ export default function AuthPage() {
                         className="w-full"
                         disabled={registerMutation.isPending}
                       >
-                        {registerMutation.isPending ? 'Creating account...' : 'Register'}
+                        {registerMutation.isPending
+                          ? "Creating account..."
+                          : "Register"}
                       </Button>
                     </form>
                   </Form>
@@ -284,11 +311,14 @@ export default function AuthPage() {
       {/* Right side - Hero */}
       <div className="hidden md:flex flex-1 bg-primary/5 p-8 items-center justify-center">
         <div className="max-w-md">
-          <h2 className="text-3xl font-bold mb-4">Build powerful AI agents with ease</h2>
+          <h2 className="text-3xl font-bold mb-4">
+            Build powerful AI agents with ease
+          </h2>
           <p className="text-muted-foreground mb-6">
-            Create, manage, and deploy AI-powered agents through an intuitive step-by-step
-            interface. Our platform offers real-time AI response previews, prompt engineering tools,
-            and REST API integration for automation.
+            Create, manage, and deploy AI-powered agents through an intuitive
+            step-by-step interface. Our platform offers real-time AI response
+            previews, prompt engineering tools, and REST API integration for
+            automation.
           </p>
           <ul className="space-y-2">
             <li className="flex items-center">

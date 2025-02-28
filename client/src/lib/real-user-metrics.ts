@@ -2,12 +2,22 @@
  * Real User Metrics (RUM) for monitoring application performance in production
  */
 
-import { PerformanceMetric, performanceMonitor } from './performance-metrics';
+import {
+  type PerformanceMetric,
+  performanceMonitor,
+} from "./performance-metrics";
 
 // Metric types
-export type CoreWebVitalMetric = 'LCP' | 'FID' | 'CLS' | 'TTFB' | 'FCP';
-export type NavigationMetric = 'navigationStart' | 'domComplete' | 'loadComplete';
-export type CustomMetric = 'jsHeapUsed' | 'jsHeapTotal' | 'domNodes' | 'firstContentfulRender';
+export type CoreWebVitalMetric = "LCP" | "FID" | "CLS" | "TTFB" | "FCP";
+export type NavigationMetric =
+  | "navigationStart"
+  | "domComplete"
+  | "loadComplete";
+export type CustomMetric =
+  | "jsHeapUsed"
+  | "jsHeapTotal"
+  | "domNodes"
+  | "firstContentfulRender";
 
 /**
  * All real user metrics types
@@ -82,9 +92,9 @@ export interface RUMConfig {
  * Default RUM configuration
  */
 const defaultConfig: RUMConfig = {
-  enabled: process.env.NODE_ENV === 'production',
+  enabled: process.env.NODE_ENV === "production",
   samplingRate: 0.1, // 10% of users
-  endpoint: '/api/metrics',
+  endpoint: "/api/metrics",
   batchSize: 10,
   maxWaitTime: 30000, // 30 seconds
   includeRouteInfo: true,
@@ -161,7 +171,8 @@ class RealUserMetrics {
     };
 
     // Determine if this session should collect metrics based on sampling rate
-    this.isEnabled = this.config.enabled && Math.random() <= this.config.samplingRate;
+    this.isEnabled =
+      this.config.enabled && Math.random() <= this.config.samplingRate;
   }
 
   /**
@@ -183,14 +194,14 @@ class RealUserMetrics {
     this.listenToPerformanceMonitor();
 
     // Set up visibility change listener to flush metrics when page is hidden
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
         this.flush(true);
       }
     });
 
     // Set up page unload listener to flush metrics
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener("beforeunload", () => {
       this.flush(true);
     });
 
@@ -198,13 +209,18 @@ class RealUserMetrics {
     this.isInitialized = true;
 
     // Log initialization
-    console.log('Real User Metrics initialized');
+    console.log("Real User Metrics initialized"); // eslint-disable-line no-console
   }
 
   /**
    * Manually track a metric
    */
-  trackMetric(name: string, value: number, unit: string, metadata?: Record<string, any>): void {
+  trackMetric(
+    name: string,
+    value: number,
+    unit: string,
+    metadata?: Record<string, any>,
+  ): void {
     if (!this.isEnabled) return;
 
     this.addMetricToQueue({
@@ -223,9 +239,9 @@ class RealUserMetrics {
     if (!this.isEnabled) return;
 
     this.addMetricToQueue({
-      name: 'error',
+      name: "error",
       value: 1,
-      unit: 'count',
+      unit: "count",
       timestamp: Date.now(),
       metadata: {
         ...metadata,
@@ -264,7 +280,7 @@ class RealUserMetrics {
   /**
    * Flush metrics to the server
    */
-  private flush(isUnloading: boolean = false): void {
+  private flush(isUnloading = false): void {
     if (!this.isEnabled || this.metricsQueue.length === 0) return;
 
     // Clear any pending flush timeout
@@ -296,15 +312,15 @@ class RealUserMetrics {
 
     // Otherwise use fetch
     fetch(this.config.endpoint, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
       // Use keepalive to ensure the request completes even if the page changes
       keepalive: true,
     }).catch((error) => {
-      console.error('Failed to send metrics:', error);
+      console.error("Failed to send metrics:", error); // eslint-disable-line no-console
     });
   }
 
@@ -333,12 +349,12 @@ class RealUserMetrics {
     }
 
     // Collect connection information
-    if (this.config.includeConnectionInfo && 'connection' in navigator) {
+    if (this.config.includeConnectionInfo && "connection" in navigator) {
       const connection = (navigator as any).connection;
 
       if (connection) {
         this.session.connection = {
-          effectiveType: connection.effectiveType || 'unknown',
+          effectiveType: connection.effectiveType || "unknown",
           downlink: connection.downlink || 0,
           rtt: connection.rtt || 0,
         };
@@ -367,10 +383,10 @@ class RealUserMetrics {
         const entries = entryList.getEntries();
         if (entries.length > 0) {
           const fcp = entries[0] as PerformanceEntry;
-          this.trackMetric('FCP', fcp.startTime, 'ms');
+          this.trackMetric("FCP", fcp.startTime, "ms");
         }
       });
-      fcpObserver.observe({ type: 'paint', buffered: true });
+      fcpObserver.observe({ type: "paint", buffered: true });
 
       // Largest Contentful Paint (LCP)
       const lcpObserver = new PerformanceObserver((entryList) => {
@@ -378,22 +394,22 @@ class RealUserMetrics {
         // We want the latest LCP event
         if (entries.length > 0) {
           const lcp = entries[entries.length - 1] as PerformanceEntry;
-          this.trackMetric('LCP', lcp.startTime, 'ms', {
+          this.trackMetric("LCP", lcp.startTime, "ms", {
             element: (lcp as any).element ? (lcp as any).element.tagName : null,
           });
         }
       });
-      lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+      lcpObserver.observe({ type: "largest-contentful-paint", buffered: true });
 
       // First Input Delay (FID)
       const fidObserver = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
         if (entries.length > 0) {
           const fid = entries[0] as PerformanceEventTiming;
-          this.trackMetric('FID', fid.processingStart - fid.startTime, 'ms');
+          this.trackMetric("FID", fid.processingStart - fid.startTime, "ms");
         }
       });
-      fidObserver.observe({ type: 'first-input', buffered: true });
+      fidObserver.observe({ type: "first-input", buffered: true });
 
       // Layout Shift (CLS)
       let cumulativeLayoutShift = 0;
@@ -402,23 +418,23 @@ class RealUserMetrics {
           // Skip layout shifts that occur after user input
           if (!(entry as any).hadRecentInput) {
             cumulativeLayoutShift += (entry as any).value;
-            this.trackMetric('CLS', cumulativeLayoutShift, 'score');
+            this.trackMetric("CLS", cumulativeLayoutShift, "score");
           }
         }
       });
-      clsObserver.observe({ type: 'layout-shift', buffered: true });
+      clsObserver.observe({ type: "layout-shift", buffered: true });
 
       // Long Tasks
       const longTaskObserver = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
         for (const entry of entries) {
-          this.trackMetric('longTask', entry.duration, 'ms', {
+          this.trackMetric("longTask", entry.duration, "ms", {
             url: document.URL,
             taskName: entry.name,
           });
         }
       });
-      longTaskObserver.observe({ type: 'longtask', buffered: true });
+      longTaskObserver.observe({ type: "longtask", buffered: true });
 
       // Resource Timing
       const resourceObserver = new PerformanceObserver((entryList) => {
@@ -428,12 +444,12 @@ class RealUserMetrics {
           const url = entry.name;
           if (
             url.includes(window.location.origin) &&
-            (url.endsWith('.js') ||
-              url.endsWith('.css') ||
-              url.includes('fonts') ||
+            (url.endsWith(".js") ||
+              url.endsWith(".css") ||
+              url.includes("fonts") ||
               url.match(/\.(png|jpg|jpeg|gif|svg)$/))
           ) {
-            this.trackMetric('resourceLoad', entry.duration, 'ms', {
+            this.trackMetric("resourceLoad", entry.duration, "ms", {
               url: entry.name,
               initiatorType: (entry as PerformanceResourceTiming).initiatorType,
               size: (entry as PerformanceResourceTiming).transferSize || 0,
@@ -441,9 +457,9 @@ class RealUserMetrics {
           }
         }
       });
-      resourceObserver.observe({ type: 'resource', buffered: true });
+      resourceObserver.observe({ type: "resource", buffered: true });
     } catch (error) {
-      console.error('Error setting up performance observers:', error);
+      console.error("Error setting up performance observers:", error); // eslint-disable-line no-console
     }
   }
 
@@ -452,7 +468,7 @@ class RealUserMetrics {
    */
   private collectNavigationTiming(): void {
     // Wait for the load event to complete
-    window.addEventListener('load', () => {
+    window.addEventListener("load", () => {
       setTimeout(() => {
         if (!window.performance || !window.performance.timing) return;
 
@@ -460,19 +476,20 @@ class RealUserMetrics {
 
         // Time to First Byte (TTFB)
         const ttfb = timing.responseStart - timing.navigationStart;
-        this.trackMetric('TTFB', ttfb, 'ms');
+        this.trackMetric("TTFB", ttfb, "ms");
 
         // DOM Content Loaded
-        const domContentLoaded = timing.domContentLoadedEventEnd - timing.navigationStart;
-        this.trackMetric('domContentLoaded', domContentLoaded, 'ms');
+        const domContentLoaded =
+          timing.domContentLoadedEventEnd - timing.navigationStart;
+        this.trackMetric("domContentLoaded", domContentLoaded, "ms");
 
         // DOM Complete
         const domComplete = timing.domComplete - timing.navigationStart;
-        this.trackMetric('domComplete', domComplete, 'ms');
+        this.trackMetric("domComplete", domComplete, "ms");
 
         // Load Complete
         const loadComplete = timing.loadEventEnd - timing.navigationStart;
-        this.trackMetric('loadComplete', loadComplete, 'ms');
+        this.trackMetric("loadComplete", loadComplete, "ms");
       }, 0);
     });
   }
@@ -484,10 +501,10 @@ class RealUserMetrics {
     performanceMonitor.addListener((metric) => {
       // Only track certain metrics to avoid too much data
       if (
-        metric.name.startsWith('component:') ||
-        metric.name.startsWith('api:') ||
-        metric.name.startsWith('render:') ||
-        metric.name.startsWith('navigation:')
+        metric.name.startsWith("component:") ||
+        metric.name.startsWith("api:") ||
+        metric.name.startsWith("render:") ||
+        metric.name.startsWith("navigation:")
       ) {
         this.addMetricToQueue(metric);
       }
@@ -498,14 +515,14 @@ class RealUserMetrics {
    * Get browser name from user agent
    */
   private getBrowserName(ua: string): string {
-    if (ua.indexOf('Firefox') > -1) return 'Firefox';
-    if (ua.indexOf('SamsungBrowser') > -1) return 'Samsung Browser';
-    if (ua.indexOf('Opera') > -1 || ua.indexOf('OPR') > -1) return 'Opera';
-    if (ua.indexOf('Edge') > -1) return 'Edge';
-    if (ua.indexOf('MSIE') > -1) return 'Internet Explorer';
-    if (ua.indexOf('Chrome') > -1) return 'Chrome';
-    if (ua.indexOf('Safari') > -1) return 'Safari';
-    return 'Unknown';
+    if (ua.indexOf("Firefox") > -1) return "Firefox";
+    if (ua.indexOf("SamsungBrowser") > -1) return "Samsung Browser";
+    if (ua.indexOf("Opera") > -1 || ua.indexOf("OPR") > -1) return "Opera";
+    if (ua.indexOf("Edge") > -1) return "Edge";
+    if (ua.indexOf("MSIE") > -1) return "Internet Explorer";
+    if (ua.indexOf("Chrome") > -1) return "Chrome";
+    if (ua.indexOf("Safari") > -1) return "Safari";
+    return "Unknown";
   }
 
   /**
@@ -516,49 +533,53 @@ class RealUserMetrics {
     let match;
 
     switch (browser) {
-      case 'Firefox':
+      case "Firefox":
         match = ua.match(/Firefox\/([0-9.]+)/);
         break;
-      case 'Samsung Browser':
+      case "Samsung Browser":
         match = ua.match(/SamsungBrowser\/([0-9.]+)/);
         break;
-      case 'Opera':
+      case "Opera":
         match = ua.match(/(?:Opera|OPR)\/([0-9.]+)/);
         break;
-      case 'Edge':
+      case "Edge":
         match = ua.match(/Edge\/([0-9.]+)/);
         break;
-      case 'Internet Explorer':
+      case "Internet Explorer":
         match = ua.match(/MSIE ([0-9.]+)/);
         break;
-      case 'Chrome':
+      case "Chrome":
         match = ua.match(/Chrome\/([0-9.]+)/);
         break;
-      case 'Safari':
+      case "Safari":
         match = ua.match(/Version\/([0-9.]+).*Safari/);
         break;
       default:
-        return 'Unknown';
+        return "Unknown";
     }
 
-    return match ? match[1] : 'Unknown';
+    return match ? match[1] : "Unknown";
   }
 
   /**
    * Get operating system from user agent
    */
   private getOS(ua: string): string {
-    if (ua.indexOf('Windows NT 10.0') > -1) return 'Windows 10';
-    if (ua.indexOf('Windows NT 6.3') > -1) return 'Windows 8.1';
-    if (ua.indexOf('Windows NT 6.2') > -1) return 'Windows 8';
-    if (ua.indexOf('Windows NT 6.1') > -1) return 'Windows 7';
-    if (ua.indexOf('Windows NT') > -1) return 'Windows';
-    if (ua.indexOf('Mac OS X') > -1) return 'macOS';
-    if (ua.indexOf('Linux') > -1) return 'Linux';
-    if (ua.indexOf('Android') > -1) return 'Android';
-    if (ua.indexOf('iOS') > -1 || ua.indexOf('iPhone') > -1 || ua.indexOf('iPad') > -1)
-      return 'iOS';
-    return 'Unknown';
+    if (ua.indexOf("Windows NT 10.0") > -1) return "Windows 10";
+    if (ua.indexOf("Windows NT 6.3") > -1) return "Windows 8.1";
+    if (ua.indexOf("Windows NT 6.2") > -1) return "Windows 8";
+    if (ua.indexOf("Windows NT 6.1") > -1) return "Windows 7";
+    if (ua.indexOf("Windows NT") > -1) return "Windows";
+    if (ua.indexOf("Mac OS X") > -1) return "macOS";
+    if (ua.indexOf("Linux") > -1) return "Linux";
+    if (ua.indexOf("Android") > -1) return "Android";
+    if (
+      ua.indexOf("iOS") > -1 ||
+      ua.indexOf("iPhone") > -1 ||
+      ua.indexOf("iPad") > -1
+    )
+      return "iOS";
+    return "Unknown";
   }
 }
 
@@ -566,10 +587,10 @@ class RealUserMetrics {
 export const realUserMetrics = new RealUserMetrics();
 
 // Initialize by default
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   // Wait for the DOM to be ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
       realUserMetrics.initialize();
     });
   } else {

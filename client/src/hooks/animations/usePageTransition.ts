@@ -1,4 +1,4 @@
-import { useReducedMotion } from './useReducedMotion';
+import { useReducedMotion } from "./useReducedMotion";
 
 /**
  * Hook to provide page transition animation variants

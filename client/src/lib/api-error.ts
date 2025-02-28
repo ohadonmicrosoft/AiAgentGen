@@ -1,18 +1,18 @@
-import { logger } from '@/lib/logger';
+import { logger } from "@/lib/logger";
 
 // Create a dedicated logger instance for API errors
-const logger = new Logger('ApiError');
+const logger = new Logger("ApiError");
 
 // Error categories for better error handling
 export enum ErrorCategory {
-  NETWORK = 'network',
-  AUTHENTICATION = 'authentication',
-  AUTHORIZATION = 'authorization',
-  VALIDATION = 'validation',
-  NOT_FOUND = 'not_found',
-  SERVER = 'server',
-  TIMEOUT = 'timeout',
-  UNKNOWN = 'unknown',
+  NETWORK = "network",
+  AUTHENTICATION = "authentication",
+  AUTHORIZATION = "authorization",
+  VALIDATION = "validation",
+  NOT_FOUND = "not_found",
+  SERVER = "server",
+  TIMEOUT = "timeout",
+  UNKNOWN = "unknown",
 }
 
 /**
@@ -21,7 +21,7 @@ export enum ErrorCategory {
 export class ApiError extends Error {
   public status: number;
   public statusText: string;
-  public data: any;
+  public data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   public endpoint: string;
   public category: ErrorCategory;
   public requestId?: string;
@@ -32,11 +32,11 @@ export class ApiError extends Error {
     status: number,
     statusText: string,
     endpoint: string,
-    data?: any,
+    data?: any, // eslint-disable-line @typescript-eslint/no-explicit-any
     requestId?: string,
   ) {
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
     this.status = status;
     this.statusText = statusText;
     this.endpoint = endpoint;
@@ -136,7 +136,7 @@ export class ApiError extends Error {
    */
   getFriendlyMessage(): string {
     if (this.isAuthError()) {
-      return 'Your session has expired. Please log in again.';
+      return "Your session has expired. Please log in again.";
     }
 
     if (this.isForbiddenError()) {
@@ -144,26 +144,26 @@ export class ApiError extends Error {
     }
 
     if (this.isNotFoundError()) {
-      return 'The requested resource was not found.';
+      return "The requested resource was not found.";
     }
 
     if (this.isValidationError()) {
-      return this.message || 'Please check your input and try again.';
+      return this.message || "Please check your input and try again.";
     }
 
     if (this.isTimeoutError()) {
-      return 'The request timed out. Please check your connection and try again.';
+      return "The request timed out. Please check your connection and try again.";
     }
 
     if (this.isClientError()) {
-      return this.message || 'There was an error with your request.';
+      return this.message || "There was an error with your request.";
     }
 
     if (this.isServerError()) {
-      return 'The server encountered an error. Please try again later.';
+      return "The server encountered an error. Please try again later.";
     }
 
-    return this.message || 'An unexpected error occurred.';
+    return this.message || "An unexpected error occurred.";
   }
 
   /**
@@ -188,10 +188,13 @@ export class ApiError extends Error {
 /**
  * Factory function to create an ApiError from a Response object
  */
-export async function createApiError(response: Response, endpoint: string): Promise<ApiError> {
+export async function createApiError(
+  response: Response,
+  endpoint: string,
+): Promise<ApiError> {
   let data;
   let errorMessage;
-  const requestId = response.headers.get('x-request-id') || undefined;
+  const requestId = response.headers.get("x-request-id") || undefined;
 
   try {
     // Try to parse the response as JSON
@@ -199,7 +202,7 @@ export async function createApiError(response: Response, endpoint: string): Prom
     errorMessage = data.error || data.message || response.statusText;
   } catch (e) {
     // If parsing fails, use the status text
-    errorMessage = response.statusText || 'Unknown error';
+    errorMessage = response.statusText || "Unknown error";
   }
 
   const error = new ApiError(
@@ -226,9 +229,9 @@ export async function createApiError(response: Response, endpoint: string): Prom
  */
 export function createNetworkError(error: Error, endpoint: string): ApiError {
   const apiError = new ApiError(
-    error.message || 'Network error',
+    error.message || "Network error",
     0, // No status code for network errors
-    'Network Error',
+    "Network Error",
     endpoint,
   );
 
@@ -243,7 +246,10 @@ export function createNetworkError(error: Error, endpoint: string): ApiError {
 /**
  * Check if a Response is ok, otherwise throw an ApiError
  */
-export async function checkResponse(response: Response, endpoint: string): Promise<Response> {
+export async function checkResponse(
+  response: Response,
+  endpoint: string,
+): Promise<Response> {
   if (!response.ok) {
     throw await createApiError(response, endpoint);
   }
@@ -283,8 +289,8 @@ export function getFriendlyErrorMessage(error: unknown): string {
   }
 
   if (error instanceof Error) {
-    return error.message || 'An unexpected error occurred.';
+    return error.message || "An unexpected error occurred.";
   }
 
-  return 'An unexpected error occurred.';
+  return "An unexpected error occurred.";
 }

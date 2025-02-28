@@ -1,14 +1,20 @@
-import { execSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import * as jscodeshift from 'jscodeshift';
-import type { API, FileInfo, Transform } from 'jscodeshift';
-import { format } from 'prettier';
+import { execSync } from "node:child_process";
+import {
+  existsSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import * as jscodeshift from "jscodeshift";
+import type { API, FileInfo, Transform } from "jscodeshift";
+import { format } from "prettier";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const ROOT_DIR = join(__dirname, '..');
+const ROOT_DIR = join(__dirname, "..");
 
 interface FixOptions {
   fix: boolean;
@@ -23,15 +29,15 @@ function transformRequireToImport(fileInfo: FileInfo): string {
   // Find all require statements
   root
     .find(j.CallExpression, {
-      callee: { type: 'Identifier', name: 'require' },
+      callee: { type: "Identifier", name: "require" },
     })
     .forEach((path) => {
       const parent = path.parentPath.node;
 
-      if (parent.type === 'VariableDeclarator') {
+      if (parent.type === "VariableDeclarator") {
         const requireArg = path.node.arguments[0];
-        if (!requireArg || requireArg.type !== 'Literal') {
-          console.warn('Skipping non-string require argument');
+        if (!requireArg || requireArg.type !== "Literal") {
+          console.warn("Skipping non-string require argument");
           return;
         }
 
@@ -49,13 +55,13 @@ function transformRequireToImport(fileInfo: FileInfo): string {
 
         // Replace require with import
         j(varDecl).replaceWith(importDeclaration);
-      } else if (parent.type === 'MemberExpression') {
+      } else if (parent.type === "MemberExpression") {
         // Handle cases like const { x } = require('y')
         const grandParent = path.parentPath.parentPath.node;
-        if (grandParent.type === 'VariableDeclarator') {
+        if (grandParent.type === "VariableDeclarator") {
           const requireArg = path.node.arguments[0];
-          if (!requireArg || requireArg.type !== 'Literal') {
-            console.warn('Skipping non-string require argument');
+          if (!requireArg || requireArg.type !== "Literal") {
+            console.warn("Skipping non-string require argument");
             return;
           }
 
@@ -83,25 +89,34 @@ function transformRequireToImport(fileInfo: FileInfo): string {
 // Fix TypeScript syntax issues
 function fixTypescriptSyntax(content: string): string {
   // Remove incorrect index signatures
-  content = content.replace(/\[\s*key:\s*string\s*\]:\s*any;\s*/g, '');
+  content = content.replace(/\[\s*key:\s*string\s*\]:\s*any;\s*/g, "");
 
   // Fix object type annotations
-  content = content.replace(/{\s*\[key:\s*string\]:\s*any\s*}/g, 'Record<string, any>');
+  content = content.replace(
+    /{\s*\[key:\s*string\]:\s*any\s*}/g,
+    "Record<string, any>",
+  );
 
   // Add type parameters to reduce calls
-  content = content.replace(/\.reduce\((.*?)\)/g, '.reduce<Record<string, any>>($1)');
+  content = content.replace(
+    /\.reduce\((.*?)\)/g,
+    ".reduce<Record<string, any>>($1)",
+  );
 
   // Fix empty interfaces
-  content = content.replace(/interface\s+(\w+)\s+extends\s+(\w+)\s*\{\s*\}/g, 'type $1 = $2');
+  content = content.replace(
+    /interface\s+(\w+)\s+extends\s+(\w+)\s*\{\s*\}/g,
+    "type $1 = $2",
+  );
 
   return content;
 }
 
 // Process a single file
-async function processFile(filePath: string, fix: boolean = false): Promise<void> {
+async function processFile(filePath: string, fix = false): Promise<void> {
   try {
     console.log(`Processing ${filePath}...`);
-    const source = readFileSync(filePath, 'utf-8');
+    const source = readFileSync(filePath, "utf-8");
 
     // Create a mock FileInfo object
     const fileInfo = {
@@ -116,14 +131,16 @@ async function processFile(filePath: string, fix: boolean = false): Promise<void
       // Format the code
       try {
         const parser =
-          filePath.endsWith('.tsx') || filePath.endsWith('.ts') ? 'typescript' : 'babel';
+          filePath.endsWith(".tsx") || filePath.endsWith(".ts")
+            ? "typescript"
+            : "babel";
         const prettierOptions = {
           parser,
           semi: true,
           singleQuote: true,
-          trailingComma: 'es5' as const,
+          trailingComma: "es5" as const,
           tabWidth: 2,
-          plugins: ['prettier-plugin-organize-imports'],
+          plugins: ["prettier-plugin-organize-imports"],
         };
 
         transformedCode = await format(transformedCode, prettierOptions);
@@ -140,7 +157,10 @@ async function processFile(filePath: string, fix: boolean = false): Promise<void
 }
 
 // Process a directory recursively
-async function processDirectory(dirPath: string, options: FixOptions): Promise<void> {
+async function processDirectory(
+  dirPath: string,
+  options: FixOptions,
+): Promise<void> {
   try {
     const entries = readdirSync(dirPath);
 
@@ -148,7 +168,7 @@ async function processDirectory(dirPath: string, options: FixOptions): Promise<v
       const fullPath = join(dirPath, entry);
 
       // Skip node_modules and dist directories
-      if (entry === 'node_modules' || entry === 'dist') {
+      if (entry === "node_modules" || entry === "dist") {
         continue;
       }
 
@@ -158,10 +178,10 @@ async function processDirectory(dirPath: string, options: FixOptions): Promise<v
         await processDirectory(fullPath, options);
       } else if (
         stat.isFile() &&
-        (fullPath.endsWith('.ts') ||
-          fullPath.endsWith('.tsx') ||
-          fullPath.endsWith('.js') ||
-          fullPath.endsWith('.jsx'))
+        (fullPath.endsWith(".ts") ||
+          fullPath.endsWith(".tsx") ||
+          fullPath.endsWith(".js") ||
+          fullPath.endsWith(".jsx"))
       ) {
         await processFile(fullPath, options.fix);
       }
@@ -176,8 +196,8 @@ async function main(): Promise<void> {
   try {
     const args = process.argv.slice(2);
     const options: FixOptions = {
-      fix: args.includes('--fix'),
-      paths: args.filter((arg) => !arg.startsWith('--')),
+      fix: args.includes("--fix"),
+      paths: args.filter((arg) => !arg.startsWith("--")),
     };
 
     if (options.paths && options.paths.length > 0) {
@@ -200,14 +220,14 @@ async function main(): Promise<void> {
       await processDirectory(ROOT_DIR, options);
     }
 
-    console.log('Code fixes completed successfully!');
+    console.log("Code fixes completed successfully!");
   } catch (error) {
-    console.error('Error fixing code:', error);
+    console.error("Error fixing code:", error);
     process.exit(1);
   }
 }
 
 main().catch((error) => {
-  console.error('Fatal error:', error);
+  console.error("Fatal error:", error);
   process.exit(1);
 });

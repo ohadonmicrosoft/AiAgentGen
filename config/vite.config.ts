@@ -8,6 +8,7 @@ import { defineConfig } from 'vite';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const rootDir = path.resolve(__dirname, '..');
 
 export default defineConfig(async ({ mode }) => {
   // Conditionally import the cartographer plugin
@@ -32,18 +33,28 @@ export default defineConfig(async ({ mode }) => {
     ],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, 'client', 'src'),
-        '@shared': path.resolve(__dirname, 'shared'),
+        '@': path.resolve(rootDir, 'client', 'src'),
+        '@shared': path.resolve(rootDir, 'shared'),
+        '@server': path.resolve(rootDir, 'server'),
       },
     },
-    root: path.resolve(__dirname, 'client'),
+    root: path.resolve(rootDir, 'client'),
     build: {
-      outDir: path.resolve(__dirname, 'dist/public'),
+      outDir: path.resolve(rootDir, 'dist/public'),
       emptyOutDir: true,
       rollupOptions: {
+        input: {
+          main: path.resolve(rootDir, 'client/index.html'),
+        },
         output: {
           manualChunks: {
-            vendor: ['react', 'react-dom', 'framer-motion', 'tailwind-merge', 'clsx'],
+            vendor: [
+              'react',
+              'react-dom',
+              'framer-motion',
+              'tailwind-merge',
+              'clsx',
+            ],
             ui: [
               '@radix-ui/react-accordion',
               '@radix-ui/react-alert-dialog',

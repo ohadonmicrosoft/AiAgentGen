@@ -1,5 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react";
 
 // Define the User type
 interface User {
@@ -15,9 +20,9 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   error: Error | null;
-  loginMutation: any;
-  registerMutation: any;
-  logoutMutation: any;
+  loginMutation: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  registerMutation: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  logoutMutation: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   checkAuthStatus: () => Promise<void>;
 }
 
@@ -40,7 +45,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const checkAuthStatus = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/user');
+      const response = await fetch("/api/user");
 
       if (response.ok) {
         const userData = await response.json();
@@ -49,7 +54,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(null);
       }
     } catch (err) {
-      console.error('Auth status check error:', err);
+      console.error("Auth status check error:", err); // eslint-disable-line no-console
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -64,22 +69,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (credentials: { username: string; password: string }) => {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Login failed');
+        throw new Error(errorData.error || "Login failed");
       }
 
       return response.json();
     },
     onSuccess: (data) => {
       setUser(data);
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (err: Error) => {
       setError(err);
@@ -93,22 +98,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
       email: string;
       password: string;
     }) => {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Registration failed');
+        throw new Error(errorData.error || "Registration failed");
       }
 
       return response.json();
     },
     onSuccess: (data) => {
       setUser(data);
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (err: Error) => {
       setError(err);
@@ -118,19 +123,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/logout', {
-        method: 'POST',
+      const response = await fetch("/api/logout", {
+        method: "POST",
       });
 
       if (!response.ok) {
-        throw new Error('Logout failed');
+        throw new Error("Logout failed");
       }
 
       return response.ok;
     },
     onSuccess: () => {
       setUser(null);
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (err: Error) => {
       setError(err);
@@ -149,5 +154,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   // Provide the context to children
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 }

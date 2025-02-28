@@ -1,13 +1,13 @@
-import { Card } from '@/components/ui/card';
-import { useMicroInteractions, useScrollAnimation } from '@/hooks/animations';
-import { motion } from 'framer-motion';
-import { ReactNode } from 'react';
+import { Card } from "@/components/ui/card";
+import { useMicroInteractions, useScrollAnimation } from "@/hooks/animations";
+import { motion } from "framer-motion";
+import type { ReactNode } from "react";
 
 interface QuickActionCardProps {
   title: string;
   description: string;
   icon: ReactNode;
-  color: 'primary' | 'green' | 'purple' | 'gray' | string;
+  color: "primary" | "green" | "purple" | "gray" | string;
   onClick: () => void;
   animationDelay?: number;
 }
@@ -24,17 +24,18 @@ export default function QuickActionCard({
   animationDelay = 0,
 }: QuickActionCardProps) {
   const [ref, isVisible] = useScrollAnimation();
-  const { buttonHover, buttonTap } = useMicroInteractions();
+  const { _buttonHover, _buttonTap } = useMicroInteractions();
 
   // Map color to Tailwind classes
   const colorMap = {
-    primary: 'bg-primary text-primary-foreground',
-    green: 'bg-green-500 text-white',
-    purple: 'bg-purple-500 text-white',
-    gray: 'bg-gray-500 text-white',
+    primary: "bg-primary text-primary-foreground",
+    green: "bg-green-500 text-white",
+    purple: "bg-purple-500 text-white",
+    gray: "bg-gray-500 text-white",
   };
 
-  const bgColorClass = colorMap[color as keyof typeof colorMap] || colorMap.primary;
+  const bgColorClass =
+    colorMap[color as keyof typeof colorMap] || colorMap.primary;
 
   return (
     <MotionCard
@@ -48,7 +49,7 @@ export default function QuickActionCard({
       }}
       whileHover={{
         y: -5,
-        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+        boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
         transition: { duration: 0.2 },
       }}
       whileTap={buttonTap}
@@ -61,7 +62,7 @@ export default function QuickActionCard({
         animate={{ scale: 1 }}
         transition={{
           delay: animationDelay * 0.1 + 0.2,
-          type: 'spring',
+          type: "spring",
           stiffness: 260,
           damping: 20,
         }}

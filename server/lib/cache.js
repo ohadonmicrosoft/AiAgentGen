@@ -1,4 +1,4 @@
-import { logger } from '../api/logs';
+import { logger } from "../api/logs";
 /**
  * Enhanced in-memory cache with TTL support, LRU eviction, and memory limits
  */
@@ -59,7 +59,7 @@ export class MemoryCache {
   estimateSize(value) {
     try {
       // For strings, use the length as an approximation
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         return value.length * 2; // UTF-16 characters are 2 bytes
       }
       // For objects, use JSON stringification as an approximation
@@ -91,7 +91,10 @@ export class MemoryCache {
       // Estimate the size of the new value
       const size = this.estimateSize(value);
       // Enforce cache size limit
-      if (this.cache.size >= this.maxSize || this.currentMemorySize + size > this.maxMemorySize) {
+      if (
+        this.cache.size >= this.maxSize ||
+        this.currentMemorySize + size > this.maxMemorySize
+      ) {
         this.evictEntries(size);
       }
       const expires = Date.now() + (ttl || this.defaultTTL);
@@ -178,7 +181,7 @@ export class MemoryCache {
       this.hits = 0;
       this.misses = 0;
       this.evictions = 0;
-      logger.debug('Cache cleared');
+      logger.debug("Cache cleared");
     } catch (error) {
       logger.error(`Error clearing cache: ${error}`);
     }
@@ -274,7 +277,8 @@ export class MemoryCache {
     for (const entry of entries) {
       if (
         this.cache.size <= this.maxSize * 0.9 &&
-        this.currentMemorySize + sizeNeeded - freedSize <= this.maxMemorySize * 0.9
+        this.currentMemorySize + sizeNeeded - freedSize <=
+          this.maxMemorySize * 0.9
       ) {
         break;
       }
@@ -285,7 +289,9 @@ export class MemoryCache {
       this.evictions++;
     }
     if (evictedCount > 0) {
-      logger.debug(`Cache evicted ${evictedCount} LRU entries, freed ${freedSize} bytes`);
+      logger.debug(
+        `Cache evicted ${evictedCount} LRU entries, freed ${freedSize} bytes`,
+      );
     }
   }
   /**
@@ -294,7 +300,7 @@ export class MemoryCache {
   evictOldest() {
     // Find the key with the earliest expiration time
     let oldestKey;
-    let oldestExpires = Infinity;
+    let oldestExpires = Number.POSITIVE_INFINITY;
     for (const [key, entry] of this.cache.entries()) {
       if (entry.expires < oldestExpires) {
         oldestKey = key;

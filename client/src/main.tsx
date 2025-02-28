@@ -1,16 +1,17 @@
-import { createRoot } from 'react-dom/client';
-import { ThemeProvider } from './providers/ThemeProvider';
-import App from './App';
-import './index.css';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+import { ThemeProvider } from "./providers/ThemeProvider";
+import "./index.css";
+import { setupOfflineListeners } from "./lib/offline-forms";
 import {
+  handleAppInstalled,
   registerServiceWorker,
   setupServiceWorkerUpdateFlow,
-  handleAppInstalled,
-} from './service-worker-registration';
-import { setupOfflineListeners } from './lib/offline-forms';
+} from "./service-worker-registration";
 
 // Create root for React rendering
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <ThemeProvider>
     <App />
   </ThemeProvider>,

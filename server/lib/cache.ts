@@ -1,4 +1,4 @@
-import { logger } from '../api/logs';
+import { logger } from "../api/logs";
 
 /**
  * Cache entry with value and expiration
@@ -35,13 +35,13 @@ export class MemoryCache<T = any> {
   private defaultTTL: number;
   private maxSize: number;
   private maxMemorySize: number;
-  private currentMemorySize: number = 0;
+  private currentMemorySize = 0;
   private cleanupInterval: number;
   private useLRU: boolean;
   private cleanupTimer: NodeJS.Timeout | null = null;
-  private hits: number = 0;
-  private misses: number = 0;
-  private evictions: number = 0;
+  private hits = 0;
+  private misses = 0;
+  private evictions = 0;
 
   /**
    * Create a new memory cache
@@ -98,9 +98,10 @@ export class MemoryCache<T = any> {
    * @returns Approximate size in bytes
    */
   private estimateSize(value: any): number {
+    // eslint-disable-line @typescript-eslint/no-explicit-any
     try {
       // For strings, use the length as an approximation
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         return value.length * 2; // UTF-16 characters are 2 bytes
       }
 
@@ -137,7 +138,10 @@ export class MemoryCache<T = any> {
       const size = this.estimateSize(value);
 
       // Enforce cache size limit
-      if (this.cache.size >= this.maxSize || this.currentMemorySize + size > this.maxMemorySize) {
+      if (
+        this.cache.size >= this.maxSize ||
+        this.currentMemorySize + size > this.maxMemorySize
+      ) {
         this.evictEntries(size);
       }
 
@@ -235,7 +239,7 @@ export class MemoryCache<T = any> {
       this.hits = 0;
       this.misses = 0;
       this.evictions = 0;
-      logger.debug('Cache cleared');
+      logger.debug("Cache cleared");
     } catch (error) {
       logger.error(`Error clearing cache: ${error}`);
     }
@@ -351,7 +355,8 @@ export class MemoryCache<T = any> {
     for (const entry of entries) {
       if (
         this.cache.size <= this.maxSize * 0.9 &&
-        this.currentMemorySize + sizeNeeded - freedSize <= this.maxMemorySize * 0.9
+        this.currentMemorySize + sizeNeeded - freedSize <=
+          this.maxMemorySize * 0.9
       ) {
         break;
       }
@@ -364,7 +369,9 @@ export class MemoryCache<T = any> {
     }
 
     if (evictedCount > 0) {
-      logger.debug(`Cache evicted ${evictedCount} LRU entries, freed ${freedSize} bytes`);
+      logger.debug(
+        `Cache evicted ${evictedCount} LRU entries, freed ${freedSize} bytes`,
+      );
     }
   }
 
@@ -374,7 +381,7 @@ export class MemoryCache<T = any> {
   private evictOldest(): void {
     // Find the key with the earliest expiration time
     let oldestKey: string | undefined;
-    let oldestExpires = Infinity;
+    let oldestExpires = Number.POSITIVE_INFINITY;
 
     for (const [key, entry] of this.cache.entries()) {
       if (entry.expires < oldestExpires) {

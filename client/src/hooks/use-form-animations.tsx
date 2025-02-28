@@ -1,4 +1,4 @@
-import { useReducedMotion } from './use-reduced-motion';
+import { useReducedMotion } from "./use-reduced-motion";
 
 export interface FormAnimationConfig {
   /**
@@ -28,19 +28,19 @@ export function useFormAnimations(config?: FormAnimationConfig) {
   const { stiffness = 400, damping = 25, duration = 0.2 } = config || {};
 
   // Transition based on reduced motion preference
-  const getTransition = (type: 'spring' | 'tween' = 'spring') => {
+  const getTransition = (type: "spring" | "tween" = "spring") => {
     if (prefersReducedMotion) {
       return { duration: 0 };
     }
 
-    return type === 'spring'
+    return type === "spring"
       ? {
-          type: 'spring',
+          type: "spring",
           stiffness,
           damping,
         }
       : {
-          type: 'tween',
+          type: "tween",
           duration,
         };
   };
@@ -49,22 +49,22 @@ export function useFormAnimations(config?: FormAnimationConfig) {
   const inputVariants = {
     idle: {
       scale: 1,
-      borderColor: 'hsl(var(--input))',
-      boxShadow: 'none',
+      borderColor: "hsl(var(--input))",
+      boxShadow: "none",
     },
     focus: {
       scale: 1,
-      borderColor: 'hsl(var(--primary))',
-      boxShadow: '0 0 0 2px hsl(var(--primary) / 0.2)',
+      borderColor: "hsl(var(--primary))",
+      boxShadow: "0 0 0 2px hsl(var(--primary) / 0.2)",
     },
     error: {
       scale: [1, 1.02, 1],
-      borderColor: 'hsl(var(--destructive))',
-      boxShadow: '0 0 0 2px hsl(var(--destructive) / 0.2)',
+      borderColor: "hsl(var(--destructive))",
+      boxShadow: "0 0 0 2px hsl(var(--destructive) / 0.2)",
     },
     success: {
-      borderColor: 'hsl(var(--success, 142 69% 58%))',
-      boxShadow: '0 0 0 2px hsl(var(--success, 142 69% 58%) / 0.2)',
+      borderColor: "hsl(var(--success, 142 69% 58%))",
+      boxShadow: "0 0 0 2px hsl(var(--success, 142 69% 58%) / 0.2)",
     },
   };
 
@@ -73,22 +73,22 @@ export function useFormAnimations(config?: FormAnimationConfig) {
     idle: {
       y: 0,
       scale: 1,
-      color: 'hsl(var(--muted-foreground))',
+      color: "hsl(var(--muted-foreground))",
     },
     focus: {
       y: -12,
       scale: 0.85,
-      color: 'hsl(var(--primary))',
+      color: "hsl(var(--primary))",
     },
     filled: {
       y: -12,
       scale: 0.85,
-      color: 'hsl(var(--muted-foreground))',
+      color: "hsl(var(--muted-foreground))",
     },
     error: {
       y: -12,
       scale: 0.85,
-      color: 'hsl(var(--destructive))',
+      color: "hsl(var(--destructive))",
     },
   };
 
@@ -102,7 +102,7 @@ export function useFormAnimations(config?: FormAnimationConfig) {
     visible: {
       opacity: 1,
       y: 0,
-      height: 'auto',
+      height: "auto",
     },
     exit: {
       opacity: 0,

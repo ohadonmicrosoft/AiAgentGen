@@ -1,18 +1,22 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { glob } from 'glob';
-import { createInterface } from 'readline';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { exec } from "child_process";
+import path from "path";
+import { createInterface } from "readline";
+import { promisify } from "util";
+import fs from "fs/promises";
+import { glob } from "glob";
 
 const execAsync = promisify(exec);
 
 // Add createBackup function
 async function createBackup(projectRoot: string) {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const backupDir = path.join(projectRoot, '..', `AI-Aget-Gen-backup-${timestamp}`);
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const backupDir = path.join(
+    projectRoot,
+    "..",
+    `AI-Aget-Gen-backup-${timestamp}`,
+  );
 
-  console.log('Creating backup...');
+  console.log("Creating backup...");
   await execAsync(`cp -r "${projectRoot}/." "${backupDir}/"`);
   console.log(`Backup created at: ${backupDir}`);
 
@@ -22,68 +26,71 @@ async function createBackup(projectRoot: string) {
 // Add ensureGitInitialized function
 async function ensureGitInitialized(projectRoot: string) {
   try {
-    await fs.access(path.join(projectRoot, '.git'));
+    await fs.access(path.join(projectRoot, ".git"));
   } catch {
-    console.log('Git not initialized. Initializing...');
-    await execAsync('git init && git add . && git commit -m "Initial commit with project backup"', {
-      cwd: projectRoot,
-    });
-    console.log('Git repository initialized with initial commit');
+    console.log("Git not initialized. Initializing...");
+    await execAsync(
+      'git init && git add . && git commit -m "Initial commit with project backup"',
+      {
+        cwd: projectRoot,
+      },
+    );
+    console.log("Git repository initialized with initial commit");
   }
 }
 
 // Critical patterns that should never be deleted
 const CRITICAL_PATTERNS = [
   // Core app directories
-  'client/**',
-  'server/**',
-  'scripts/**',
-  'public/**',
-  'src/**',
-  'types/**',
-  'doc/**',
-  '__tests__/**',
+  "client/**",
+  "server/**",
+  "scripts/**",
+  "public/**",
+  "src/**",
+  "types/**",
+  "doc/**",
+  "__tests__/**",
 
   // Config files
-  'package.json',
-  'package-lock.json',
-  'tsconfig.json',
-  'vite.config.ts',
-  'jest.config.js',
-  'tailwind.config.ts',
-  '.gitignore',
-  '.env.example',
+  "package.json",
+  "package-lock.json",
+  "tsconfig.json",
+  "vite.config.ts",
+  "jest.config.js",
+  "tailwind.config.ts",
+  ".gitignore",
+  ".env.example",
 
   // Documentation
-  'README.md',
-  'CHANGELOG.md',
-  'LICENSE',
+  "README.md",
+  "CHANGELOG.md",
+  "LICENSE",
 
   // Git
-  '.git/**',
-  '.github/**',
+  ".git/**",
+  ".github/**",
 ];
 
 // Patterns for files that are safe to remove
 const CLEANUP_PATTERNS = [
   // Temporary files
-  '**/temp/**',
-  '**/tmp/**',
-  '**/*.log',
+  "**/temp/**",
+  "**/tmp/**",
+  "**/*.log",
 
   // Build artifacts
-  'dist/**',
-  'build/**',
-  '.cache/**',
-  '.next/**',
+  "dist/**",
+  "build/**",
+  ".cache/**",
+  ".next/**",
 
   // Development files
-  '.vscode/**',
-  '.idea/**',
-  '*.sublime-*',
-  '.DS_Store',
-  'Thumbs.db',
-  '**/node_modules/.cache/**',
+  ".vscode/**",
+  ".idea/**",
+  "*.sublime-*",
+  ".DS_Store",
+  "Thumbs.db",
+  "**/node_modules/.cache/**",
 ];
 
 const isMainModule = import.meta.url === `file://${process.argv[1]}`;
@@ -99,7 +106,7 @@ async function cleanup() {
     await ensureGitInitialized(projectRoot);
 
     // Verify critical directories exist
-    const criticalDirs = ['client', 'src', 'server'];
+    const criticalDirs = ["client", "src", "server"];
     for (const dir of criticalDirs) {
       try {
         await fs.access(path.join(projectRoot, dir));
@@ -110,13 +117,13 @@ async function cleanup() {
       }
     }
 
-    console.log('Starting cleanup process...');
+    console.log("Starting cleanup process...");
     console.log(`Project root: ${projectRoot}`);
 
     // Get all files in the project
-    const allFiles = await glob('**/*', {
+    const allFiles = await glob("**/*", {
       dot: true,
-      ignore: ['node_modules/**'],
+      ignore: ["node_modules/**"],
       cwd: projectRoot,
     });
 
@@ -124,7 +131,9 @@ async function cleanup() {
     const criticalFiles = new Set(
       (
         await Promise.all(
-          CRITICAL_PATTERNS.map((pattern) => glob(pattern, { dot: true, cwd: projectRoot })),
+          CRITICAL_PATTERNS.map((pattern) =>
+            glob(pattern, { dot: true, cwd: projectRoot }),
+          ),
         )
       ).flat(),
     );
@@ -133,7 +142,9 @@ async function cleanup() {
     const cleanupFiles = new Set(
       (
         await Promise.all(
-          CLEANUP_PATTERNS.map((pattern) => glob(pattern, { dot: true, cwd: projectRoot })),
+          CLEANUP_PATTERNS.map((pattern) =>
+            glob(pattern, { dot: true, cwd: projectRoot }),
+          ),
         )
       ).flat(),
     );
@@ -144,32 +155,41 @@ async function cleanup() {
     );
 
     // Generate report
-    console.log('\nFiles to be removed:');
+    console.log("\nFiles to be removed:");
     filesToRemove.forEach((file) => {
       console.log(`- ${file}`);
     });
 
     // Add additional safety check before deletion
-    if (filesToRemove.some((file) => criticalDirs.some((dir) => file.startsWith(dir)))) {
-      console.error('SAFETY CHECK FAILED: Attempted to remove protected directory!');
-      console.error('Cleanup cancelled.');
+    if (
+      filesToRemove.some((file) =>
+        criticalDirs.some((dir) => file.startsWith(dir)),
+      )
+    ) {
+      console.error(
+        "SAFETY CHECK FAILED: Attempted to remove protected directory!",
+      );
+      console.error("Cleanup cancelled.");
       process.exit(1);
     }
 
     // Confirm with user
-    if (process.env.NODE_ENV !== 'test') {
+    if (process.env.NODE_ENV !== "test") {
       const readline = createInterface({
         input: process.stdin,
         output: process.stdout,
       });
 
       const answer = await new Promise((resolve) => {
-        readline.question('Do you want to proceed with deletion? (y/N) ', resolve);
+        readline.question(
+          "Do you want to proceed with deletion? (y/N) ",
+          resolve,
+        );
       });
       readline.close();
 
-      if (answer.toLowerCase() !== 'y') {
-        console.log('Cleanup cancelled.');
+      if (answer.toLowerCase() !== "y") {
+        console.log("Cleanup cancelled.");
         return;
       }
     }
@@ -198,14 +218,14 @@ async function cleanup() {
     // Remove empty directories
     await removeEmptyDirs(projectRoot);
 
-    console.log('\nCleanup completed!');
+    console.log("\nCleanup completed!");
     console.log(`Successfully removed ${removedCount} files/directories`);
     if (errorCount > 0) {
       console.log(`Failed to remove ${errorCount} files/directories`);
     }
   } catch (error) {
-    console.error('Error during cleanup:', error);
-    console.error('Please restore from the latest backup if needed');
+    console.error("Error during cleanup:", error);
+    console.error("Please restore from the latest backup if needed");
     process.exit(1);
   }
 }
@@ -224,7 +244,9 @@ async function removeEmptyDirs(dir: string) {
       const remainingFiles = await fs.readdir(fullPath);
       if (remainingFiles.length === 0) {
         await fs.rmdir(fullPath);
-        console.log(`Removed empty directory: ${path.relative(process.cwd(), fullPath)}`);
+        console.log(
+          `Removed empty directory: ${path.relative(process.cwd(), fullPath)}`,
+        );
       }
     }
   }

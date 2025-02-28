@@ -1,12 +1,12 @@
-import { withErrorBoundary } from '@/components/ui/error-boundary';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Logger } from '@/lib/logger';
-import { cn } from '@/lib/utils';
-import { PanInfo, motion, useAnimation } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
-import * as React from 'react';
+import { withErrorBoundary } from "@/components/ui/error-boundary";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Logger } from "@/lib/logger";
+import { cn } from "@/lib/utils";
+import { type PanInfo, motion, useAnimation } from "framer-motion";
+import { Loader2 } from "lucide-react";
+import * as React from "react";
 
-const logger = new Logger('PullRefresh');
+const logger = new Logger("PullRefresh");
 
 export interface PullRefreshProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
@@ -71,9 +71,9 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
       pullThreshold = 80,
       maxPullDistance = 120,
       loadingIndicator,
-      pullText = 'Pull to refresh',
-      releaseText = 'Release to refresh',
-      refreshingText = 'Refreshing...',
+      pullText = "Pull to refresh",
+      releaseText = "Release to refresh",
+      refreshingText = "Refreshing...",
       disabled = false,
       ...props
     },
@@ -103,20 +103,20 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
             // Animate to loading state
             controls.start({
               y: pullThreshold / 2,
-              transition: { type: 'spring', bounce: 0.3 },
+              transition: { type: "spring", bounce: 0.3 },
             });
 
             // Call the onRefresh function
             try {
               await onRefresh();
             } catch (error) {
-              logger.error('Error during refresh:', { error });
+              logger.error("Error during refresh:", { error });
             }
 
             // Animation to close the refresh view
             controls.start({
               y: 0,
-              transition: { type: 'spring', bounce: 0.2 },
+              transition: { type: "spring", bounce: 0.2 },
             });
 
             setIsRefreshing(false);
@@ -124,14 +124,14 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
             // If not pulled far enough, animate back to starting position
             controls.start({
               y: 0,
-              transition: { type: 'spring', bounce: 0.2 },
+              transition: { type: "spring", bounce: 0.2 },
             });
           }
 
           setIsPulling(false);
           setPullDistance(0);
         } catch (error) {
-          logger.error('Error in pull refresh handler:', { error });
+          logger.error("Error in pull refresh handler:", { error });
           setIsRefreshing(false);
           setIsPulling(false);
           setPullDistance(0);
@@ -139,7 +139,7 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
           // Ensure we reset the UI state even if there was an error
           controls.start({
             y: 0,
-            transition: { type: 'spring', bounce: 0.2 },
+            transition: { type: "spring", bounce: 0.2 },
           });
         }
       },
@@ -159,7 +159,10 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
             setIsPulling(true);
 
             // Apply resistance to the pull (gets harder as you pull further)
-            const resistedPull = Math.min(maxPullDistance, Math.pow(offset.y, 0.8));
+            const resistedPull = Math.min(
+              maxPullDistance,
+              Math.pow(offset.y, 0.8),
+            );
 
             setPullDistance(resistedPull);
             controls.set({ y: resistedPull });
@@ -168,7 +171,7 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
             setPullDistance(0);
           }
         } catch (error) {
-          logger.error('Error during pull motion:', { error });
+          logger.error("Error during pull motion:", { error });
         }
       },
       [controls, isPullEnabled, maxPullDistance],
@@ -201,8 +204,12 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
     return (
       <motion.div
         ref={ref}
-        className={cn('relative overflow-hidden', disabled && 'pointer-events-none', className)}
-        drag={isPullEnabled ? 'y' : false}
+        className={cn(
+          "relative overflow-hidden",
+          disabled && "pointer-events-none",
+          className,
+        )}
+        drag={isPullEnabled ? "y" : false}
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={0.1}
         onDrag={handleDrag}
@@ -213,8 +220,8 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
         {/* Loading indicator container */}
         <div
           className={cn(
-            'absolute left-0 right-0 flex justify-center -top-16 transition-opacity',
-            isPulling || isRefreshing ? 'opacity-100' : 'opacity-0',
+            "absolute left-0 right-0 flex justify-center -top-16 transition-opacity",
+            isPulling || isRefreshing ? "opacity-100" : "opacity-0",
           )}
         >
           {loadingIndicator || defaultLoadingIndicator}
@@ -222,7 +229,10 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
 
         {/* Content container */}
         <div
-          className={cn('min-h-full will-change-transform', isRefreshing && 'pointer-events-none')}
+          className={cn(
+            "min-h-full will-change-transform",
+            isRefreshing && "pointer-events-none",
+          )}
         >
           {children}
         </div>
@@ -231,10 +241,10 @@ const PullRefreshBase = React.forwardRef<HTMLDivElement, PullRefreshProps>(
   },
 );
 
-PullRefreshBase.displayName = 'PullRefreshBase';
+PullRefreshBase.displayName = "PullRefreshBase";
 
 // Wrap with error boundary
 const PullRefresh = withErrorBoundary(PullRefreshBase);
-PullRefresh.displayName = 'PullRefresh';
+PullRefresh.displayName = "PullRefresh";
 
 export { PullRefresh };

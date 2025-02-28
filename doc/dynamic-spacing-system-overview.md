@@ -62,9 +62,9 @@ A Tailwind CSS plugin that generates utility classes:
 // Using the hook with inline styles
 const MyComponent = () => {
   const { style } = useFluidSpacing({
-    padding: { x: 'lg', y: 'md' },
-    margin: 'sm',
-    maxWidth: 'text',
+    padding: { x: "lg", y: "md" },
+    margin: "sm",
+    maxWidth: "text",
   });
 
   return <div style={style}>Content</div>;

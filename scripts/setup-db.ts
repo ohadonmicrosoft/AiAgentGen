@@ -1,17 +1,17 @@
 // Direct database setup script using TypeScript
-import postgres from 'postgres';
+import postgres from "postgres";
 
 async function main() {
   if (!process.env.DATABASE_URL) {
-    console.error('DATABASE_URL environment variable is required');
+    console.error("DATABASE_URL environment variable is required");
     process.exit(1);
   }
 
   try {
-    console.log('Connecting to database...');
+    console.log("Connecting to database...");
     const client = postgres(process.env.DATABASE_URL);
 
-    console.log('Creating tables from schema...');
+    console.log("Creating tables from schema...");
 
     // Create users table
     await client`
@@ -24,7 +24,7 @@ async function main() {
         custom_permissions JSONB
       )
     `;
-    console.log('✓ Users table created');
+    console.log("✓ Users table created");
 
     // Create agents table
     await client`
@@ -44,7 +44,7 @@ async function main() {
         updated_at TIMESTAMP NOT NULL DEFAULT NOW()
       )
     `;
-    console.log('✓ Agents table created');
+    console.log("✓ Agents table created");
 
     // Create prompts table
     await client`
@@ -59,7 +59,7 @@ async function main() {
         updated_at TIMESTAMP NOT NULL DEFAULT NOW()
       )
     `;
-    console.log('✓ Prompts table created');
+    console.log("✓ Prompts table created");
 
     // Create api_keys table
     await client`
@@ -69,7 +69,7 @@ async function main() {
         api_key TEXT NOT NULL
       )
     `;
-    console.log('✓ API Keys table created');
+    console.log("✓ API Keys table created");
 
     // Create sessions table for connect-pg-simple
     await client`
@@ -80,19 +80,19 @@ async function main() {
         CONSTRAINT "session_pkey" PRIMARY KEY ("sid")
       )
     `;
-    console.log('✓ Sessions table created');
+    console.log("✓ Sessions table created");
 
     await client`
       CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire")
     `;
-    console.log('✓ Sessions index created');
+    console.log("✓ Sessions index created");
 
-    console.log('Database setup completed successfully!');
+    console.log("Database setup completed successfully!");
 
     await client.end();
     process.exit(0);
   } catch (error) {
-    console.error('Database setup failed:', error);
+    console.error("Database setup failed:", error);
     process.exit(1);
   }
 }

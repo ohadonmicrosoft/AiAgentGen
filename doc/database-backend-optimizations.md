@@ -91,7 +91,7 @@ export const pool = postgres(process.env.DATABASE_URL, {
   idle_timeout: IDLE_TIMEOUT, // Close idle connections after timeout
   connect_timeout: 15, // Connection timeout (15 seconds)
   max_lifetime: 60 * 30, // Connections live max 30 minutes
-  ssl: process.env.DATABASE_SSL === 'true', // Optional SSL support
+  ssl: process.env.DATABASE_SSL === "true", // Optional SSL support
   // Additional options for debugging and monitoring
 });
 ```

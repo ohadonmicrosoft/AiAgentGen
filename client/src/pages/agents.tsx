@@ -1,23 +1,23 @@
-import AgentCard from '@/components/AgentCard';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useScrollAnimation } from '@/hooks/animations';
-import { useAuth } from '@/hooks/use-auth';
-import MainLayout from '@/layouts/MainLayout';
-import { Agent as AgentSchema } from '@shared/schema';
-import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
-import { Loader2, Plus, Search } from 'lucide-react';
-import { useState } from 'react';
-import { useLocation } from 'wouter';
+import AgentCard from "@/components/AgentCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useScrollAnimation } from "@/hooks/animations";
+import { useAuth } from "@/hooks/use-auth";
+import MainLayout from "@/layouts/MainLayout";
+import type { Agent as AgentSchema } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { Loader2, Plus, Search } from "lucide-react";
+import { useState } from "react";
+import { useLocation } from "wouter";
 
 // Define the UIAgent type to match the AgentCard component props
 interface UIAgent {
   id: string;
   name: string;
   description: string;
-  status: 'active' | 'draft';
+  status: "active" | "draft";
   lastUpdated: string;
 }
 
@@ -29,14 +29,14 @@ function formatLastUpdated(date: string): string {
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) {
-    return 'Updated today';
+    return "Updated today";
   } else if (diffDays === 1) {
-    return 'Updated yesterday';
+    return "Updated yesterday";
   } else if (diffDays < 7) {
     return `Updated ${diffDays} days ago`;
   } else if (diffDays < 30) {
     const weeks = Math.floor(diffDays / 7);
-    return `Updated ${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+    return `Updated ${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
   } else {
     return `Updated on ${updatedDate.toLocaleDateString()}`;
   }
@@ -44,7 +44,7 @@ function formatLastUpdated(date: string): string {
 
 export default function Agents() {
   const [, navigate] = useLocation();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
   const { ref, controls } = useScrollAnimation();
 
@@ -75,27 +75,40 @@ export default function Agents() {
     isLoading,
     error,
   } = useQuery<AgentSchema[]>({
-    queryKey: ['/api/agents'],
+    queryKey: ["/api/agents"],
     enabled: !!user,
   });
 
   const filteredAgents = agents?.filter(
     (agent) =>
       agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (agent.description && agent.description.toLowerCase().includes(searchQuery.toLowerCase())),
+      (agent.description &&
+        agent.description.toLowerCase().includes(searchQuery.toLowerCase())),
   );
 
-  const activeAgents = filteredAgents?.filter((agent) => agent.status === 'active');
-  const draftAgents = filteredAgents?.filter((agent) => agent.status === 'draft');
+  const activeAgents = filteredAgents?.filter(
+    (agent) => agent.status === "active",
+  );
+  const draftAgents = filteredAgents?.filter(
+    (agent) => agent.status === "draft",
+  );
 
   return (
     <MainLayout title="Agents">
-      <motion.div className="py-6" initial="hidden" animate="visible" variants={containerVariants}>
+      <motion.div
+        className="py-6"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
         <motion.div
           className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"
           variants={containerVariants}
         >
-          <motion.div className="relative w-full sm:w-64" variants={itemVariants}>
+          <motion.div
+            className="relative w-full sm:w-64"
+            variants={itemVariants}
+          >
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -108,7 +121,7 @@ export default function Agents() {
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <Button onClick={() => navigate('/create-agent')}>
+            <Button onClick={() => navigate("/create-agent")}>
               <Plus className="mr-2 h-4 w-4" />
               Create Agent
             </Button>
@@ -117,7 +130,10 @@ export default function Agents() {
 
         {/* Loading state */}
         {isLoading && (
-          <motion.div className="flex justify-center items-center py-12" variants={itemVariants}>
+          <motion.div
+            className="flex justify-center items-center py-12"
+            variants={itemVariants}
+          >
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </motion.div>
         )}
@@ -125,7 +141,9 @@ export default function Agents() {
         {/* Error state */}
         {error && (
           <motion.div className="py-8 text-center" variants={itemVariants}>
-            <p className="text-destructive">Error loading agents. Please try again later.</p>
+            <p className="text-destructive">
+              Error loading agents. Please try again later.
+            </p>
           </motion.div>
         )}
 
@@ -135,9 +153,15 @@ export default function Agents() {
             <Tabs defaultValue="all" className="w-full">
               <motion.div variants={itemVariants}>
                 <TabsList className="mb-4">
-                  <TabsTrigger value="all">All Agents ({filteredAgents?.length || 0})</TabsTrigger>
-                  <TabsTrigger value="active">Active ({activeAgents?.length || 0})</TabsTrigger>
-                  <TabsTrigger value="draft">Draft ({draftAgents?.length || 0})</TabsTrigger>
+                  <TabsTrigger value="all">
+                    All Agents ({filteredAgents?.length || 0})
+                  </TabsTrigger>
+                  <TabsTrigger value="active">
+                    Active ({activeAgents?.length || 0})
+                  </TabsTrigger>
+                  <TabsTrigger value="draft">
+                    Draft ({draftAgents?.length || 0})
+                  </TabsTrigger>
                 </TabsList>
               </motion.div>
 
@@ -147,13 +171,17 @@ export default function Agents() {
                   variants={containerVariants}
                 >
                   {filteredAgents?.map((agent, index) => (
-                    <motion.div key={agent.id} variants={itemVariants} custom={index}>
+                    <motion.div
+                      key={agent.id}
+                      variants={itemVariants}
+                      custom={index}
+                    >
                       <AgentCard
                         agent={{
                           id: agent.id.toString(),
                           name: agent.name,
-                          description: agent.description || '',
-                          status: agent.status as 'active' | 'draft',
+                          description: agent.description || "",
+                          status: agent.status as "active" | "draft",
                           lastUpdated: formatLastUpdated(agent.updatedAt),
                         }}
                         onEdit={() => navigate(`/agents/${agent.id}`)}
@@ -163,9 +191,13 @@ export default function Agents() {
                     </motion.div>
                   ))}
                   {filteredAgents?.length === 0 && (
-                    <motion.div className="col-span-full py-8 text-center" variants={itemVariants}>
+                    <motion.div
+                      className="col-span-full py-8 text-center"
+                      variants={itemVariants}
+                    >
                       <p className="text-muted-foreground">
-                        No agents found. Try a different search term or create a new agent.
+                        No agents found. Try a different search term or create a
+                        new agent.
                       </p>
                     </motion.div>
                   )}
@@ -178,13 +210,17 @@ export default function Agents() {
                   variants={containerVariants}
                 >
                   {activeAgents?.map((agent, index) => (
-                    <motion.div key={agent.id} variants={itemVariants} custom={index}>
+                    <motion.div
+                      key={agent.id}
+                      variants={itemVariants}
+                      custom={index}
+                    >
                       <AgentCard
                         agent={{
                           id: agent.id.toString(),
                           name: agent.name,
-                          description: agent.description || '',
-                          status: agent.status as 'active' | 'draft',
+                          description: agent.description || "",
+                          status: agent.status as "active" | "draft",
                           lastUpdated: formatLastUpdated(agent.updatedAt),
                         }}
                         onEdit={() => navigate(`/agents/${agent.id}`)}
@@ -194,10 +230,13 @@ export default function Agents() {
                     </motion.div>
                   ))}
                   {activeAgents?.length === 0 && (
-                    <motion.div className="col-span-full py-8 text-center" variants={itemVariants}>
+                    <motion.div
+                      className="col-span-full py-8 text-center"
+                      variants={itemVariants}
+                    >
                       <p className="text-muted-foreground">
-                        No active agents found. Try a different search term or activate a draft
-                        agent.
+                        No active agents found. Try a different search term or
+                        activate a draft agent.
                       </p>
                     </motion.div>
                   )}
@@ -210,13 +249,17 @@ export default function Agents() {
                   variants={containerVariants}
                 >
                   {draftAgents?.map((agent, index) => (
-                    <motion.div key={agent.id} variants={itemVariants} custom={index}>
+                    <motion.div
+                      key={agent.id}
+                      variants={itemVariants}
+                      custom={index}
+                    >
                       <AgentCard
                         agent={{
                           id: agent.id.toString(),
                           name: agent.name,
-                          description: agent.description || '',
-                          status: agent.status as 'active' | 'draft',
+                          description: agent.description || "",
+                          status: agent.status as "active" | "draft",
                           lastUpdated: formatLastUpdated(agent.updatedAt),
                         }}
                         onEdit={() => navigate(`/agents/${agent.id}`)}
@@ -226,7 +269,10 @@ export default function Agents() {
                     </motion.div>
                   ))}
                   {draftAgents?.length === 0 && (
-                    <motion.div className="col-span-full py-8 text-center" variants={itemVariants}>
+                    <motion.div
+                      className="col-span-full py-8 text-center"
+                      variants={itemVariants}
+                    >
                       <p className="text-muted-foreground">
                         No draft agents found. Try a different search term.
                       </p>

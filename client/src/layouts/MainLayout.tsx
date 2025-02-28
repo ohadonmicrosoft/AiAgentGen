@@ -1,20 +1,20 @@
-import Sidebar from '@/components/Sidebar';
-import { SkipLink } from '@/components/SkipLink';
-import TopNav from '@/components/TopNav';
-import { Backdrop } from '@/components/ui/backdrop';
-import { ErrorBoundary } from '@/components/ui/error-boundary';
-import { Icons } from '@/components/ui/icons';
-import { PERMISSIONS } from '@/constants';
-import { usePreferences } from '@/context/preferences-context';
-import { useAuth } from '@/hooks/use-auth';
-import { useBreakpoint } from '@/hooks/use-breakpoint';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { SidebarProvider, useSidebarState } from '@/hooks/use-sidebar-state';
-import { useAnnouncer, useFocusTrap } from '@/lib/accessibility';
-import { cn } from '@/lib/utils';
-import { NavItem } from '@/types';
-import { FocusTrap } from '@radix-ui/react-focus-trap';
-import { motion } from 'framer-motion';
+import Sidebar from "@/components/Sidebar";
+import { SkipLink } from "@/components/SkipLink";
+import TopNav from "@/components/TopNav";
+import { Backdrop } from "@/components/ui/backdrop";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { Icons } from "@/components/ui/icons";
+import { PERMISSIONS } from "@/constants";
+import { usePreferences } from "@/context/preferences-context";
+import { useAuth } from "@/hooks/use-auth";
+import { useBreakpoint } from "@/hooks/use-breakpoint";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { SidebarProvider, useSidebarState } from "@/hooks/use-sidebar-state";
+import { useAnnouncer, useFocusTrap } from "@/lib/accessibility";
+import { cn } from "@/lib/utils";
+import type { NavItem } from "@/types";
+import { FocusTrap } from "@radix-ui/react-focus-trap";
+import { motion } from "framer-motion";
 import {
   AlertTriangle,
   Bot,
@@ -27,8 +27,14 @@ import {
   Sparkles,
   Users,
   X,
-} from 'lucide-react';
-import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+} from "lucide-react";
+import {
+  type ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -38,28 +44,28 @@ interface MainLayoutProps {
 // Define navigation items
 const navItems: NavItem[] = [
   {
-    label: 'Dashboard',
-    path: '/',
+    label: "Dashboard",
+    path: "/",
     icon: <Home className="w-5 h-5" />,
   },
   {
-    label: 'Agents',
-    path: '/agents',
+    label: "Agents",
+    path: "/agents",
     icon: <Bot className="w-5 h-5" />,
   },
   {
-    label: 'Conversations',
-    path: '/conversations',
+    label: "Conversations",
+    path: "/conversations",
     icon: <MessagesSquare className="w-5 h-5" />,
   },
   {
-    label: 'Explore',
-    path: '/explore',
+    label: "Explore",
+    path: "/explore",
     icon: <Compass className="w-5 h-5" />,
   },
   {
-    label: 'Settings',
-    path: '/settings',
+    label: "Settings",
+    path: "/settings",
     icon: <Settings className="w-5 h-5" />,
   },
 ];
@@ -67,8 +73,8 @@ const navItems: NavItem[] = [
 // Define demo items
 const demoItems: NavItem[] = [
   {
-    label: 'UI Components',
-    path: '/demo/components',
+    label: "UI Components",
+    path: "/demo/components",
     icon: <Sparkles className="w-5 h-5" />,
   },
 ];
@@ -76,13 +82,13 @@ const demoItems: NavItem[] = [
 // Define admin items
 const adminItems: NavItem[] = [
   {
-    label: 'User Management',
-    path: '/admin/users',
+    label: "User Management",
+    path: "/admin/users",
     icon: <Users className="w-5 h-5" />,
   },
   {
-    label: 'System Status',
-    path: '/admin/system',
+    label: "System Status",
+    path: "/admin/system",
     icon: <Database className="w-5 h-5" />,
   },
 ];
@@ -109,7 +115,9 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
   const { announce } = useAnnouncer();
 
   // Focus trap for mobile sidebar
-  const sidebarFocusTrapRef = useFocusTrap(isMobile && sidebarOpen, () => setSidebarOpen(false));
+  const sidebarFocusTrapRef = useFocusTrap(isMobile && sidebarOpen, () =>
+    setSidebarOpen(false),
+  );
 
   // Close sidebar when transitioning from mobile to desktop
   useEffect(() => {
@@ -121,13 +129,13 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
   // Close sidebar when pressing Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && sidebarOpen) {
+      if (e.key === "Escape" && sidebarOpen) {
         setSidebarOpen(false);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [sidebarOpen]);
 
   const toggleSidebar = () => {
@@ -136,9 +144,9 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
 
     // Announce sidebar state change to screen readers
     if (newState) {
-      announce('Navigation sidebar opened');
+      announce("Navigation sidebar opened");
     } else {
-      announce('Navigation sidebar closed');
+      announce("Navigation sidebar closed");
     }
   };
 
@@ -146,14 +154,14 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
   useEffect(() => {
     if (isMobile) {
       if (sidebarOpen) {
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = "hidden";
       } else {
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       }
     }
 
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [sidebarOpen, isMobile]);
 
@@ -184,7 +192,7 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
               fixed inset-y-0 left-0 z-40 
               w-64 transform transition-transform duration-300 ease-in-out
               lg:translate-x-0 lg:static lg:w-auto lg:flex-shrink-0
-              ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+              ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
               flex-shrink-0
             `}
           >
@@ -212,7 +220,9 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
               fallback={
                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
                   <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
-                  <h2 className="text-2xl font-semibold mb-2">Something went wrong</h2>
+                  <h2 className="text-2xl font-semibold mb-2">
+                    Something went wrong
+                  </h2>
                   <p className="text-muted-foreground mb-4">
                     An error occurred while loading this page content.
                   </p>
@@ -231,7 +241,9 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
                 {title && <h1 className="sr-only">{title}</h1>}
 
                 {/* Animated page entry */}
-                <div className="animate-in fade-in duration-500">{children}</div>
+                <div className="animate-in fade-in duration-500">
+                  {children}
+                </div>
               </div>
             </ErrorBoundary>
           </main>

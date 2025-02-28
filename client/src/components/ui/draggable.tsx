@@ -1,8 +1,9 @@
-import { useDraggable } from '@/hooks/use-draggable';
-import { cn } from '@/lib/utils';
-import { DraggableConfig, DraggableItem } from '@/types/drag-types';
-import { motion } from 'framer-motion';
-import React, { forwardRef } from 'react';
+import { useDraggable } from "@/hooks/use-draggable";
+import { cn } from "@/lib/utils";
+import type { DraggableConfig, DraggableItem } from "@/types/drag-types";
+import { motion } from "framer-motion";
+import type React from "react";
+import { forwardRef } from "react";
 
 export interface DraggableProps extends React.HTMLAttributes<HTMLDivElement> {
   item: DraggableItem;
@@ -10,9 +11,9 @@ export interface DraggableProps extends React.HTMLAttributes<HTMLDivElement> {
   disabled?: boolean;
   dragHandleSelector?: string;
   onDragStart?: (item: DraggableItem) => void;
-  onDragEnd?: (result: any) => void;
+  onDragEnd?: (result: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   children: React.ReactNode;
-  dragHandleRender?: (props: any) => React.ReactNode;
+  dragHandleRender?: (props: any) => React.ReactNode; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 const Draggable = forwardRef<HTMLDivElement, DraggableProps>(
@@ -39,27 +40,27 @@ const Draggable = forwardRef<HTMLDivElement, DraggableProps>(
       onDragEnd,
     };
 
-    const { draggableProps, dragHandleProps, isDragging, animationControls } = useDraggable(
-      item,
-      config,
-    );
+    const { draggableProps, dragHandleProps, isDragging, animationControls } =
+      useDraggable(item, config);
 
     return (
       <motion.div
         ref={ref}
-        className={cn('relative', isDragging && 'opacity-50', className)}
+        className={cn("relative", isDragging && "opacity-50", className)}
         animate={animationControls}
         {...draggableProps}
         {...props}
       >
         {children}
 
-        {dragHandleSelector && dragHandleRender && dragHandleRender(dragHandleProps)}
+        {dragHandleSelector &&
+          dragHandleRender &&
+          dragHandleRender(dragHandleProps)}
       </motion.div>
     );
   },
 );
 
-Draggable.displayName = 'Draggable';
+Draggable.displayName = "Draggable";
 
 export { Draggable };

@@ -10,16 +10,19 @@ export interface FluidTypographyOptions {
   maxSize: number;
   minWidth?: number;
   maxWidth?: number;
-  unit?: 'px' | 'rem' | 'em';
+  unit?: "px" | "rem" | "em";
 }
 
 /**
  * Converts a pixel value to the specified unit
  */
-export function convertToUnit(value: number, unit: 'px' | 'rem' | 'em' = 'px'): string {
-  if (unit === 'px') return `${value}px`;
-  if (unit === 'rem') return `${value / 16}rem`;
-  if (unit === 'em') return `${value / 16}em`;
+export function convertToUnit(
+  value: number,
+  unit: "px" | "rem" | "em" = "px",
+): string {
+  if (unit === "px") return `${value}px`;
+  if (unit === "rem") return `${value / 16}rem`;
+  if (unit === "em") return `${value / 16}em`;
   return `${value}px`;
 }
 
@@ -31,7 +34,7 @@ export function fluidTypography({
   maxSize,
   minWidth = 320,
   maxWidth = 1280,
-  unit = 'px',
+  unit = "px",
 }: FluidTypographyOptions): string {
   const slope = (maxSize - minSize) / (maxWidth - minWidth);
   const slopeVw = slope * 100; // Convert to vw units
@@ -40,7 +43,9 @@ export function fluidTypography({
   const minSizeValue = convertToUnit(minSize, unit);
   const maxSizeValue = convertToUnit(maxSize, unit);
   const interceptValue =
-    unit === 'px' ? `${intercept.toFixed(4)}px` : `${(intercept / 16).toFixed(4)}${unit}`;
+    unit === "px"
+      ? `${intercept.toFixed(4)}px`
+      : `${(intercept / 16).toFixed(4)}${unit}`;
 
   return `clamp(${minSizeValue}, ${interceptValue} + ${slopeVw.toFixed(4)}vw, ${maxSizeValue})`;
 }
@@ -68,7 +73,7 @@ export const fluidTypeScale = {
  */
 export function getFluidType(
   key: keyof typeof fluidTypeScale,
-  unit: 'px' | 'rem' | 'em' = 'px',
+  unit: "px" | "rem" | "em" = "px",
 ): string {
   const { minSize, maxSize } = fluidTypeScale[key];
   return fluidTypography({ minSize, maxSize, unit });
@@ -85,8 +90,8 @@ export function getFluidType(
 export function fluidLineHeight(
   minLineHeight: number,
   maxLineHeight: number,
-  minWidth: number = 320,
-  maxWidth: number = 1280,
+  minWidth = 320,
+  maxWidth = 1280,
 ): string {
   const slope = (maxLineHeight - minLineHeight) / (maxWidth - minWidth);
   const slopeVw = slope * 100;
@@ -102,7 +107,7 @@ export function fluidLineHeight(
  */
 export function calculateOptimalLineLength(
   fontSize: number,
-  charactersPerLine: number = 66,
+  charactersPerLine = 66,
 ): string {
   // Using the approximation that 1em contains ~2 characters for average English text
   const emLength = charactersPerLine / 2;

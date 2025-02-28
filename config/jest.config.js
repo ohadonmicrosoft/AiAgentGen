@@ -15,11 +15,12 @@ export default {
       {
         useESM: true,
         isolatedModules: true,
+        jsx: 'react-jsx',
       },
     ],
   },
   extensionsToTreatAsEsm: ['.ts', '.tsx', '.jsx'],
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/config/jest.setup.js'],
   testPathIgnorePatterns: ['<rootDir>/node_modules/'],
   // Coverage configuration
   collectCoverage: true,

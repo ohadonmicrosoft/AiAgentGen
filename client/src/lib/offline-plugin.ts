@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query';
+import type { QueryClient } from "@tanstack/react-query";
 
 /**
  * Simple storage interface for the offline cache
@@ -13,14 +13,14 @@ interface OfflineStorage {
  * LocalStorage implementation of OfflineStorage
  */
 class LocalStorageAdapter implements OfflineStorage {
-  private prefix = 'offline-cache:';
+  private prefix = "offline-cache:";
 
   async getItem(key: string): Promise<unknown | null> {
     try {
       const data = localStorage.getItem(this.prefix + key);
       return data ? JSON.parse(data) : null;
     } catch (e) {
-      console.error('Failed to get item from localStorage:', e);
+      console.error("Failed to get item from localStorage:", e); // eslint-disable-line no-console
       return null;
     }
   }
@@ -29,7 +29,7 @@ class LocalStorageAdapter implements OfflineStorage {
     try {
       localStorage.setItem(this.prefix + key, JSON.stringify(value));
     } catch (e) {
-      console.error('Failed to save item to localStorage:', e);
+      console.error("Failed to save item to localStorage:", e); // eslint-disable-line no-console
     }
   }
 
@@ -37,7 +37,7 @@ class LocalStorageAdapter implements OfflineStorage {
     try {
       localStorage.removeItem(this.prefix + key);
     } catch (e) {
-      console.error('Failed to remove item from localStorage:', e);
+      console.error("Failed to remove item from localStorage:", e); // eslint-disable-line no-console
     }
   }
 }
@@ -93,23 +93,23 @@ export function offlinePlugin(options: OfflinePluginOptions = {}) {
       this.restoreFromStorage(client);
 
       // Add listeners for online/offline events
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         // Refetch stale queries when coming back online
         if (refetchOnReconnect) {
-          window.addEventListener('online', () => {
-            client.refetchQueries({ type: 'all', stale: true });
+          window.addEventListener("online", () => {
+            client.refetchQueries({ type: "all", stale: true });
           });
         }
 
         // Save cache state before going offline
-        window.addEventListener('offline', () => {
+        window.addEventListener("offline", () => {
           this.saveToStorage(client);
         });
       }
 
       // Register event handlers for persisting query results
       client.getQueryCache().subscribe((event) => {
-        if (event.type === 'updated' || event.type === 'added') {
+        if (event.type === "updated" || event.type === "added") {
           const query = event.query;
 
           // Check if this query should be persisted
@@ -162,7 +162,7 @@ export function offlinePlugin(options: OfflinePluginOptions = {}) {
 
       for (const query of queries) {
         const queryKey = query.queryKey[0];
-        if (typeof queryKey === 'string' && this.shouldPersistQuery(queryKey)) {
+        if (typeof queryKey === "string" && this.shouldPersistQuery(queryKey)) {
           await this.persistQuery(queryKey, query.state.data);
         }
       }
@@ -176,13 +176,13 @@ export function offlinePlugin(options: OfflinePluginOptions = {}) {
       try {
         // Get all keys in storage that match our prefix
         const keys = Object.keys(localStorage)
-          .filter((key) => key.startsWith('offline-cache:'))
-          .map((key) => key.replace('offline-cache:', ''));
+          .filter((key) => key.startsWith("offline-cache:"))
+          .map((key) => key.replace("offline-cache:", ""));
 
         for (const key of keys) {
           const cached = await storage.getItem(key);
 
-          if (cached && typeof cached === 'object' && cached !== null) {
+          if (cached && typeof cached === "object" && cached !== null) {
             const { data, expiry } = cached as {
               data: unknown;
               expiry: number;
@@ -198,7 +198,7 @@ export function offlinePlugin(options: OfflinePluginOptions = {}) {
           }
         }
       } catch (e) {
-        console.error('Failed to restore cache from storage:', e);
+        console.error("Failed to restore cache from storage:", e); // eslint-disable-line no-console
       }
     },
   };
@@ -206,14 +206,19 @@ export function offlinePlugin(options: OfflinePluginOptions = {}) {
 
 // Detect network status
 export function isOffline(): boolean {
-  return typeof navigator !== 'undefined' && !navigator.onLine;
+  return typeof navigator !== "undefined" && !navigator.onLine;
 }
 
 // Initialize the offline plugin with the query client
 export function initOfflineSupport(queryClient: QueryClient): void {
   const plugin = offlinePlugin({
     defaultTTL: 24 * 60 * 60 * 1000, // 24 hours
-    persistQueries: [/^\/api\/user/, /^\/api\/agents/, /^\/api\/prompts/, /^\/api\/conversations/],
+    persistQueries: [
+      /^\/api\/user/,
+      /^\/api\/agents/,
+      /^\/api\/prompts/,
+      /^\/api\/conversations/,
+    ],
   });
 
   plugin.register(queryClient);

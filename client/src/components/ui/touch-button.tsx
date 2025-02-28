@@ -1,15 +1,22 @@
-import { Button, ButtonProps } from '@/components/ui/button';
-import { withErrorBoundary } from '@/components/ui/error-boundary';
-import { useReducedMotion } from '@/hooks/animations/useReducedMotion';
-import { useFluidSpacing } from '@/hooks/use-fluid-spacing';
-import { useHaptic } from '@/hooks/use-haptic';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import * as React from 'react';
+import { Button, type ButtonProps } from "@/components/ui/button";
+import { withErrorBoundary } from "@/components/ui/error-boundary";
+import { useReducedMotion } from "@/hooks/animations/useReducedMotion";
+import { useFluidSpacing } from "@/hooks/use-fluid-spacing";
+import { useHaptic } from "@/hooks/use-haptic";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import * as React from "react";
 
 // Define haptic feedback types
-type HapticType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | boolean;
+type HapticType =
+  | "light"
+  | "medium"
+  | "heavy"
+  | "success"
+  | "warning"
+  | "error"
+  | boolean;
 
 interface TouchButtonProps extends ButtonProps {
   /**
@@ -71,7 +78,10 @@ interface TouchButtonProps extends ButtonProps {
  * A touch-optimized button component that enhances the touch experience on mobile devices.
  * It provides visual feedback through animations and optional haptic feedback.
  */
-const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProps>(
+const TouchButtonComponent = React.forwardRef<
+  HTMLButtonElement,
+  TouchButtonProps
+>(
   (
     {
       children,
@@ -79,10 +89,10 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
       pressScale = 0.95,
       pressDuration = 0.2,
       tapHighlight = true,
-      tapHighlightColor = 'rgba(0, 0, 0, 0.1)',
-      hapticFeedback = 'light',
+      tapHighlightColor = "rgba(0, 0, 0, 0.1)",
+      hapticFeedback = "light",
       showRipple = false,
-      rippleColor = 'currentColor',
+      rippleColor = "currentColor",
       touchPadding,
       tactileAnimation = true,
       onClick,
@@ -124,10 +134,12 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
       return (elementRef: HTMLButtonElement) => {
         // Update internal ref
         if (buttonRef) {
-          (buttonRef as React.MutableRefObject<HTMLButtonElement | null>).current = elementRef;
+          (
+            buttonRef as React.MutableRefObject<HTMLButtonElement | null>
+          ).current = elementRef;
         }
         // Forward the ref
-        if (typeof ref === 'function') {
+        if (typeof ref === "function") {
           ref(elementRef);
         } else if (ref) {
           ref.current = elementRef;
@@ -141,22 +153,22 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
 
       try {
         switch (hapticFeedback) {
-          case 'light':
+          case "light":
             triggerLightFeedback();
             break;
-          case 'medium':
+          case "medium":
             triggerMediumFeedback();
             break;
-          case 'heavy':
+          case "heavy":
             triggerHeavyFeedback();
             break;
-          case 'success':
+          case "success":
             triggerSuccessFeedback();
             break;
-          case 'warning':
+          case "warning":
             triggerWarningFeedback();
             break;
-          case 'error':
+          case "error":
             triggerErrorFeedback();
             break;
           case true:
@@ -167,7 +179,7 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
             break;
         }
       } catch (error) {
-        console.warn('Haptic feedback failed:', error);
+        console.warn("Haptic feedback failed:", error); // eslint-disable-line no-console
         // Fail silently - haptic is an enhancement, not critical functionality
       }
     }, [
@@ -183,7 +195,11 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
 
     // Create a ripple effect centered on the touch/click point
     const createRipple = React.useCallback(
-      (e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>) => {
+      (
+        e:
+          | React.MouseEvent<HTMLButtonElement>
+          | React.TouchEvent<HTMLButtonElement>,
+      ) => {
         if (!showRipple || disabled) return;
 
         try {
@@ -195,7 +211,7 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
 
           // Get coordinates (handle both touch and mouse events)
           let x, y;
-          if ('touches' in e) {
+          if ("touches" in e) {
             // Touch event
             x = e.touches[0].clientX - rect.left;
             y = e.touches[0].clientY - rect.top;
@@ -217,7 +233,7 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
             setRipples((prev) => prev.filter((ripple) => ripple.id !== id));
           }, 600); // Match with CSS animation duration
         } catch (error) {
-          console.warn('Ripple effect failed:', error);
+          console.warn("Ripple effect failed:", error); // eslint-disable-line no-console
           // Fail silently - ripple is just a visual enhancement
         }
       },
@@ -241,7 +257,7 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
             onClick(e);
           }
         } catch (error) {
-          console.error('Error in TouchButton click handler:', error);
+          console.error("Error in TouchButton click handler:", error); // eslint-disable-line no-console
           // Ensure the error doesn't prevent default button behavior
           if (onClick && !e.defaultPrevented) {
             // Try again with basic functionality
@@ -273,7 +289,7 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
       if (touchPadding !== undefined) {
         return touchPadding;
       }
-      return isMobile ? getSpacing('xs') : '0';
+      return isMobile ? getSpacing("xs") : "0";
     }, [touchPadding, isMobile, getSpacing]);
 
     // Add touch-specific styles for mobile devices
@@ -282,18 +298,20 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
           // Increase touch target size
           padding: padValue,
           // Remove outline on touch devices
-          WebkitTapHighlightColor: tapHighlight ? tapHighlightColor : 'transparent',
+          WebkitTapHighlightColor: tapHighlight
+            ? tapHighlightColor
+            : "transparent",
           // Prevent text selection during taps
-          WebkitUserSelect: 'none' as const,
-          userSelect: 'none' as const,
+          WebkitUserSelect: "none" as const,
+          userSelect: "none" as const,
           // Prevent double-tap zoom
-          touchAction: 'manipulation' as const,
+          touchAction: "manipulation" as const,
           // Position relative for ripple container
-          position: 'relative' as const,
+          position: "relative" as const,
           // Isolate z-index stacking context
           zIndex: 1,
           // Ensure content doesn't get clipped
-          overflow: 'hidden' as const,
+          overflow: "hidden" as const,
         }
       : {};
 
@@ -303,28 +321,30 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
     return (
       <motion.div
         whileTap={shouldAnimate ? { scale: pressScale } : undefined}
-        animate={isPressed && shouldAnimate ? { scale: pressScale } : { scale: 1 }}
+        animate={
+          isPressed && shouldAnimate ? { scale: pressScale } : { scale: 1 }
+        }
         transition={{
           duration: pressDuration,
           // Use more performant animations on mobile
-          type: isMobile ? 'tween' : 'spring',
+          type: isMobile ? "tween" : "spring",
           // Reduce animation complexity on mobile
           bounce: isMobile ? 0 : 0.25,
         }}
         style={{
-          display: 'inline-block',
+          display: "inline-block",
           // Improve performance by using hardware acceleration
-          willChange: 'transform',
+          willChange: "transform",
           // Ensure the animation doesn't cause layout shifts
-          transform: 'translateZ(0)',
+          transform: "translateZ(0)",
         }}
       >
         <Button
           ref={mergedRef}
           className={cn(
-            'transition-all duration-200',
-            isMobile && 'mobile-optimized touch-manipulation',
-            showRipple && 'overflow-hidden',
+            "transition-all duration-200",
+            isMobile && "mobile-optimized touch-manipulation",
+            showRipple && "overflow-hidden",
             className,
           )}
           onClick={handleClick}
@@ -348,7 +368,7 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
                     width: ripple.size,
                     height: ripple.size,
                     backgroundColor: rippleColor,
-                    transform: 'translate(-50%, -50%) scale(0)',
+                    transform: "translate(-50%, -50%) scale(0)",
                   }}
                 />
               ))}
@@ -363,7 +383,7 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
   },
 );
 
-TouchButtonComponent.displayName = 'TouchButton';
+TouchButtonComponent.displayName = "TouchButton";
 
 // Export the component wrapped with an error boundary
 export const TouchButton = withErrorBoundary(TouchButtonComponent, {

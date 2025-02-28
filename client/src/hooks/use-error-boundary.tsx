@@ -1,5 +1,6 @@
-import { ErrorBoundary } from '@/components/ui/error-boundary';
-import React, { useState, useCallback, ReactNode } from 'react';
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import type React from "react";
+import { type ReactNode, useCallback, useState } from "react";
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -34,23 +35,30 @@ export function useErrorBoundary(): UseErrorBoundaryResult {
     });
   }, []);
 
-  const handleError = useCallback((error: Error, errorInfo: React.ErrorInfo) => {
-    setErrorState({
-      hasError: true,
-      error,
-      errorInfo,
-    });
+  const handleError = useCallback(
+    (error: Error, errorInfo: React.ErrorInfo) => {
+      setErrorState({
+        hasError: true,
+        error,
+        errorInfo,
+      });
 
-    // Log the error
-    console.error('Error caught by useErrorBoundary:', error, errorInfo);
-  }, []);
+      // Log the error
+      console.error("Error caught by useErrorBoundary:", error, errorInfo); // eslint-disable-line no-console
+    },
+    [],
+  );
 
   const ErrorBoundaryWrapper: React.FC<{
     children: ReactNode;
     fallback?: ReactNode;
   }> = useCallback(
     ({ children, fallback }) => (
-      <ErrorBoundary fallback={fallback} onReset={resetBoundary} onError={handleError}>
+      <ErrorBoundary
+        fallback={fallback}
+        onReset={resetBoundary}
+        onError={handleError}
+      >
         {children}
       </ErrorBoundary>
     ),

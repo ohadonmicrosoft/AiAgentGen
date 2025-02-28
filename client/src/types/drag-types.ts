@@ -13,7 +13,7 @@ export interface DragState {
   isDragging: boolean;
   startPosition: Position | null;
   currentPosition: Position | null;
-  draggedItem: any | null;
+  draggedItem: any | null; // eslint-disable-line @typescript-eslint/no-explicit-any
   draggedId: string | null;
   sourceContainerId: string | null;
   targetContainerId: string | null;
@@ -23,7 +23,7 @@ export interface DragState {
 export interface DraggableItem {
   id: string;
   type: string;
-  [key: string]: any;
+  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 // Container that can accept dropped items
@@ -48,7 +48,7 @@ export interface DroppableConfig {
   id: string;
   accepts: string[];
   isDisabled?: boolean;
-  orientation?: 'vertical' | 'horizontal';
+  orientation?: "vertical" | "horizontal";
   onDragEnter?: (item: DraggableItem) => void;
   onDragLeave?: (item: DraggableItem) => void;
   onDrop?: (result: DragResult) => void;

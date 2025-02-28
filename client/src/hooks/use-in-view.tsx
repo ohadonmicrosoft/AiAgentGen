@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { type MutableRefObject, useEffect, useRef, useState } from "react";
 
 export interface UseInViewOptions {
   /**
@@ -60,7 +60,7 @@ export interface UseInViewResult<T extends Element = Element> {
  */
 export function useInView<T extends Element = Element>({
   root = null,
-  rootMargin = '0px',
+  rootMargin = "0px",
   threshold = 0,
   triggerOnce = false,
   skip = false,
@@ -119,13 +119,16 @@ export function useInView<T extends Element = Element>({
  */
 export function InView<T extends Element = Element>({
   children,
-  as = 'div',
+  as = "div",
   onChange,
   ...options
 }: UseInViewOptions & {
   children:
     | React.ReactNode
-    | ((inView: boolean, entry: IntersectionObserverEntry | null) => React.ReactNode);
+    | ((
+        inView: boolean,
+        entry: IntersectionObserverEntry | null,
+      ) => React.ReactNode);
   as?: React.ElementType;
   onChange?: (inView: boolean, entry: IntersectionObserverEntry | null) => void;
 }) {
@@ -142,7 +145,7 @@ export function InView<T extends Element = Element>({
 
   return (
     <Component ref={ref}>
-      {typeof children === 'function' ? children(inView, entry) : children}
+      {typeof children === "function" ? children(inView, entry) : children}
     </Component>
   );
 }

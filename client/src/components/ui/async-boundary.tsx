@@ -1,7 +1,8 @@
-import { ErrorBoundary } from '@/components/ui/error-boundary';
-import { ErrorFallback } from '@/components/ui/error-fallback';
-import { Skeleton } from '@/components/ui/skeleton';
-import React, { ReactNode, Suspense } from 'react';
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { ErrorFallback } from "@/components/ui/error-fallback";
+import { Skeleton } from "@/components/ui/skeleton";
+import type React from "react";
+import { type ReactNode, Suspense } from "react";
 
 interface AsyncBoundaryProps {
   children: ReactNode;
@@ -65,9 +66,9 @@ export function AsyncBoundary({
  */
 export function withAsyncBoundary<P extends object>(
   Component: React.ComponentType<P>,
-  options?: Omit<AsyncBoundaryProps, 'children'>,
+  options?: Omit<AsyncBoundaryProps, "children">,
 ): React.FC<P> {
-  const displayName = Component.displayName || Component.name || 'Component';
+  const displayName = Component.displayName || Component.name || "Component";
 
   const WrappedComponent: React.FC<P> = (props) => (
     <AsyncBoundary {...options}>
@@ -94,7 +95,7 @@ export function withAsyncBoundary<P extends object>(
  *   )}
  *   onError={(error, info) => {
  *     // Log error to a service
- *     console.error('Caught error:', error, info);
+ *     console.error('Caught error:', error, info); // eslint-disable-line no-console
  *   }}
  * >
  *   <DataComponent />

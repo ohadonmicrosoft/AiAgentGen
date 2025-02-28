@@ -121,8 +121,8 @@ Utilities for standardized API error handling.
 
 ```tsx
 try {
-  const response = await fetch('/api/data');
-  await checkResponse(response, '/api/data');
+  const response = await fetch("/api/data");
+  await checkResponse(response, "/api/data");
   const data = await response.json();
   // Process data
 } catch (error) {
@@ -155,7 +155,7 @@ function UserProfile() {
   const [fetchApi, { data, isLoading, error }] = useApi<User>();
 
   useEffect(() => {
-    fetchApi('/api/user/profile');
+    fetchApi("/api/user/profile");
   }, [fetchApi]);
 
   if (isLoading) return <LoadingSpinner />;
@@ -188,15 +188,15 @@ Comprehensive logging system for both client and server.
 
 ```tsx
 // Client-side
-import { logger } from '@/lib/logger';
+import { logger } from "@/lib/logger";
 
-logger.info('User action completed', { userId: '123', action: 'save' });
-logger.error('Failed to save data', error, { component: 'UserForm' });
+logger.info("User action completed", { userId: "123", action: "save" });
+logger.error("Failed to save data", error, { component: "UserForm" });
 
 // Server-side
-import { logger } from './api/logs';
+import { logger } from "./api/logs";
 
-logger.info('API request received', { endpoint: '/api/users', method: 'GET' });
+logger.info("API request received", { endpoint: "/api/users", method: "GET" });
 ```
 
 ## Implementation Strategy

@@ -1,5 +1,5 @@
-import { RefObject, useEffect, useRef, useState } from 'react';
-import { useReducedMotion } from './useReducedMotion';
+import { type RefObject, useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "./useReducedMotion";
 
 interface ScrollAnimationOptions {
   threshold?: number;
@@ -14,7 +14,7 @@ interface ScrollAnimationOptions {
 export function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
   options: ScrollAnimationOptions = {},
 ): [RefObject<T>, boolean] {
-  const { threshold = 0.1, rootMargin = '0px', triggerOnce = true } = options;
+  const { threshold = 0.1, rootMargin = "0px", triggerOnce = true } = options;
 
   const ref = useRef<T>(null);
   const [isVisible, setIsVisible] = useState(false);

@@ -1,30 +1,30 @@
 // Service Worker for AI Agent Generator
 // Version: 1.0.0
 
-const CACHE_NAME = 'ai-agent-generator-cache-v1';
-const RUNTIME_CACHE = 'ai-agent-generator-runtime-v1';
+const CACHE_NAME = "ai-agent-generator-cache-v1";
+const RUNTIME_CACHE = "ai-agent-generator-runtime-v1";
 
 // Resources to cache immediately on install
 const PRECACHE_URLS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/assets/index.css',
-  '/assets/index.js',
-  '/assets/vendor.js',
-  '/assets/ui.js',
-  '/assets/form.js',
-  '/assets/charts.js',
-  '/favicon.ico',
-  '/logo192.png',
-  '/logo512.png',
+  "/",
+  "/index.html",
+  "/manifest.json",
+  "/assets/index.css",
+  "/assets/index.js",
+  "/assets/vendor.js",
+  "/assets/ui.js",
+  "/assets/form.js",
+  "/assets/charts.js",
+  "/favicon.ico",
+  "/logo192.png",
+  "/logo512.png",
 ];
 
 // API routes that should be network-first with fallback to cache
-const API_ROUTES = ['/api/user', '/api/agents', '/api/prompts'];
+const API_ROUTES = ["/api/user", "/api/agents", "/api/prompts"];
 
 // Install event - precache static assets
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
@@ -36,14 +36,16 @@ self.addEventListener('install', (event) => {
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   const currentCaches = [CACHE_NAME, RUNTIME_CACHE];
 
   event.waitUntil(
     caches
       .keys()
       .then((cacheNames) => {
-        return cacheNames.filter((cacheName) => !currentCaches.includes(cacheName));
+        return cacheNames.filter(
+          (cacheName) => !currentCaches.includes(cacheName),
+        );
       })
       .then((cachesToDelete) => {
         return Promise.all(
@@ -64,28 +66,28 @@ function isApiRoute(url) {
 // Helper function to determine if a request is for a static asset
 function isStaticAsset(url) {
   return (
-    url.pathname.startsWith('/assets/') ||
-    url.pathname.startsWith('/static/') ||
-    url.pathname.endsWith('.png') ||
-    url.pathname.endsWith('.jpg') ||
-    url.pathname.endsWith('.svg') ||
-    url.pathname.endsWith('.ico') ||
-    url.pathname.endsWith('.css') ||
-    url.pathname.endsWith('.js')
+    url.pathname.startsWith("/assets/") ||
+    url.pathname.startsWith("/static/") ||
+    url.pathname.endsWith(".png") ||
+    url.pathname.endsWith(".jpg") ||
+    url.pathname.endsWith(".svg") ||
+    url.pathname.endsWith(".ico") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".js")
   );
 }
 
 // Helper function to determine if a request is for an HTML page
 function isHtmlPage(url) {
   return (
-    url.pathname === '/' ||
-    url.pathname.endsWith('.html') ||
-    (!url.pathname.includes('.') && !url.pathname.startsWith('/api/'))
+    url.pathname === "/" ||
+    url.pathname.endsWith(".html") ||
+    (!url.pathname.includes(".") && !url.pathname.startsWith("/api/"))
   );
 }
 
 // Fetch event - handle requests with appropriate strategies
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
   // Skip cross-origin requests
@@ -163,7 +165,7 @@ self.addEventListener('fetch', (event) => {
             }
 
             // If no cached response, serve the offline page
-            return caches.match('/index.html');
+            return caches.match("/index.html");
           });
         }),
     );
@@ -175,7 +177,7 @@ self.addEventListener('fetch', (event) => {
     fetch(event.request)
       .then((response) => {
         // Don't cache non-GET requests
-        if (event.request.method !== 'GET') {
+        if (event.request.method !== "GET") {
           return response;
         }
 
@@ -196,15 +198,15 @@ self.addEventListener('fetch', (event) => {
 });
 
 // Handle messages from clients
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 });
 
 // Background sync for offline form submissions
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-forms') {
+self.addEventListener("sync", (event) => {
+  if (event.tag === "sync-forms") {
     event.waitUntil(syncForms());
   }
 });
@@ -214,8 +216,8 @@ async function syncForms() {
   try {
     // Open the IndexedDB database
     const db = await openDatabase();
-    const tx = db.transaction('offline-forms', 'readwrite');
-    const store = tx.objectStore('offline-forms');
+    const tx = db.transaction("offline-forms", "readwrite");
+    const store = tx.objectStore("offline-forms");
 
     // Get all stored form submissions
     const forms = await store.getAll();
@@ -228,7 +230,7 @@ async function syncForms() {
           method: form.method,
           headers: form.headers,
           body: form.body,
-          credentials: 'include',
+          credentials: "include",
         });
 
         if (response.ok) {
@@ -236,27 +238,27 @@ async function syncForms() {
           await store.delete(form.id);
         }
       } catch (error) {
-        console.error('Failed to sync form:', error);
+        console.error("Failed to sync form:", error);
       }
     }
 
     await tx.complete;
   } catch (error) {
-    console.error('Error syncing forms:', error);
+    console.error("Error syncing forms:", error);
   }
 }
 
 // Helper function to open the IndexedDB database
 function openDatabase() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('offline-storage', 1);
+    const request = indexedDB.open("offline-storage", 1);
 
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
 
       // Create object stores if they don't exist
-      if (!db.objectStoreNames.contains('offline-forms')) {
-        db.createObjectStore('offline-forms', { keyPath: 'id' });
+      if (!db.objectStoreNames.contains("offline-forms")) {
+        db.createObjectStore("offline-forms", { keyPath: "id" });
       }
     };
 

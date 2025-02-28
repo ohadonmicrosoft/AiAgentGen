@@ -1,21 +1,35 @@
-import AgentTester from '@/components/AgentTester';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import MainLayout from '@/layouts/MainLayout';
-import { getQueryFn } from '@/lib/queryClient';
-import { Agent } from '@shared/schema';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Bot, Cog, History, Loader2, Save, Wand2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useParams } from 'wouter';
+import AgentTester from "@/components/AgentTester";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MainLayout from "@/layouts/MainLayout";
+import { getQueryFn } from "@/lib/queryClient";
+import type { Agent } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
+import {
+  ArrowLeft,
+  Bot,
+  Cog,
+  History,
+  Loader2,
+  Save,
+  Wand2,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useParams } from "wouter";
 
 export default function TestAgentPage() {
   const [_, setLocation] = useLocation();
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<string>('test');
+  const [activeTab, setActiveTab] = useState<string>("test");
 
   // If we have an ID, fetch the agent
   const {
@@ -23,28 +37,28 @@ export default function TestAgentPage() {
     isLoading,
     error,
   } = useQuery<Agent>({
-    queryKey: ['/api/agents', id],
-    queryFn: getQueryFn({ on401: 'throw' }),
+    queryKey: ["/api/agents", id],
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!id,
   });
 
   // Log agent data for debugging
   useEffect(() => {
     if (agent) {
-      console.log('Agent data loaded:', agent);
+      console.log("Agent data loaded:", agent); // eslint-disable-line no-console
     }
   }, [agent]);
 
   // If we don't have an ID, we'll use a temporary agent
   const tempAgent: Partial<Agent> = {
-    name: 'Test Agent',
-    description: 'This is a temporary agent for testing',
+    name: "Test Agent",
+    description: "This is a temporary agent for testing",
     systemPrompt:
-      'You are a helpful, creative, clever, and friendly AI assistant. Your purpose is to engage in natural, helpful conversations. You have a cheerful, optimistic, and supportive personality. You help users with their questions and problems to the best of your ability. You respond to questions conversationally.',
-    model: 'gpt-4o',
-    temperature: '0.7',
+      "You are a helpful, creative, clever, and friendly AI assistant. Your purpose is to engage in natural, helpful conversations. You have a cheerful, optimistic, and supportive personality. You help users with their questions and problems to the best of your ability. You respond to questions conversationally.",
+    model: "gpt-4o",
+    temperature: "0.7",
     maxTokens: 1000,
-    status: 'draft',
+    status: "draft",
   };
 
   const currentAgent = id ? agent : tempAgent;
@@ -65,9 +79,9 @@ export default function TestAgentPage() {
         <div className="flex flex-col items-center justify-center gap-4 min-h-[500px]">
           <h2 className="text-2xl font-bold">Error Loading Agent</h2>
           <p className="text-muted-foreground">
-            {error instanceof Error ? error.message : 'Failed to load agent'}
+            {error instanceof Error ? error.message : "Failed to load agent"}
           </p>
-          <Button onClick={() => setLocation('/agents')}>
+          <Button onClick={() => setLocation("/agents")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Agents
           </Button>
@@ -77,7 +91,7 @@ export default function TestAgentPage() {
   }
 
   return (
-    <MainLayout title={id ? `Testing: ${currentAgent?.name}` : 'Test an Agent'}>
+    <MainLayout title={id ? `Testing: ${currentAgent?.name}` : "Test an Agent"}>
       <div className="flex flex-col space-y-6">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -88,11 +102,15 @@ export default function TestAgentPage() {
               </Button>
             </Link>
             <h1 className="text-2xl font-bold">
-              {id ? currentAgent?.name : 'Test Agent Configuration'}
+              {id ? currentAgent?.name : "Test Agent Configuration"}
             </h1>
             {currentAgent?.status && (
-              <Badge variant={currentAgent.status === 'active' ? 'default' : 'secondary'}>
-                {currentAgent.status === 'active' ? 'Active' : 'Draft'}
+              <Badge
+                variant={
+                  currentAgent.status === "active" ? "default" : "secondary"
+                }
+              >
+                {currentAgent.status === "active" ? "Active" : "Draft"}
               </Badge>
             )}
           </div>
@@ -105,7 +123,7 @@ export default function TestAgentPage() {
                   Edit Agent
                 </Button>
               </Link>
-              {currentAgent?.status !== 'active' && (
+              {currentAgent?.status !== "active" && (
                 <Button>
                   <Save className="mr-2 h-4 w-4" />
                   Activate Agent
@@ -115,7 +133,11 @@ export default function TestAgentPage() {
           )}
         </div>
 
-        <Tabs defaultValue="test" value={activeTab} onValueChange={setActiveTab}>
+        <Tabs
+          defaultValue="test"
+          value={activeTab}
+          onValueChange={setActiveTab}
+        >
           <TabsList className="grid w-full md:w-[600px] grid-cols-3">
             <TabsTrigger value="test">
               <Bot className="mr-2 h-4 w-4" />
@@ -142,23 +164,29 @@ export default function TestAgentPage() {
                   <History className="h-5 w-5 text-primary" />
                   Conversation History
                 </CardTitle>
-                <CardDescription>View past conversations with this agent</CardDescription>
+                <CardDescription>
+                  View past conversations with this agent
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {id ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-2">
-                      To manage conversation history, go to the Test Agent tab and use the History
-                      button.
+                      To manage conversation history, go to the Test Agent tab
+                      and use the History button.
                     </p>
-                    <Button variant="outline" onClick={() => setActiveTab('test')}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setActiveTab("test")}
+                    >
                       Go to Test Agent
                     </Button>
                   </div>
                 ) : (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-2">
-                      You need to save this agent before you can use conversation history.
+                      You need to save this agent before you can use
+                      conversation history.
                     </p>
                   </div>
                 )}
@@ -173,18 +201,22 @@ export default function TestAgentPage() {
                   <Wand2 className="h-5 w-5 text-primary" />
                   Agent Configuration
                 </CardTitle>
-                <CardDescription>These are the current settings for this agent</CardDescription>
+                <CardDescription>
+                  These are the current settings for this agent
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <h3 className="font-medium">Model</h3>
-                    <p className="text-sm">{currentAgent?.model || 'gpt-4o'}</p>
+                    <p className="text-sm">{currentAgent?.model || "gpt-4o"}</p>
                   </div>
 
                   <div className="space-y-2">
                     <h3 className="font-medium">Temperature</h3>
-                    <p className="text-sm">{currentAgent?.temperature || 0.7}</p>
+                    <p className="text-sm">
+                      {currentAgent?.temperature || 0.7}
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -194,7 +226,7 @@ export default function TestAgentPage() {
 
                   <div className="space-y-2">
                     <h3 className="font-medium">Status</h3>
-                    <p className="text-sm">{currentAgent?.status || 'draft'}</p>
+                    <p className="text-sm">{currentAgent?.status || "draft"}</p>
                   </div>
                 </div>
 

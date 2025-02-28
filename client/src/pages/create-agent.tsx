@@ -1,6 +1,6 @@
-import AgentWizard from '@/components/wizard/AgentWizard';
-import MainLayout from '@/layouts/MainLayout';
-import { useState } from 'react';
+import AgentWizard from "@/components/wizard/AgentWizard";
+import MainLayout from "@/layouts/MainLayout";
+import { useState } from "react";
 
 export default function CreateAgent() {
   return (

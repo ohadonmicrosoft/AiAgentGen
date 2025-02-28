@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export function useLocalStorage<T>(
   key: string,
@@ -8,7 +8,7 @@ export function useLocalStorage<T>(
   // parse stored json or return initialValue
   const readValue = (): T => {
     // Prevent build error "window is undefined" but keep working
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return initialValue;
     }
 
@@ -16,7 +16,7 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key);
       return item ? (JSON.parse(item) as T) : initialValue;
     } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error);
+      console.warn(`Error reading localStorage key "${key}":`, error); // eslint-disable-line no-console
       return initialValue;
     }
   };
@@ -30,17 +30,18 @@ export function useLocalStorage<T>(
   const setValue = (value: T | ((val: T) => T)) => {
     try {
       // Allow value to be a function so we have the same API as useState
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value;
 
       // Save to state
       setStoredValue(valueToStore);
 
       // Save to local storage
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
       }
     } catch (error) {
-      console.warn(`Error setting localStorage key "${key}":`, error);
+      console.warn(`Error setting localStorage key "${key}":`, error); // eslint-disable-line no-console
     }
   };
 
@@ -56,9 +57,9 @@ export function useLocalStorage<T>(
       }
     };
 
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', handleStorageChange);
-      return () => window.removeEventListener('storage', handleStorageChange);
+    if (typeof window !== "undefined") {
+      window.addEventListener("storage", handleStorageChange);
+      return () => window.removeEventListener("storage", handleStorageChange);
     }
   }, [key]);
 

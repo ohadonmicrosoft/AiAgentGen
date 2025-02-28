@@ -1,18 +1,19 @@
-import { useReducedMotion } from '@/hooks/animations/useReducedMotion';
-import { useInView } from '@/hooks/use-in-view';
+import { useReducedMotion } from "@/hooks/animations/useReducedMotion";
+import { useInView } from "@/hooks/use-in-view";
 import {
-  ImageLoadingMode,
-  ImageOptimizationOptions,
+  type ImageLoadingMode,
+  type ImageOptimizationOptions,
   getBestSupportedFormat,
   getLowQualityImagePlaceholder,
   getOptimizedImageUrl,
   getResponsiveSrcSet,
   preloadImage,
-} from '@/lib/image-optimization';
-import { cn } from '@/lib/utils';
-import React, { useState, useEffect, useRef, memo } from 'react';
+} from "@/lib/image-optimization";
+import { cn } from "@/lib/utils";
+import React, { useState, useEffect, useRef, memo } from "react";
 
-export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+export interface OptimizedImageProps
+  extends React.ImgHTMLAttributes<HTMLImageElement> {
   /**
    * Source URL of the image
    */
@@ -83,7 +84,7 @@ export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageEl
    * Object fit style
    * @default 'cover'
    */
-  objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  objectFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
 
   /**
    * Priority loading (sets loading='eager' and fetchpriority='high')
@@ -124,7 +125,10 @@ export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageEl
 /**
  * A responsive, optimized image component with blur-up loading effect
  */
-const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImageProps>(
+const OptimizedImageComponent = React.forwardRef<
+  HTMLImageElement,
+  OptimizedImageProps
+>(
   (
     {
       src,
@@ -134,19 +138,19 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
       height,
       aspectRatio,
       responsiveWidths = [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-      loading: initialLoading = 'lazy',
+      loading: initialLoading = "lazy",
       useModernFormat = true,
       quality = 80,
       containerClassName,
       className,
       fill = false,
-      objectFit = 'cover',
+      objectFit = "cover",
       priority = false,
       imageOptions = {},
       style,
       sizes,
       threshold = 0.1,
-      rootMargin = '200px',
+      rootMargin = "200px",
       disableAnimation = false,
       nativeLazyLoading = true,
       ...props
@@ -167,11 +171,15 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
     });
 
     // Override loading mode if priority is set
-    const loading = priority ? 'eager' : nativeLazyLoading ? initialLoading : undefined;
-    const fetchPriority = priority ? 'high' : undefined;
+    const loading = priority
+      ? "eager"
+      : nativeLazyLoading
+        ? initialLoading
+        : undefined;
+    const fetchPriority = priority ? "high" : undefined;
 
     // Get best supported image format if enabled
-    const format = useModernFormat ? getBestSupportedFormat() : 'original';
+    const format = useModernFormat ? getBestSupportedFormat() : "original";
 
     // Combine options
     const options: Partial<ImageOptimizationOptions> = {
@@ -187,7 +195,7 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
     const optimizedSrc = getOptimizedImageUrl(src, options);
 
     // Generate a low quality placeholder for blur-up effect
-    const placeholderSrc = blurUp ? getLowQualityImagePlaceholder(src) : '';
+    const placeholderSrc = blurUp ? getLowQualityImagePlaceholder(src) : "";
 
     // Generate srcset for responsive images
     const srcSet = width
@@ -213,9 +221,9 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
       ...(fill
         ? {
             objectFit,
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
+            position: "absolute",
+            width: "100%",
+            height: "100%",
             inset: 0,
           }
         : {}),
@@ -251,25 +259,26 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
       return (
         <div
           className={cn(
-            'bg-muted flex items-center justify-center text-muted-foreground',
+            "bg-muted flex items-center justify-center text-muted-foreground",
             containerClassName,
           )}
           style={aspectRatioStyle}
         >
-          <span>{alt || 'Image failed to load'}</span>
+          <span>{alt || "Image failed to load"}</span>
         </div>
       );
     }
 
     // Determine blur animation duration based on reduced motion preference
-    const blurAnimationDuration = disableAnimation || prefersReducedMotion ? 0 : 300;
+    const blurAnimationDuration =
+      disableAnimation || prefersReducedMotion ? 0 : 300;
 
     // Determine if we need a container
     if (fill || containerClassName) {
       return (
         <div
           ref={inViewRef as React.RefObject<HTMLDivElement>}
-          className={cn('relative overflow-hidden', containerClassName)}
+          className={cn("relative overflow-hidden", containerClassName)}
           style={aspectRatioStyle}
           data-testid="optimized-image-container"
         >
@@ -277,13 +286,13 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
             <img
               src={placeholderSrc}
               alt={alt}
-              className={cn('transition-opacity w-full h-full', className)}
+              className={cn("transition-opacity w-full h-full", className)}
               style={{
                 ...combinedStyles,
-                filter: 'blur(15px)',
+                filter: "blur(15px)",
                 objectFit,
                 opacity: isLoaded ? 0 : 1,
-                position: 'absolute',
+                position: "absolute",
                 inset: 0,
                 transitionDuration: `${blurAnimationDuration}ms`,
               }}
@@ -293,14 +302,24 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
 
           <img
             ref={combinedRef}
-            src={nativeLazyLoading ? optimizedSrc : priority ? optimizedSrc : undefined}
+            src={
+              nativeLazyLoading
+                ? optimizedSrc
+                : priority
+                  ? optimizedSrc
+                  : undefined
+            }
             alt={alt}
             width={width}
             height={height}
             loading={loading}
             onLoad={() => setIsLoaded(true)}
             onError={() => setError(true)}
-            className={cn('transition-opacity', !isLoaded && blurUp && 'opacity-0', className)}
+            className={cn(
+              "transition-opacity",
+              !isLoaded && blurUp && "opacity-0",
+              className,
+            )}
             style={{
               ...combinedStyles,
               transitionDuration: `${blurAnimationDuration}ms`,
@@ -308,7 +327,7 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
             sizes={sizes}
             srcSet={nativeLazyLoading ? srcSet : undefined}
             fetchPriority={fetchPriority}
-            decoding={priority ? 'sync' : 'async'}
+            decoding={priority ? "sync" : "async"}
             {...props}
           />
         </div>
@@ -322,10 +341,10 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
           <img
             src={placeholderSrc}
             alt={alt}
-            className={cn('transition-opacity absolute', className)}
+            className={cn("transition-opacity absolute", className)}
             style={{
               ...combinedStyles,
-              filter: 'blur(15px)',
+              filter: "blur(15px)",
               opacity: isLoaded ? 0 : 1,
               transitionDuration: `${blurAnimationDuration}ms`,
             }}
@@ -335,14 +354,24 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
 
         <img
           ref={combinedRef}
-          src={nativeLazyLoading ? optimizedSrc : priority || inView ? optimizedSrc : undefined}
+          src={
+            nativeLazyLoading
+              ? optimizedSrc
+              : priority || inView
+                ? optimizedSrc
+                : undefined
+          }
           alt={alt}
           width={width}
           height={height}
           loading={loading}
           onLoad={() => setIsLoaded(true)}
           onError={() => setError(true)}
-          className={cn('transition-opacity', !isLoaded && blurUp && 'opacity-0', className)}
+          className={cn(
+            "transition-opacity",
+            !isLoaded && blurUp && "opacity-0",
+            className,
+          )}
           style={{
             ...combinedStyles,
             transitionDuration: `${blurAnimationDuration}ms`,
@@ -350,7 +379,7 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
           sizes={sizes}
           srcSet={nativeLazyLoading ? srcSet : undefined}
           fetchPriority={fetchPriority}
-          decoding={priority ? 'sync' : 'async'}
+          decoding={priority ? "sync" : "async"}
           {...props}
         />
       </>
@@ -358,7 +387,7 @@ const OptimizedImageComponent = React.forwardRef<HTMLImageElement, OptimizedImag
   },
 );
 
-OptimizedImageComponent.displayName = 'OptimizedImage';
+OptimizedImageComponent.displayName = "OptimizedImage";
 
 // Helper to combine refs
 function useCombinedRefs<T>(
@@ -369,7 +398,7 @@ function useCombinedRefs<T>(
       refs.forEach((ref) => {
         if (!ref) return;
 
-        if (typeof ref === 'function') {
+        if (typeof ref === "function") {
           ref(element);
         } else {
           (ref as React.MutableRefObject<T | null>).current = element;
@@ -388,11 +417,13 @@ export const OptimizedImage = memo(OptimizedImageComponent);
  * @param images Array of image URLs or objects with src and options
  */
 export function preloadImages(
-  images: Array<string | { src: string; options?: Partial<ImageOptimizationOptions> }>,
+  images: Array<
+    string | { src: string; options?: Partial<ImageOptimizationOptions> }
+  >,
 ): void {
   images.forEach((image) => {
-    const src = typeof image === 'string' ? image : image.src;
-    const options = typeof image === 'string' ? undefined : image.options;
+    const src = typeof image === "string" ? image : image.src;
+    const options = typeof image === "string" ? undefined : image.options;
 
     preloadImage(src, options).catch(() => {
       // Silently catch errors for preloading
@@ -405,7 +436,7 @@ export function preloadImages(
  */
 export const OptimizedBackgroundImage = React.forwardRef<
   HTMLDivElement,
-  Omit<OptimizedImageProps, 'alt'> & { children?: React.ReactNode }
+  Omit<OptimizedImageProps, "alt"> & { children?: React.ReactNode }
 >(
   (
     {
@@ -420,7 +451,7 @@ export const OptimizedBackgroundImage = React.forwardRef<
     },
     ref,
   ) => {
-    const format = useModernFormat ? getBestSupportedFormat() : 'original';
+    const format = useModernFormat ? getBestSupportedFormat() : "original";
 
     const options: Partial<ImageOptimizationOptions> = {
       ...imageOptions,
@@ -433,7 +464,7 @@ export const OptimizedBackgroundImage = React.forwardRef<
     return (
       <div
         ref={ref}
-        className={cn('bg-no-repeat bg-cover bg-center', className)}
+        className={cn("bg-no-repeat bg-cover bg-center", className)}
         style={{
           backgroundImage: `url(${optimizedSrc})`,
           ...style,
@@ -446,4 +477,4 @@ export const OptimizedBackgroundImage = React.forwardRef<
   },
 );
 
-OptimizedBackgroundImage.displayName = 'OptimizedBackgroundImage';
+OptimizedBackgroundImage.displayName = "OptimizedBackgroundImage";

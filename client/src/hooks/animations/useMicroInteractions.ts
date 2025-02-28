@@ -1,4 +1,4 @@
-import { useReducedMotion } from './useReducedMotion';
+import { useReducedMotion } from "./useReducedMotion";
 
 /**
  * Hook to provide micro-interaction animation variants
@@ -29,7 +29,7 @@ export function useMicroInteractions() {
       ? {}
       : {
           y: -4,
-          boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
+          boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
           transition: { duration: 0.2 },
         },
 
@@ -80,7 +80,7 @@ export const microInteractionVariants = {
     off: { x: 0 },
     on: {
       x: 22,
-      transition: { type: 'spring', stiffness: 500, damping: 30 },
+      transition: { type: "spring", stiffness: 500, damping: 30 },
     },
   },
 
@@ -88,7 +88,7 @@ export const microInteractionVariants = {
   dropdown: {
     closed: { height: 0, opacity: 0 },
     open: {
-      height: 'auto',
+      height: "auto",
       opacity: 1,
       transition: { duration: 0.3 },
     },

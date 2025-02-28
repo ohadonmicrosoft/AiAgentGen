@@ -34,10 +34,10 @@ The central utility that collects and manages performance metrics:
 performanceMonitor.startMonitoring();
 
 // Record a custom metric
-performanceMonitor.recordMetric('custom-operation', 150, 'ms');
+performanceMonitor.recordMetric("custom-operation", 150, "ms");
 
 // Measure a function's execution time
-performanceMonitor.measureFunction('data-processing', () => {
+performanceMonitor.measureFunction("data-processing", () => {
   // Function to measure
   return processData();
 });
@@ -50,13 +50,13 @@ React hooks for integrating performance monitoring into components:
 ```typescript
 // Monitor component performance
 const { metrics, trackOperation } = usePerformance({
-  name: 'MyComponent',
+  name: "MyComponent",
   trackRenders: true,
   trackFPS: true,
 });
 
 // Measure specific operations
-const { start, end } = useOperationPerformance('MyComponent', 'dataFetch');
+const { start, end } = useOperationPerformance("MyComponent", "dataFetch");
 ```
 
 ### Technical Implementation
@@ -75,7 +75,7 @@ The performance monitoring system uses a combination of browser APIs and custom 
 
 ```typescript
 // Initialize monitoring for the entire application
-import { initializePerformanceMonitoring } from '@/hooks/use-performance';
+import { initializePerformanceMonitoring } from "@/hooks/use-performance";
 
 const { stopMonitoring, getMetrics, clearMetrics } =
   initializePerformanceMonitoring();
@@ -106,14 +106,14 @@ function MyComponent() {
 ### Async Operation Tracking
 
 ```typescript
-import { usePerformance } from '@/hooks/use-performance';
+import { usePerformance } from "@/hooks/use-performance";
 
 function DataList() {
-  const { trackAsyncOperation } = usePerformance({ name: 'DataList' });
+  const { trackAsyncOperation } = usePerformance({ name: "DataList" });
 
   const fetchData = async () => {
-    return trackAsyncOperation('fetchData', async () => {
-      const response = await fetch('/api/data');
+    return trackAsyncOperation("fetchData", async () => {
+      const response = await fetch("/api/data");
       return response.json();
     });
   };

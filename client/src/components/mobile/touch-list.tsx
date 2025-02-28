@@ -1,12 +1,12 @@
-import { withErrorBoundary } from '@/components/ui/error-boundary';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Logger } from '@/lib/logger';
-import { cn } from '@/lib/utils';
-import { AnimatePresence, motion } from 'framer-motion';
-import * as React from 'react';
-import { SwipeContainer } from './swipe-container';
+import { withErrorBoundary } from "@/components/ui/error-boundary";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Logger } from "@/lib/logger";
+import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
+import * as React from "react";
+import { SwipeContainer } from "./swipe-container";
 
-const logger = new Logger('TouchList');
+const logger = new Logger("TouchList");
 
 // Item actions that can be revealed by swiping
 export interface TouchListItemAction {
@@ -37,7 +37,8 @@ export interface TouchListItemAction {
   color?: string;
 }
 
-export interface TouchListItemProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TouchListItemProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Unique identifier for the item
    */
@@ -144,7 +145,7 @@ const TouchListItem = React.forwardRef<HTMLDivElement, TouchListItemProps>(
         // Call the onTap callback
         onTap();
       } catch (error) {
-        logger.error('Error handling item tap:', { error, itemId });
+        logger.error("Error handling item tap:", { error, itemId });
       }
     }, [disabled, onTap, itemId]);
 
@@ -155,7 +156,7 @@ const TouchListItem = React.forwardRef<HTMLDivElement, TouchListItemProps>(
         setShowLeftActions(true);
         setShowRightActions(false);
       } catch (error) {
-        logger.error('Error handling swipe left:', { error, itemId });
+        logger.error("Error handling swipe left:", { error, itemId });
       }
     }, [disabled, leftActions, itemId]);
 
@@ -166,7 +167,7 @@ const TouchListItem = React.forwardRef<HTMLDivElement, TouchListItemProps>(
         setShowRightActions(true);
         setShowLeftActions(false);
       } catch (error) {
-        logger.error('Error handling swipe right:', { error, itemId });
+        logger.error("Error handling swipe right:", { error, itemId });
       }
     }, [disabled, rightActions, itemId]);
 
@@ -182,9 +183,9 @@ const TouchListItem = React.forwardRef<HTMLDivElement, TouchListItemProps>(
         <div
           ref={ref}
           className={cn(
-            'py-3 px-4',
-            divider && 'border-b',
-            disabled && 'opacity-50 pointer-events-none',
+            "py-3 px-4",
+            divider && "border-b",
+            disabled && "opacity-50 pointer-events-none",
             className,
           )}
           onClick={!disabled && onTap ? onTap : undefined}
@@ -196,21 +197,24 @@ const TouchListItem = React.forwardRef<HTMLDivElement, TouchListItemProps>(
     }
 
     // Render the action buttons
-    const renderActionButtons = (actions: TouchListItemAction[], position: 'left' | 'right') => {
+    const renderActionButtons = (
+      actions: TouchListItemAction[],
+      position: "left" | "right",
+    ) => {
       return (
         <div
           className={cn(
-            'absolute top-0 bottom-0 flex h-full',
-            position === 'left' ? 'right-0' : 'left-0',
+            "absolute top-0 bottom-0 flex h-full",
+            position === "left" ? "right-0" : "left-0",
           )}
         >
           {actions.map((action) => (
             <button
               key={action.id}
               className={cn(
-                'h-full px-4 flex items-center justify-center',
-                action.color || 'bg-primary',
-                'text-white',
+                "h-full px-4 flex items-center justify-center",
+                action.color || "bg-primary",
+                "text-white",
               )}
               onClick={(e) => {
                 e.stopPropagation();
@@ -231,9 +235,9 @@ const TouchListItem = React.forwardRef<HTMLDivElement, TouchListItemProps>(
     return (
       <div
         className={cn(
-          'relative overflow-hidden',
-          divider && 'border-b',
-          disabled && 'opacity-50 pointer-events-none',
+          "relative overflow-hidden",
+          divider && "border-b",
+          disabled && "opacity-50 pointer-events-none",
           className,
         )}
         {...props}
@@ -242,25 +246,25 @@ const TouchListItem = React.forwardRef<HTMLDivElement, TouchListItemProps>(
         <AnimatePresence>
           {showLeftActions && leftActions.length > 0 && (
             <motion.div
-              initial={{ x: '100%' }}
+              initial={{ x: "100%" }}
               animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 20 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 20 }}
               className="absolute inset-0"
             >
-              {renderActionButtons(leftActions, 'left')}
+              {renderActionButtons(leftActions, "left")}
             </motion.div>
           )}
 
           {showRightActions && rightActions.length > 0 && (
             <motion.div
-              initial={{ x: '-100%' }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 20 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 20 }}
               className="absolute inset-0"
             >
-              {renderActionButtons(rightActions, 'right')}
+              {renderActionButtons(rightActions, "right")}
             </motion.div>
           )}
         </AnimatePresence>
@@ -269,8 +273,8 @@ const TouchListItem = React.forwardRef<HTMLDivElement, TouchListItemProps>(
         <SwipeContainer
           ref={ref}
           className={cn(
-            'bg-background py-3 px-4',
-            showLeftActions || showRightActions ? 'shadow-md z-10' : '',
+            "bg-background py-3 px-4",
+            showLeftActions || showRightActions ? "shadow-md z-10" : "",
           )}
           onSwipeLeft={handleSwipeLeft}
           onSwipeRight={handleSwipeRight}
@@ -287,7 +291,7 @@ const TouchListItem = React.forwardRef<HTMLDivElement, TouchListItemProps>(
   },
 );
 
-TouchListItem.displayName = 'TouchListItem';
+TouchListItem.displayName = "TouchListItem";
 
 export interface TouchListProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
@@ -299,21 +303,28 @@ export interface TouchListProps extends React.HTMLAttributes<HTMLDivElement> {
 const TouchListBase = React.forwardRef<HTMLDivElement, TouchListProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('border rounded-md overflow-hidden', className)} {...props}>
+      <div
+        ref={ref}
+        className={cn("border rounded-md overflow-hidden", className)}
+        {...props}
+      >
         {children}
       </div>
     );
   },
 );
 
-TouchListBase.displayName = 'TouchListBase';
+TouchListBase.displayName = "TouchListBase";
 
 // Apply error boundaries
 const TouchListWithBoundary = withErrorBoundary(TouchListBase);
-TouchListWithBoundary.displayName = 'TouchList';
+TouchListWithBoundary.displayName = "TouchList";
 
 const TouchListItemWithBoundary = withErrorBoundary(TouchListItem);
-TouchListItemWithBoundary.displayName = 'TouchListItem';
+TouchListItemWithBoundary.displayName = "TouchListItem";
 
 // Export the components
-export { TouchListWithBoundary as TouchList, TouchListItemWithBoundary as TouchListItem };
+export {
+  TouchListWithBoundary as TouchList,
+  TouchListItemWithBoundary as TouchListItem,
+};

@@ -57,8 +57,8 @@ Key technical aspects:
 ### Basic Implementation
 
 ```tsx
-import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { InfiniteScrollLoader } from '@/components/ui/loading-indicator';
+import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
+import { InfiniteScrollLoader } from "@/components/ui/loading-indicator";
 
 function MyList() {
   const [items, setItems] = useState([]);
@@ -102,7 +102,7 @@ const { sentinelRef, isLoading } = useInfiniteScroll({
 });
 
 return (
-  <div ref={containerRef} style={{ height: '500px', overflow: 'auto' }}>
+  <div ref={containerRef} style={{ height: "500px", overflow: "auto" }}>
     {/* List items */}
     <div ref={sentinelRef}>{isLoading && <InfiniteScrollLoader />}</div>
   </div>

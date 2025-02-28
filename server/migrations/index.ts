@@ -1,12 +1,12 @@
-import fs from 'fs';
-import path from 'path';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import postgres from 'postgres';
-import { logger } from '../api/logs';
+import fs from "fs";
+import path from "path";
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import postgres from "postgres";
+import { logger } from "../api/logs";
 
 // Migration tracking table name
-const MIGRATION_TABLE = 'drizzle_migrations';
+const MIGRATION_TABLE = "drizzle_migrations";
 
 // Maximum retry attempts for migrations
 const MAX_RETRY_ATTEMPTS = 3;
@@ -17,17 +17,19 @@ const RETRY_DELAY_MS = 2000;
  */
 export async function runMigrations(migrationDir?: string) {
   // Default to the generated migrations directory
-  const migrationsDir = migrationDir || path.join(process.cwd(), 'migrations');
+  const migrationsDir = migrationDir || path.join(process.cwd(), "migrations");
 
   // Check if USE_MOCK_STORAGE is true
-  if (process.env.USE_MOCK_STORAGE === 'true') {
-    logger.info('Skipping migrations while using mock storage');
+  if (process.env.USE_MOCK_STORAGE === "true") {
+    logger.info("Skipping migrations while using mock storage");
     return;
   }
 
   // Check if DATABASE_URL is defined
   if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL environment variable is required for migrations');
+    throw new Error(
+      "DATABASE_URL environment variable is required for migrations",
+    );
   }
 
   // Check if migrations directory exists
@@ -41,7 +43,7 @@ export async function runMigrations(migrationDir?: string) {
 
   while (retryAttempts < MAX_RETRY_ATTEMPTS) {
     try {
-      logger.info('Starting database migration...', {
+      logger.info("Starting database migration...", {
         migrationsDir,
         attempt: retryAttempts + 1,
       });
@@ -52,7 +54,7 @@ export async function runMigrations(migrationDir?: string) {
         idle_timeout: 30, // Allow the connection to be idle longer during migrations
         connect_timeout: 15, // Longer timeout for initial connection
         prepare: false,
-        ssl: process.env.DATABASE_SSL === 'true',
+        ssl: process.env.DATABASE_SSL === "true",
       });
 
       // Test the connection
@@ -65,12 +67,13 @@ export async function runMigrations(migrationDir?: string) {
         migrationsTable: MIGRATION_TABLE,
       });
 
-      logger.info('Database migrations completed successfully!');
+      logger.info("Database migrations completed successfully!");
       return;
     } catch (error: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       retryAttempts++;
 
-      logger.error('Database migration attempt failed', {
+      logger.error("Database migration attempt failed", {
         error: error.message,
         code: error.code,
         attempt: retryAttempts,
@@ -81,7 +84,7 @@ export async function runMigrations(migrationDir?: string) {
         try {
           await client.end();
         } catch (closeErr) {
-          logger.error('Error closing database connection', {
+          logger.error("Error closing database connection", {
             error: closeErr,
           });
         }
@@ -93,10 +96,12 @@ export async function runMigrations(migrationDir?: string) {
         logger.info(`Retrying migration in ${RETRY_DELAY_MS}ms...`);
         await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
       } else {
-        logger.error('Database migration failed after maximum retry attempts', {
+        logger.error("Database migration failed after maximum retry attempts", {
           error,
         });
-        throw new Error(`Migration failed after ${MAX_RETRY_ATTEMPTS} attempts: ${error.message}`);
+        throw new Error(
+          `Migration failed after ${MAX_RETRY_ATTEMPTS} attempts: ${error.message}`,
+        );
       }
     }
   }
@@ -107,14 +112,14 @@ export async function runMigrations(migrationDir?: string) {
  */
 export async function getMigrationHistory() {
   // Check if USE_MOCK_STORAGE is true
-  if (process.env.USE_MOCK_STORAGE === 'true') {
-    logger.info('Using mock storage - returning empty migration history');
+  if (process.env.USE_MOCK_STORAGE === "true") {
+    logger.info("Using mock storage - returning empty migration history");
     return [];
   }
 
   // Check if DATABASE_URL is defined
   if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL environment variable is required');
+    throw new Error("DATABASE_URL environment variable is required");
   }
 
   let client: ReturnType<typeof postgres> | null = null;
@@ -126,7 +131,7 @@ export async function getMigrationHistory() {
       client = postgres(process.env.DATABASE_URL, {
         max: 1,
         connect_timeout: 10,
-        ssl: process.env.DATABASE_SSL === 'true',
+        ssl: process.env.DATABASE_SSL === "true",
       });
 
       // Test connection
@@ -153,9 +158,10 @@ export async function getMigrationHistory() {
 
       return migrations;
     } catch (error: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       retryAttempts++;
 
-      logger.error('Failed to get migration history', {
+      logger.error("Failed to get migration history", {
         error: error.message,
         code: error.code,
         attempt: retryAttempts,
@@ -166,7 +172,7 @@ export async function getMigrationHistory() {
         try {
           await client.end();
         } catch (closeErr) {
-          logger.error('Error closing database connection', {
+          logger.error("Error closing database connection", {
             error: closeErr,
           });
         }
@@ -192,19 +198,23 @@ export async function getMigrationHistory() {
 /**
  * Check if database is up to date with all migrations
  */
-export async function isDatabaseUpToDate(migrationDir?: string): Promise<boolean> {
+export async function isDatabaseUpToDate(
+  migrationDir?: string,
+): Promise<boolean> {
   // Check if USE_MOCK_STORAGE is true
-  if (process.env.USE_MOCK_STORAGE === 'true') {
-    logger.info('Using mock storage - assuming database is up to date');
+  if (process.env.USE_MOCK_STORAGE === "true") {
+    logger.info("Using mock storage - assuming database is up to date");
     return true;
   }
 
   // Default to the generated migrations directory
-  const migrationsDir = migrationDir || path.join(process.cwd(), 'migrations');
+  const migrationsDir = migrationDir || path.join(process.cwd(), "migrations");
 
   // Check if migrations directory exists
   if (!fs.existsSync(migrationsDir)) {
-    logger.info('No migrations directory found - database is considered up to date');
+    logger.info(
+      "No migrations directory found - database is considered up to date",
+    );
     return true; // No migrations to apply
   }
 
@@ -212,11 +222,13 @@ export async function isDatabaseUpToDate(migrationDir?: string): Promise<boolean
     // Get list of migration files
     const migrationFiles = fs
       .readdirSync(migrationsDir)
-      .filter((f) => f.endsWith('.sql'))
+      .filter((f) => f.endsWith(".sql"))
       .sort();
 
     if (migrationFiles.length === 0) {
-      logger.info('No migration files found - database is considered up to date');
+      logger.info(
+        "No migration files found - database is considered up to date",
+      );
       return true; // No migrations to apply
     }
 
@@ -227,9 +239,9 @@ export async function isDatabaseUpToDate(migrationDir?: string): Promise<boolean
     const isUpToDate = appliedMigrations.length >= migrationFiles.length;
 
     if (isUpToDate) {
-      logger.info('Database is up to date with all migrations');
+      logger.info("Database is up to date with all migrations");
     } else {
-      logger.info('Database needs migrations', {
+      logger.info("Database needs migrations", {
         applied: appliedMigrations.length,
         available: migrationFiles.length,
       });
@@ -237,7 +249,8 @@ export async function isDatabaseUpToDate(migrationDir?: string): Promise<boolean
 
     return isUpToDate;
   } catch (error: any) {
-    logger.error('Failed to check database migration status', {
+    // eslint-disable-line @typescript-eslint/no-explicit-any
+    logger.error("Failed to check database migration status", {
       error: error.message,
       code: error.code,
     });

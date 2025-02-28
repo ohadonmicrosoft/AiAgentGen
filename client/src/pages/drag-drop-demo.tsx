@@ -1,39 +1,55 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DragHandle } from '@/components/ui/drag-handle';
-import { Draggable } from '@/components/ui/draggable';
-import { Droppable } from '@/components/ui/droppable';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DragProvider } from '@/contexts/drag-context';
-import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { MainLayout } from '@/layouts/main-layout';
-import { moveItemBetweenLists, reorderItems } from '@/lib/drag-and-drop';
-import { DragResult, DraggableItem } from '@/types/drag-types';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Bookmark, Check, FileText, Grip, ImageIcon, Plus, Trash2, X } from 'lucide-react';
-import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { DragHandle } from "@/components/ui/drag-handle";
+import { Draggable } from "@/components/ui/draggable";
+import { Droppable } from "@/components/ui/droppable";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DragProvider } from "@/contexts/drag-context";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { MainLayout } from "@/layouts/main-layout";
+import { moveItemBetweenLists, reorderItems } from "@/lib/drag-and-drop";
+import type { DragResult, DraggableItem } from "@/types/drag-types";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Bookmark,
+  Check,
+  FileText,
+  Grip,
+  ImageIcon,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
+import type React from "react";
+import { useState } from "react";
 
 // Demo task type for the kanban board
 interface Task extends DraggableItem {
   id: string;
-  type: 'task';
+  type: "task";
   content: string;
-  priority: 'low' | 'medium' | 'high';
+  priority: "low" | "medium" | "high";
 }
 
 // Demo file type for the file manager
 interface File extends DraggableItem {
   id: string;
-  type: 'file' | 'image';
+  type: "file" | "image";
   name: string;
   size: string;
   icon: React.ReactNode;
 }
 
 export default function DragDropDemo() {
-  const [selectedTab, setSelectedTab] = useState<string>('kanban');
+  const [selectedTab, setSelectedTab] = useState<string>("kanban");
   const prefersReducedMotion = useReducedMotion();
 
   // Kanban Board Demo State
@@ -44,59 +60,59 @@ export default function DragDropDemo() {
     };
   }>({
     todo: {
-      title: 'To Do',
+      title: "To Do",
       tasks: [
         {
-          id: 't1',
-          type: 'task',
-          content: 'Research drag and drop libraries',
-          priority: 'high',
+          id: "t1",
+          type: "task",
+          content: "Research drag and drop libraries",
+          priority: "high",
         },
         {
-          id: 't2',
-          type: 'task',
-          content: 'Create UI components for draggable items',
-          priority: 'medium',
+          id: "t2",
+          type: "task",
+          content: "Create UI components for draggable items",
+          priority: "medium",
         },
         {
-          id: 't3',
-          type: 'task',
-          content: 'Design drop zones with visual feedback',
-          priority: 'medium',
+          id: "t3",
+          type: "task",
+          content: "Design drop zones with visual feedback",
+          priority: "medium",
         },
       ],
     },
     inProgress: {
-      title: 'In Progress',
+      title: "In Progress",
       tasks: [
         {
-          id: 't4',
-          type: 'task',
-          content: 'Implement drag animations',
-          priority: 'high',
+          id: "t4",
+          type: "task",
+          content: "Implement drag animations",
+          priority: "high",
         },
         {
-          id: 't5',
-          type: 'task',
-          content: 'Test on touch devices',
-          priority: 'low',
+          id: "t5",
+          type: "task",
+          content: "Test on touch devices",
+          priority: "low",
         },
       ],
     },
     done: {
-      title: 'Done',
+      title: "Done",
       tasks: [
         {
-          id: 't6',
-          type: 'task',
-          content: 'Set up project structure',
-          priority: 'medium',
+          id: "t6",
+          type: "task",
+          content: "Set up project structure",
+          priority: "medium",
         },
         {
-          id: 't7',
-          type: 'task',
-          content: 'Write documentation',
-          priority: 'low',
+          id: "t7",
+          type: "task",
+          content: "Write documentation",
+          priority: "low",
         },
       ],
     },
@@ -110,45 +126,45 @@ export default function DragDropDemo() {
     };
   }>({
     documents: {
-      title: 'Documents',
+      title: "Documents",
       files: [
         {
-          id: 'f1',
-          type: 'file',
-          name: 'Project Plan.pdf',
-          size: '2.4 MB',
+          id: "f1",
+          type: "file",
+          name: "Project Plan.pdf",
+          size: "2.4 MB",
           icon: <FileText className="h-4 w-4" />,
         },
         {
-          id: 'f2',
-          type: 'file',
-          name: 'Meeting Notes.docx',
-          size: '1.2 MB',
+          id: "f2",
+          type: "file",
+          name: "Meeting Notes.docx",
+          size: "1.2 MB",
           icon: <FileText className="h-4 w-4" />,
         },
       ],
     },
     images: {
-      title: 'Images',
+      title: "Images",
       files: [
         {
-          id: 'f3',
-          type: 'image',
-          name: 'Screenshot.png',
-          size: '3.1 MB',
+          id: "f3",
+          type: "image",
+          name: "Screenshot.png",
+          size: "3.1 MB",
           icon: <ImageIcon className="h-4 w-4" />,
         },
         {
-          id: 'f4',
-          type: 'image',
-          name: 'Profile Picture.jpg',
-          size: '1.8 MB',
+          id: "f4",
+          type: "image",
+          name: "Profile Picture.jpg",
+          size: "1.8 MB",
           icon: <ImageIcon className="h-4 w-4" />,
         },
       ],
     },
     trash: {
-      title: 'Trash',
+      title: "Trash",
       files: [],
     },
   });
@@ -257,12 +273,16 @@ export default function DragDropDemo() {
           <div>
             <h1 className="fluid-h1 font-bold">Drag and Drop System</h1>
             <p className="fluid-body text-muted-foreground mt-2 max-w-3xl">
-              Explore the highly interactive drag and drop system with physics-based animations,
-              visual feedback, and touch support.
+              Explore the highly interactive drag and drop system with
+              physics-based animations, visual feedback, and touch support.
             </p>
           </div>
 
-          <Tabs defaultValue="kanban" onValueChange={setSelectedTab} value={selectedTab}>
+          <Tabs
+            defaultValue="kanban"
+            onValueChange={setSelectedTab}
+            value={selectedTab}
+          >
             <TabsList className="grid w-full max-w-md grid-cols-2">
               <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
               <TabsTrigger value="fileManager">File Manager</TabsTrigger>
@@ -276,12 +296,14 @@ export default function DragDropDemo() {
                     <h3 className="font-medium mb-2">{column.title}</h3>
                     <Droppable
                       id={columnId}
-                      accepts={['task']}
+                      accepts={["task"]}
                       onDrop={handleTaskDrop}
                       className="bg-muted/30 rounded-md p-3 min-h-[300px] flex-1 border"
                       emptyPlaceholder={
                         <div className="flex items-center justify-center h-full">
-                          <p className="text-muted-foreground">Drop tasks here</p>
+                          <p className="text-muted-foreground">
+                            Drop tasks here
+                          </p>
                         </div>
                       }
                     >
@@ -293,7 +315,9 @@ export default function DragDropDemo() {
                             containerId={columnId}
                             dragHandleSelector="[data-drag-handle]"
                             className="mb-2"
-                            dragHandleRender={(dragHandleProps: any) => (
+                            dragHandleRender={(
+                              dragHandleProps: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+                            ) => (
                               <DragHandle
                                 className="absolute top-3 right-2"
                                 variant="minimal"
@@ -314,15 +338,16 @@ export default function DragDropDemo() {
                                 <div className="mt-2 flex items-center">
                                   <span
                                     className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                                      task.priority === 'high'
-                                        ? 'bg-red-500'
-                                        : task.priority === 'medium'
-                                          ? 'bg-yellow-500'
-                                          : 'bg-green-500'
+                                      task.priority === "high"
+                                        ? "bg-red-500"
+                                        : task.priority === "medium"
+                                          ? "bg-yellow-500"
+                                          : "bg-green-500"
                                     }`}
                                   />
                                   <span className="text-xs text-muted-foreground">
-                                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}{' '}
+                                    {task.priority.charAt(0).toUpperCase() +
+                                      task.priority.slice(1)}{" "}
                                     Priority
                                   </span>
                                 </div>
@@ -344,26 +369,34 @@ export default function DragDropDemo() {
                   <Card key={folderId} className="overflow-hidden">
                     <CardHeader className="bg-muted/30 pb-3">
                       <CardTitle className="text-base flex items-center">
-                        {folder.title === 'Documents' && <FileText className="mr-2 h-4 w-4" />}
-                        {folder.title === 'Images' && <ImageIcon className="mr-2 h-4 w-4" />}
-                        {folder.title === 'Trash' && <Trash2 className="mr-2 h-4 w-4" />}
+                        {folder.title === "Documents" && (
+                          <FileText className="mr-2 h-4 w-4" />
+                        )}
+                        {folder.title === "Images" && (
+                          <ImageIcon className="mr-2 h-4 w-4" />
+                        )}
+                        {folder.title === "Trash" && (
+                          <Trash2 className="mr-2 h-4 w-4" />
+                        )}
                         {folder.title}
                       </CardTitle>
                       <CardDescription>
                         {folder.files.length} file
-                        {folder.files.length !== 1 ? 's' : ''}
+                        {folder.files.length !== 1 ? "s" : ""}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
                       <Droppable
                         id={folderId}
-                        accepts={['file', 'image']}
+                        accepts={["file", "image"]}
                         orientation="vertical"
                         onDrop={handleFileDrop}
                         className="min-h-[200px] p-3"
                         emptyPlaceholder={
                           <div className="flex items-center justify-center h-full py-6 border-t">
-                            <p className="text-sm text-muted-foreground">Drop files here</p>
+                            <p className="text-sm text-muted-foreground">
+                              Drop files here
+                            </p>
                           </div>
                         }
                       >
@@ -383,10 +416,16 @@ export default function DragDropDemo() {
                                 transition={{ duration: 0.2 }}
                                 className="flex items-center p-2 hover:bg-muted/50 rounded-md cursor-grab"
                               >
-                                <div className="mr-3 text-muted-foreground">{file.icon}</div>
+                                <div className="mr-3 text-muted-foreground">
+                                  {file.icon}
+                                </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm truncate">{file.name}</p>
-                                  <p className="text-xs text-muted-foreground">{file.size}</p>
+                                  <p className="text-sm truncate">
+                                    {file.name}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {file.size}
+                                  </p>
                                 </div>
                               </motion.div>
                             </Draggable>
@@ -401,7 +440,9 @@ export default function DragDropDemo() {
           </Tabs>
 
           <div className="p-6 bg-muted/20 rounded-lg border mt-8">
-            <h2 className="fluid-h3 font-semibold mb-4">Implementation Details</h2>
+            <h2 className="fluid-h3 font-semibold mb-4">
+              Implementation Details
+            </h2>
             <ul className="space-y-2 list-disc list-inside text-muted-foreground">
               <li>Physics-based animation spring system</li>
               <li>Supports both mouse and touch interactions</li>

@@ -1,5 +1,5 @@
-import { AnimatedFormField } from '@/components/ui/animated-form-field';
-import { Button } from '@/components/ui/button';
+import { AnimatedFormField } from "@/components/ui/animated-form-field";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,8 +7,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { FloatingLabelInput } from '@/components/ui/floating-label-input';
+} from "@/components/ui/card";
+import { FloatingLabelInput } from "@/components/ui/floating-label-input";
 import {
   Form,
   FormControl,
@@ -17,45 +17,45 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import MainLayout from '@/layouts/MainLayout';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import MainLayout from "@/layouts/MainLayout";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 // Define schema
 const formSchema = z
   .object({
-    name: z.string().min(2, 'Name must be at least 2 characters').max(50),
-    email: z.string().email('Please enter a valid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
+    name: z.string().min(2, "Name must be at least 2 characters").max(50),
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ['confirmPassword'],
+    path: ["confirmPassword"],
   });
 
 type FormValues = z.infer<typeof formSchema>;
 
 export default function FormDemo() {
   const prefersReducedMotion = useReducedMotion();
-  const [activeTab, setActiveTab] = useState('standard');
+  const [activeTab, setActiveTab] = useState("standard");
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   // Standard form with default components
   const standardForm = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
@@ -63,10 +63,10 @@ export default function FormDemo() {
   const floatingLabelForm = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
@@ -74,15 +74,18 @@ export default function FormDemo() {
   const animatedForm = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
-  const onSubmit = (values: FormValues, form: 'standard' | 'floating' | 'animated') => {
-    console.log(`Form submitted (${form}):`, values);
+  const onSubmit = (
+    values: FormValues,
+    form: "standard" | "floating" | "animated",
+  ) => {
+    console.log(`Form submitted (${form}):`, values); // eslint-disable-line no-console
     setFormSubmitted(true);
     setTimeout(() => {
       setFormSubmitted(false);
@@ -100,11 +103,16 @@ export default function FormDemo() {
           <div className="max-w-3xl mx-auto">
             <h1 className="text-3xl font-bold mb-6">Form Animation Examples</h1>
             <p className="text-muted-foreground mb-8">
-              This demo showcases different approaches to form animations and enhancements, from
-              standard forms to fully animated form controls with validation feedback.
+              This demo showcases different approaches to form animations and
+              enhancements, from standard forms to fully animated form controls
+              with validation feedback.
             </p>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
               <TabsList className="grid grid-cols-3 mb-8">
                 <TabsTrigger value="standard">Standard Form</TabsTrigger>
                 <TabsTrigger value="floating">Floating Labels</TabsTrigger>
@@ -117,14 +125,15 @@ export default function FormDemo() {
                   <CardHeader>
                     <CardTitle>Standard Form</CardTitle>
                     <CardDescription>
-                      Basic form with standard components and minimal animations.
+                      Basic form with standard components and minimal
+                      animations.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Form {...standardForm}>
                       <form
                         onSubmit={standardForm.handleSubmit((values) =>
-                          onSubmit(values, 'standard'),
+                          onSubmit(values, "standard"),
                         )}
                         className="space-y-6"
                       >
@@ -135,7 +144,10 @@ export default function FormDemo() {
                             <FormItem>
                               <FormLabel>Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter your name" {...field} />
+                                <Input
+                                  placeholder="Enter your name"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormDescription>
                                 Your full name as it appears on your ID.
@@ -152,7 +164,10 @@ export default function FormDemo() {
                             <FormItem>
                               <FormLabel>Email</FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter your email" {...field} />
+                                <Input
+                                  placeholder="Enter your email"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -166,7 +181,11 @@ export default function FormDemo() {
                             <FormItem>
                               <FormLabel>Password</FormLabel>
                               <FormControl>
-                                <Input type="password" placeholder="Create a password" {...field} />
+                                <Input
+                                  type="password"
+                                  placeholder="Create a password"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -206,14 +225,15 @@ export default function FormDemo() {
                   <CardHeader>
                     <CardTitle>Floating Label Form</CardTitle>
                     <CardDescription>
-                      Form with animated floating labels and validation feedback.
+                      Form with animated floating labels and validation
+                      feedback.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Form {...floatingLabelForm}>
                       <form
                         onSubmit={floatingLabelForm.handleSubmit((values) =>
-                          onSubmit(values, 'floating'),
+                          onSubmit(values, "floating"),
                         )}
                         className="space-y-6"
                       >
@@ -226,7 +246,10 @@ export default function FormDemo() {
                                 <FloatingLabelInput
                                   label="Name"
                                   error={fieldState.error?.message}
-                                  success={field.value?.length >= 2 && !fieldState.error}
+                                  success={
+                                    field.value?.length >= 2 &&
+                                    !fieldState.error
+                                  }
                                   required
                                   {...field}
                                 />
@@ -247,7 +270,10 @@ export default function FormDemo() {
                                 <FloatingLabelInput
                                   label="Email"
                                   error={fieldState.error?.message}
-                                  success={field.value?.includes('@') && !fieldState.error}
+                                  success={
+                                    field.value?.includes("@") &&
+                                    !fieldState.error
+                                  }
                                   required
                                   {...field}
                                 />
@@ -266,7 +292,10 @@ export default function FormDemo() {
                                   label="Password"
                                   type="password"
                                   error={fieldState.error?.message}
-                                  success={field.value?.length >= 8 && !fieldState.error}
+                                  success={
+                                    field.value?.length >= 8 &&
+                                    !fieldState.error
+                                  }
                                   required
                                   {...field}
                                 />
@@ -286,7 +315,8 @@ export default function FormDemo() {
                                   type="password"
                                   error={fieldState.error?.message}
                                   success={
-                                    field.value === floatingLabelForm.getValues('password') &&
+                                    field.value ===
+                                      floatingLabelForm.getValues("password") &&
                                     field.value?.length > 0 &&
                                     !fieldState.error
                                   }
@@ -313,14 +343,15 @@ export default function FormDemo() {
                   <CardHeader>
                     <CardTitle>Fully Animated Form</CardTitle>
                     <CardDescription>
-                      Enhanced form with animated form fields, validation, and feedback.
+                      Enhanced form with animated form fields, validation, and
+                      feedback.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Form {...animatedForm}>
                       <form
                         onSubmit={animatedForm.handleSubmit((values) =>
-                          onSubmit(values, 'animated'),
+                          onSubmit(values, "animated"),
                         )}
                         className="space-y-6"
                       >
@@ -332,7 +363,7 @@ export default function FormDemo() {
                           description="Your full name as it appears on your ID."
                           floatingLabel
                           showSuccessState
-                          rules={{ required: 'Name is required' }}
+                          rules={{ required: "Name is required" }}
                         />
 
                         <AnimatedFormField
@@ -342,7 +373,7 @@ export default function FormDemo() {
                           placeholder="Enter your email"
                           floatingLabel
                           showSuccessState
-                          rules={{ required: 'Email is required' }}
+                          rules={{ required: "Email is required" }}
                         />
 
                         <AnimatedFormField
@@ -353,7 +384,7 @@ export default function FormDemo() {
                           placeholder="Create a password"
                           floatingLabel
                           showSuccessState
-                          rules={{ required: 'Password is required' }}
+                          rules={{ required: "Password is required" }}
                         />
 
                         <AnimatedFormField
@@ -364,7 +395,7 @@ export default function FormDemo() {
                           placeholder="Confirm your password"
                           floatingLabel
                           showSuccessState
-                          rules={{ required: 'Please confirm your password' }}
+                          rules={{ required: "Please confirm your password" }}
                         />
 
                         <motion.div
@@ -391,12 +422,14 @@ export default function FormDemo() {
               initial={{ opacity: 0, height: 0 }}
               animate={{
                 opacity: formSubmitted ? 1 : 0,
-                height: formSubmitted ? 'auto' : 0,
+                height: formSubmitted ? "auto" : 0,
               }}
               transition={{ duration: 0.3 }}
             >
               <div className="bg-green-500/10 text-green-600 dark:text-green-400 p-4 rounded-lg">
-                <p className="font-medium text-center">Form submitted successfully!</p>
+                <p className="font-medium text-center">
+                  Form submitted successfully!
+                </p>
               </div>
             </motion.div>
           </div>

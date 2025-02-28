@@ -14,8 +14,8 @@ Code splitting allows us to split the application bundle into smaller chunks tha
 
 ```tsx
 // Example from App.tsx
-const Dashboard = lazy(() => import('@/pages/dashboard'));
-const Agents = lazy(() => import('@/pages/agents'));
+const Dashboard = lazy(() => import("@/pages/dashboard"));
+const Agents = lazy(() => import("@/pages/agents"));
 
 // Usage with Suspense
 <Suspense fallback={<LoadingFallback />}>
@@ -74,8 +74,8 @@ Several techniques were implemented to reduce the overall bundle size of the app
 // vite.config.ts
 export default defineConfig({
   build: {
-    target: 'es2015',
-    minify: 'terser',
+    target: "es2015",
+    minify: "terser",
     terserOptions: {
       compress: {
         drop_console: true,
@@ -85,9 +85,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'wouter'],
-          ui: ['@/components/ui'],
-          utils: ['@/lib/utils'],
+          vendor: ["react", "react-dom", "wouter"],
+          ui: ["@/components/ui"],
+          utils: ["@/lib/utils"],
         },
       },
     },

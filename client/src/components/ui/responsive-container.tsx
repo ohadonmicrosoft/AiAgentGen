@@ -1,8 +1,15 @@
-import { fluidSpacingToClassName, useFluidSpacing } from '@/hooks/use-fluid-spacing';
-import { SpaceScaleKey } from '@/hooks/use-fluid-spacing';
-import { useActiveBreakpoint, useIsMobile, useIsTablet } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
-import { ReactNode, useEffect, useState } from 'react';
+import {
+  fluidSpacingToClassName,
+  useFluidSpacing,
+} from "@/hooks/use-fluid-spacing";
+import type { SpaceScaleKey } from "@/hooks/use-fluid-spacing";
+import {
+  useActiveBreakpoint,
+  useIsMobile,
+  useIsTablet,
+} from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import { type ReactNode, useEffect, useState } from "react";
 
 interface ResponsiveContainerProps {
   children: ReactNode;
@@ -12,7 +19,7 @@ interface ResponsiveContainerProps {
   desktopClassName?: string;
   fullWidth?: boolean;
   withTransition?: boolean;
-  maxWidth?: 'text' | 'ui' | 'full' | number;
+  maxWidth?: "text" | "ui" | "full" | number;
   padding?: SpaceScaleKey | { x?: SpaceScaleKey; y?: SpaceScaleKey };
   margin?: SpaceScaleKey | { x?: SpaceScaleKey; y?: SpaceScaleKey };
   deviceSpecific?: boolean;
@@ -24,10 +31,10 @@ interface ResponsiveContainerProps {
  */
 export function ResponsiveContainer({
   children,
-  className = '',
-  mobileClassName = '',
-  tabletClassName = '',
-  desktopClassName = '',
+  className = "",
+  mobileClassName = "",
+  tabletClassName = "",
+  desktopClassName = "",
   fullWidth = false,
   withTransition = true,
   maxWidth,
@@ -55,7 +62,7 @@ export function ResponsiveContainer({
     isTablet && tabletClassName,
     !isMobile && !isTablet && desktopClassName,
     // Automatically apply fluid container classes if fullWidth is false
-    !fullWidth && 'fluid-container',
+    !fullWidth && "fluid-container",
     // Generate classes from fluid spacing options
     padding && fluidSpacingToClassName({ padding, deviceSpecific }),
     margin && fluidSpacingToClassName({ margin, deviceSpecific }),
@@ -70,7 +77,8 @@ export function ResponsiveContainer({
     ...(!fullWidth && !maxWidth ? {} : spacingStyle),
     ...(withTransition && isClient
       ? {
-          transition: 'padding 0.3s ease, margin 0.3s ease, max-width 0.3s ease',
+          transition:
+            "padding 0.3s ease, margin 0.3s ease, max-width 0.3s ease",
         }
       : {}),
   };
@@ -98,7 +106,7 @@ export function ScreenSizeOnly({
   mobile = false,
   tablet = false,
   desktop = false,
-  className = '',
+  className = "",
 }: ScreenSizeOnlyProps) {
   const [mounted, setMounted] = useState(false);
   const isMobile = useIsMobile();
@@ -126,8 +134,8 @@ export function ScreenSizeOnly({
  */
 export function DeviceAdaptiveContainer({
   children,
-  className = '',
-  horizontalPadding = 'md',
+  className = "",
+  horizontalPadding = "md",
   verticalPadding,
 }: {
   children: ReactNode;
@@ -144,7 +152,7 @@ export function DeviceAdaptiveContainer({
   });
 
   return (
-    <div className={cn('w-full', className)} style={style}>
+    <div className={cn("w-full", className)} style={style}>
       {children}
     </div>
   );

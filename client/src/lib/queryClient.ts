@@ -1,14 +1,14 @@
 import {
   DefaultOptions,
   QueryClient,
-  QueryClientConfig,
-  QueryFunction,
-} from '@tanstack/react-query';
-import { offlinePlugin } from './offline-plugin'; // We'll create this next
+  type QueryClientConfig,
+  type QueryFunction,
+} from "@tanstack/react-query";
+import { offlinePlugin } from "./offline-plugin"; // We'll create this next
 
 export enum UnauthorizedBehavior {
-  Throw = 'throw',
-  ReturnNull = 'returnNull',
+  Throw = "throw",
+  ReturnNull = "returnNull",
 }
 
 type ApiRequestOptions = {
@@ -20,11 +20,12 @@ type ApiRequestOptions = {
 
 // Network error detection
 function isNetworkError(error: any): boolean {
+  // eslint-disable-line @typescript-eslint/no-explicit-any
   return (
     !window.navigator.onLine ||
-    error.message === 'Failed to fetch' ||
-    error.message.includes('NetworkError') ||
-    error.message.includes('Network request failed')
+    error.message === "Failed to fetch" ||
+    error.message.includes("NetworkError") ||
+    error.message.includes("Network request failed")
   );
 }
 
@@ -41,7 +42,12 @@ export async function apiRequest(
   data?: unknown | undefined,
   options?: ApiRequestOptions,
 ): Promise<Response> {
-  const { timeout = 10000, headers = {}, retries = 3, retryDelay = 1000 } = options || {};
+  const {
+    timeout = 10000,
+    headers = {},
+    retries = 3,
+    retryDelay = 1000,
+  } = options || {};
 
   // Add timeout support with AbortController
   const controller = new AbortController();
@@ -49,20 +55,21 @@ export async function apiRequest(
 
   try {
     const defaultHeaders: Record<string, string> = data
-      ? { 'Content-Type': 'application/json' }
+      ? { "Content-Type": "application/json" }
       : {};
 
     const res = await fetch(url, {
       method,
       headers: { ...defaultHeaders, ...headers },
       body: data ? JSON.stringify(data) : undefined,
-      credentials: 'include',
+      credentials: "include",
       signal: controller.signal,
     });
 
     await throwIfResNotOk(res);
     return res;
   } catch (error: any) {
+    // eslint-disable-line @typescript-eslint/no-explicit-any
     // Handle retries for network errors
     if (isNetworkError(error) && retries > 0) {
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
@@ -86,11 +93,14 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey, signal }) => {
     try {
       const res = await fetch(queryKey[0] as string, {
-        credentials: 'include',
+        credentials: "include",
         signal,
       });
 
-      if (unauthorizedBehavior === UnauthorizedBehavior.ReturnNull && res.status === 401) {
+      if (
+        unauthorizedBehavior === UnauthorizedBehavior.ReturnNull &&
+        res.status === 401
+      ) {
         return null;
       }
 
@@ -111,25 +121,25 @@ export const getQueryFn: <T>(options: {
             }),
           );
         } catch (e) {
-          console.warn('Failed to cache query result:', e);
+          console.warn("Failed to cache query result:", e); // eslint-disable-line no-console
         }
       }
 
       return data;
     } catch (error) {
       // Try to use cached data when offline
-      if (isNetworkError(error) && typeof localStorage !== 'undefined') {
+      if (isNetworkError(error) && typeof localStorage !== "undefined") {
         const cachedItem = localStorage.getItem(`query-cache:${queryKey[0]}`);
         if (cachedItem) {
           try {
             const parsed = JSON.parse(cachedItem);
             // Check if cache is valid
             if (parsed.expiry > Date.now()) {
-              console.info('Using cached data for:', queryKey[0]);
+              console.info("Using cached data for:", queryKey[0]); // eslint-disable-line no-console
               return parsed.data;
             }
           } catch (e) {
-            console.warn('Failed to parse cached query result:', e);
+            console.warn("Failed to parse cached query result:", e); // eslint-disable-line no-console
           }
         }
       }

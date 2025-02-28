@@ -1,7 +1,7 @@
-import { jest } from '@jest/globals';
+import { jest } from "@jest/globals";
 
 // Mock postgres module
-jest.mock('postgres', () => {
+jest.mock("postgres", () => {
   const mockSql = jest.fn();
   mockSql.mockReturnValue({
     // Mock basic query methods
@@ -18,7 +18,7 @@ const originalEnv = process.env;
 beforeEach(() => {
   jest.resetModules();
   process.env = { ...originalEnv };
-  process.env.DATABASE_URL = 'postgres://user:pass@localhost:5432/testdb';
+  process.env.DATABASE_URL = "postgres://user:pass@localhost:5432/testdb";
 });
 
 afterEach(() => {
@@ -26,27 +26,27 @@ afterEach(() => {
 });
 
 // Mock logger
-jest.mock('../lib/logger', () => ({
+jest.mock("../lib/logger", () => ({
   debug: jest.fn(),
   info: jest.fn(),
   warn: jest.fn(),
   error: jest.fn(),
 }));
 
-describe('Database Connection', () => {
-  it('should create a connection pool with improved settings', async () => {
+describe("Database Connection", () => {
+  it("should create a connection pool with improved settings", async () => {
     // Import the postgres mock
-    const postgres = require('postgres');
+    import postgres from "postgres";
 
     // Import the db module (which will use our mocked postgres)
-    const { getPool } = require('../db');
+    import { getPool } from "../db";
 
     // Call getPool to initialize the connection
     await getPool();
 
     // Verify postgres was called with improved settings
     expect(postgres).toHaveBeenCalledWith(
-      'postgres://user:pass@localhost:5432/testdb',
+      "postgres://user:pass@localhost:5432/testdb",
       expect.objectContaining({
         max: expect.any(Number),
         idle_timeout: expect.any(Number),
@@ -54,18 +54,18 @@ describe('Database Connection', () => {
         max_lifetime: 60 * 60,
         prepare: false,
         connection: {
-          application_name: 'ai-agent-generator',
+          application_name: "ai-agent-generator",
         },
         onretry: expect.any(Function),
       }),
     );
   });
 
-  it('should retry connection on failure', async () => {
+  it("should retry connection on failure", async () => {
     // Mock postgres to fail on first attempt
-    const postgres = require('postgres');
+    import postgres from "postgres";
     postgres.mockImplementationOnce(() => {
-      throw new Error('Connection failed');
+      throw new Error("Connection failed");
     });
 
     // Second attempt succeeds
@@ -77,7 +77,7 @@ describe('Database Connection', () => {
     }));
 
     // Import the db module
-    const { getPool } = require('../db');
+    import { getPool } from "../db";
 
     // Call getPool which should retry
     const pool = await getPool();
@@ -87,29 +87,29 @@ describe('Database Connection', () => {
     expect(pool).toBeDefined();
   });
 
-  it('should throw after max retry attempts', async () => {
+  it("should throw after max retry attempts", async () => {
     // Mock postgres to always fail
-    const postgres = require('postgres');
+    import postgres from "postgres";
     postgres.mockImplementation(() => {
-      throw new Error('Connection failed');
+      throw new Error("Connection failed");
     });
 
     // Import the db module
-    const { getPool } = require('../db');
+    import { getPool } from "../db";
 
     // Call getPool which should eventually fail
     await expect(getPool()).rejects.toThrow();
   });
 
-  it('should use SSL when configured', async () => {
+  it("should use SSL when configured", async () => {
     // Set SSL to true
-    process.env.DATABASE_SSL = 'true';
+    process.env.DATABASE_SSL = "true";
 
     // Import the postgres mock
-    const postgres = require('postgres');
+    import postgres from "postgres";
 
     // Import the db module
-    const { getPool } = require('../db');
+    import { getPool } from "../db";
 
     // Call getPool
     await getPool();
@@ -123,15 +123,15 @@ describe('Database Connection', () => {
     );
   });
 
-  it('should disable SSL when not configured', async () => {
+  it("should disable SSL when not configured", async () => {
     // Set SSL to false
-    process.env.DATABASE_SSL = 'false';
+    process.env.DATABASE_SSL = "false";
 
     // Import the postgres mock
-    const postgres = require('postgres');
+    import postgres from "postgres";
 
     // Import the db module
-    const { getPool } = require('../db');
+    import { getPool } from "../db";
 
     // Call getPool
     await getPool();
@@ -145,9 +145,9 @@ describe('Database Connection', () => {
     );
   });
 
-  it('should handle connection parameters', async () => {
+  it("should handle connection parameters", async () => {
     // Import the postgres mock
-    const postgres = require('postgres');
+    import postgres from "postgres";
 
     // Create a mock for the onparameter callback
     let parameterCallback: Function | null = null;
@@ -163,8 +163,8 @@ describe('Database Connection', () => {
     });
 
     // Import the db module
-    const { getPool } = require('../db');
-    const logger = require('../lib/logger');
+    import { getPool } from "../db";
+    import logger from "../lib/logger";
 
     // Call getPool
     await getPool();
@@ -174,22 +174,22 @@ describe('Database Connection', () => {
 
     // Call the onparameter callback
     if (parameterCallback) {
-      parameterCallback('timezone', 'UTC');
+      parameterCallback("timezone", "UTC");
     }
 
     // Verify logger.debug was called
     expect(logger.debug).toHaveBeenCalledWith(
-      'Postgres parameter change:',
+      "Postgres parameter change:",
       expect.objectContaining({
-        key: 'timezone',
-        value: 'UTC',
+        key: "timezone",
+        value: "UTC",
       }),
     );
   });
 
-  it('should handle notices', async () => {
+  it("should handle notices", async () => {
     // Import the postgres mock
-    const postgres = require('postgres');
+    import postgres from "postgres";
 
     // Create a mock for the onnotice callback
     let noticeCallback: Function | null = null;
@@ -205,8 +205,8 @@ describe('Database Connection', () => {
     });
 
     // Import the db module
-    const { getPool } = require('../db');
-    const logger = require('../lib/logger');
+    import { getPool } from "../db";
+    import logger from "../lib/logger";
 
     // Call getPool
     await getPool();
@@ -216,14 +216,14 @@ describe('Database Connection', () => {
 
     // Call the onnotice callback
     if (noticeCallback) {
-      noticeCallback({ message: 'Test notice' });
+      noticeCallback({ message: "Test notice" });
     }
 
     // Verify logger.debug was called
     expect(logger.debug).toHaveBeenCalledWith(
-      'Postgres notice:',
+      "Postgres notice:",
       expect.objectContaining({
-        notice: 'Test notice',
+        notice: "Test notice",
       }),
     );
   });
