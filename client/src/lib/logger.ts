@@ -100,7 +100,12 @@ class LoggerService {
   /**
    * Log an error message
    */
-  error(message: string, error?: unknown, context?: Record<string, any>, tags?: string[]): void {
+  error(
+    message: string,
+    error?: unknown,
+    context?: Record<string, any>,
+    tags?: string[],
+  ): void {
     // Format the error if provided
     const errorContext = error
       ? {
@@ -149,7 +154,8 @@ class LoggerService {
    * Check if the log level should be processed
    */
   private shouldLog(level: LogLevel): boolean {
-    const minLevelPriority = LOG_LEVEL_PRIORITY[this.options.minLevel || 'debug'];
+    const minLevelPriority =
+      LOG_LEVEL_PRIORITY[this.options.minLevel || 'debug'];
     const currentLevelPriority = LOG_LEVEL_PRIORITY[level];
     return currentLevelPriority >= minLevelPriority;
   }
@@ -207,7 +213,11 @@ class LoggerService {
    */
   async flush(): Promise<void> {
     // Don't flush if already flushing, no logs, or not enabled
-    if (this.isFlushing || this.logQueue.length === 0 || !this.options.enableRemoteLogging) {
+    if (
+      this.isFlushing ||
+      this.logQueue.length === 0 ||
+      !this.options.enableRemoteLogging
+    ) {
       return;
     }
 
@@ -231,20 +241,25 @@ class LoggerService {
       };
 
       // Send logs to the server
-      const response = await fetch(this.options.remoteLoggingUrl || '/api/logs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        this.options.remoteLoggingUrl || '/api/logs',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+          // Don't let this request slow down the application
+          keepalive: true,
         },
-        body: JSON.stringify(payload),
-        // Don't let this request slow down the application
-        keepalive: true,
-      });
+      );
 
       if (!response.ok) {
         // Add logs back to the queue on failure
         this.logQueue = [...logsToSend, ...this.logQueue];
-        console.error(`Failed to send logs: ${response.status} ${response.statusText}`);
+        console.error(
+          `Failed to send logs: ${response.status} ${response.statusText}`,
+        );
       }
     } catch (error) {
       // Add logs back to the queue on error

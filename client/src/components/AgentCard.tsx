@@ -1,17 +1,17 @@
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Edit, Play, MoreHorizontal } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useLocation } from 'wouter';
+import { useMicroInteractions, useScrollAnimation } from '@/hooks/animations';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { useMicroInteractions, useScrollAnimation } from '@/hooks/animations';
+import { Edit, MoreHorizontal, Play } from 'lucide-react';
+import { useLocation } from 'wouter';
 
 interface Agent {
   id: string;
@@ -31,7 +31,12 @@ interface AgentCardProps {
 // Create a motion version of our Card component
 const MotionCard = motion(Card);
 
-export default function AgentCard({ agent, onEdit, onTest, animationDelay = 0 }: AgentCardProps) {
+export default function AgentCard({
+  agent,
+  onEdit,
+  onTest,
+  animationDelay = 0,
+}: AgentCardProps) {
   const [, navigate] = useLocation();
   const [ref, isVisible] = useScrollAnimation();
   const { cardHover } = useMicroInteractions();
@@ -110,15 +115,22 @@ export default function AgentCard({ agent, onEdit, onTest, animationDelay = 0 }:
           <div className="ml-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <motion.div whileHover={{ rotate: 15 }} whileTap={{ scale: 0.9 }}>
+                <motion.div
+                  whileHover={{ rotate: 15 }}
+                  whileTap={{ scale: 0.9 }}
+                >
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </motion.div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem className="cursor-pointer">Duplicate</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">Share</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
+                  Share
+                </DropdownMenuItem>
                 <DropdownMenuItem className="text-destructive cursor-pointer">
                   Delete
                 </DropdownMenuItem>

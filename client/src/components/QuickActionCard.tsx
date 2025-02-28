@@ -1,7 +1,7 @@
-import { ReactNode } from 'react';
 import { Card } from '@/components/ui/card';
-import { motion } from 'framer-motion';
 import { useMicroInteractions, useScrollAnimation } from '@/hooks/animations';
+import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
 interface QuickActionCardProps {
   title: string;
@@ -34,7 +34,8 @@ export default function QuickActionCard({
     gray: 'bg-gray-500 text-white',
   };
 
-  const bgColorClass = colorMap[color as keyof typeof colorMap] || colorMap.primary;
+  const bgColorClass =
+    colorMap[color as keyof typeof colorMap] || colorMap.primary;
 
   return (
     <MotionCard

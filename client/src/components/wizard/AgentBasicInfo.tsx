@@ -1,6 +1,4 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -10,11 +8,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Settings, ShoppingCart, HeadphonesIcon } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { HeadphonesIcon, Settings, ShoppingCart } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Agent name must be at least 3 characters'),
@@ -78,7 +78,11 @@ export default function AgentBasicInfo({
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="What is this agent's purpose?" rows={3} {...field} />
+                  <Textarea
+                    placeholder="What is this agent's purpose?"
+                    rows={3}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -118,7 +122,9 @@ export default function AgentBasicInfo({
                         <div className="p-2 mb-2 rounded-full bg-blue-100 dark:bg-blue-900">
                           <HeadphonesIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <span className="text-sm font-medium">Customer Support</span>
+                        <span className="text-sm font-medium">
+                          Customer Support
+                        </span>
                       </Label>
                     </div>
 
@@ -129,7 +135,11 @@ export default function AgentBasicInfo({
                           : 'border-border'
                       }`}
                     >
-                      <RadioGroupItem value="sales" id="agent-type-sales" className="sr-only" />
+                      <RadioGroupItem
+                        value="sales"
+                        id="agent-type-sales"
+                        className="sr-only"
+                      />
                       <Label
                         htmlFor="agent-type-sales"
                         className="flex flex-col items-center cursor-pointer"
@@ -137,7 +147,9 @@ export default function AgentBasicInfo({
                         <div className="p-2 mb-2 rounded-full bg-green-100 dark:bg-green-900">
                           <ShoppingCart className="h-5 w-5 text-green-600 dark:text-green-400" />
                         </div>
-                        <span className="text-sm font-medium">Sales Assistant</span>
+                        <span className="text-sm font-medium">
+                          Sales Assistant
+                        </span>
                       </Label>
                     </div>
 
@@ -148,7 +160,11 @@ export default function AgentBasicInfo({
                           : 'border-border'
                       }`}
                     >
-                      <RadioGroupItem value="custom" id="agent-type-custom" className="sr-only" />
+                      <RadioGroupItem
+                        value="custom"
+                        id="agent-type-custom"
+                        className="sr-only"
+                      />
                       <Label
                         htmlFor="agent-type-custom"
                         className="flex flex-col items-center cursor-pointer"
@@ -156,7 +172,9 @@ export default function AgentBasicInfo({
                         <div className="p-2 mb-2 rounded-full bg-primary/10">
                           <Settings className="h-5 w-5 text-primary" />
                         </div>
-                        <span className="text-sm font-medium">Custom Agent</span>
+                        <span className="text-sm font-medium">
+                          Custom Agent
+                        </span>
                       </Label>
                     </div>
                   </RadioGroup>

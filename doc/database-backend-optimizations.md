@@ -39,10 +39,12 @@ npm run db:status
 Strategic database indexes have been added to improve query performance for frequently accessed fields:
 
 ### User-related Indexes:
+
 - `idx_users_username`: Improves user lookup by username
 - `idx_users_role`: Faster filtering of users by role
 
 ### Agent-related Indexes:
+
 - `idx_agents_user_id`: Speeds up finding agents by user
 - `idx_agents_name`: Faster search by agent name
 - `idx_agents_status`: Optimizes filtering agents by status
@@ -50,12 +52,14 @@ Strategic database indexes have been added to improve query performance for freq
 - `idx_agents_created_at`: Better performance for time-based sorts
 
 ### Prompt-related Indexes:
+
 - `idx_prompts_user_id`: Speeds up finding prompts by user
 - `idx_prompts_title`: Faster search by prompt title
 - `idx_prompts_is_favorite`: Optimizes filtering favorite prompts
 - `idx_prompts_created_at`: Better performance for time-based sorts
 
 ### Conversation & Message Indexes:
+
 - `idx_conversations_user_id`: Speeds up finding conversations by user
 - `idx_conversations_agent_id`: Faster lookup of conversations by agent
 - `idx_messages_conversation_id`: Optimizes retrieving messages for a conversation
@@ -83,10 +87,10 @@ The connection pool is configured in `server/db.ts` with the following features:
 
 ```typescript
 export const pool = postgres(process.env.DATABASE_URL, {
-  max: MAX_CONNECTIONS,             // Environment-based connection limit
-  idle_timeout: IDLE_TIMEOUT,       // Close idle connections after timeout
-  connect_timeout: 15,              // Connection timeout (15 seconds)
-  max_lifetime: 60 * 30,            // Connections live max 30 minutes
+  max: MAX_CONNECTIONS, // Environment-based connection limit
+  idle_timeout: IDLE_TIMEOUT, // Close idle connections after timeout
+  connect_timeout: 15, // Connection timeout (15 seconds)
+  max_lifetime: 60 * 30, // Connections live max 30 minutes
   ssl: process.env.DATABASE_SSL === 'true', // Optional SSL support
   // Additional options for debugging and monitoring
 });
@@ -110,6 +114,7 @@ A performant caching layer has been implemented to reduce database load for freq
 ### Cached Operations:
 
 The following database operations now use caching:
+
 - User lookup by ID and username
 - Agent retrieval by ID
 - Prompt retrieval by ID
@@ -118,6 +123,7 @@ The following database operations now use caching:
 ### Cache Invalidation:
 
 Cache entries are automatically invalidated:
+
 - When the TTL expires
 - When a record is updated or deleted
 - During periodic cache cleanup

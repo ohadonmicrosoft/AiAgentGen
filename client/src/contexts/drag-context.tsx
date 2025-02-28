@@ -1,3 +1,11 @@
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { getCursorPosition, isCursorOutOfBounds } from '@/lib/drag-and-drop';
+import {
+  DragResult,
+  DragState,
+  DraggableItem,
+  Position,
+} from '@/types/drag-types';
 import React, {
   createContext,
   useContext,
@@ -6,9 +14,6 @@ import React, {
   useCallback,
   useEffect,
 } from 'react';
-import { DragState, Position, DraggableItem, DragResult } from '@/types/drag-types';
-import { getCursorPosition, isCursorOutOfBounds } from '@/lib/drag-and-drop';
-import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 // Initial drag state
 const initialDragState: DragState = {
@@ -25,10 +30,21 @@ const initialDragState: DragState = {
 type DragAction =
   | {
       type: 'START_DRAG';
-      payload: { item: any; id: string; containerId: string; position: Position };
+      payload: {
+        item: any;
+        id: string;
+        containerId: string;
+        position: Position;
+      };
     }
-  | { type: 'UPDATE_DRAG'; payload: { position: Position; targetContainerId?: string } }
-  | { type: 'END_DRAG'; payload?: { targetContainerId?: string; targetIndex?: number } }
+  | {
+      type: 'UPDATE_DRAG';
+      payload: { position: Position; targetContainerId?: string };
+    }
+  | {
+      type: 'END_DRAG';
+      payload?: { targetContainerId?: string; targetIndex?: number };
+    }
   | { type: 'CANCEL_DRAG' }
   | { type: 'SET_TARGET_CONTAINER'; payload: { containerId: string | null } };
 
@@ -51,14 +67,16 @@ function dragReducer(state: DragState, action: DragAction): DragState {
       return {
         ...state,
         currentPosition: action.payload.position,
-        targetContainerId: action.payload.targetContainerId || state.targetContainerId,
+        targetContainerId:
+          action.payload.targetContainerId || state.targetContainerId,
       };
 
     case 'END_DRAG':
       return {
         ...state,
         isDragging: false,
-        targetContainerId: action.payload?.targetContainerId || state.targetContainerId,
+        targetContainerId:
+          action.payload?.targetContainerId || state.targetContainerId,
       };
 
     case 'CANCEL_DRAG':
@@ -84,11 +102,20 @@ interface DragContextValue {
     containerId: string,
     event: React.MouseEvent | React.TouchEvent,
   ) => void;
-  updateDrag: (event: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent) => void;
-  endDrag: (targetContainerId?: string, targetIndex?: number) => DragResult | null;
+  updateDrag: (
+    event: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent,
+  ) => void;
+  endDrag: (
+    targetContainerId?: string,
+    targetIndex?: number,
+  ) => DragResult | null;
   cancelDrag: () => void;
   setTargetContainer: (containerId: string | null) => void;
-  registerDropContainer: (id: string, element: HTMLElement, accepts: string[]) => void;
+  registerDropContainer: (
+    id: string,
+    element: HTMLElement,
+    accepts: string[],
+  ) => void;
   unregisterDropContainer: (id: string) => void;
   prefersReducedMotion: boolean;
 }
@@ -103,7 +130,9 @@ type DropContainerRef = {
 };
 
 // Provider component
-export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const DragProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [dragState, dispatch] = useReducer(dragReducer, initialDragState);
   const dropContainersRef = useRef<Map<string, DropContainerRef>>(new Map());
   const prefersReducedMotion = useReducedMotion();
@@ -126,7 +155,12 @@ export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Start drag operation
   const startDrag = useCallback(
-    (item: any, id: string, containerId: string, event: React.MouseEvent | React.TouchEvent) => {
+    (
+      item: any,
+      id: string,
+      containerId: string,
+      event: React.MouseEvent | React.TouchEvent,
+    ) => {
       const position = getCursorPosition(event);
 
       dispatch({
@@ -152,7 +186,10 @@ export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { element, accepts } = container;
 
         // Skip if the container doesn't accept this type of item
-        if (dragState.draggedItem && !accepts.includes(dragState.draggedItem.type)) {
+        if (
+          dragState.draggedItem &&
+          !accepts.includes(dragState.draggedItem.type)
+        ) {
           return;
         }
 
@@ -202,10 +239,14 @@ export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: dragState.sourceContainerId,
           index: dragState.draggedItem.index || 0,
         },
-        destination: finalTargetId ? { id: finalTargetId, index: targetIndex || 0 } : null,
+        destination: finalTargetId
+          ? { id: finalTargetId, index: targetIndex || 0 }
+          : null,
         isDropped: Boolean(finalTargetId),
         isReordered: finalTargetId === dragState.sourceContainerId,
-        isMoved: Boolean(finalTargetId) && finalTargetId !== dragState.sourceContainerId,
+        isMoved:
+          Boolean(finalTargetId) &&
+          finalTargetId !== dragState.sourceContainerId,
       };
 
       dispatch({
@@ -297,7 +338,9 @@ export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children
     prefersReducedMotion,
   };
 
-  return <DragContext.Provider value={contextValue}>{children}</DragContext.Provider>;
+  return (
+    <DragContext.Provider value={contextValue}>{children}</DragContext.Provider>
+  );
 };
 
 // Hook to use the drag context

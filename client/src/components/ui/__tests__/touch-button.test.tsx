@@ -1,5 +1,5 @@
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
 import { TouchButton } from '../touch-button';
 
 // Mock the required hooks
@@ -89,7 +89,10 @@ describe('TouchButton Component', () => {
     render(<TouchButton showRipple>Click Me</TouchButton>);
 
     // Trigger a click to create ripple
-    fireEvent.mouseDown(screen.getByRole('button'), { clientX: 50, clientY: 50 });
+    fireEvent.mouseDown(screen.getByRole('button'), {
+      clientX: 50,
+      clientY: 50,
+    });
 
     // Check for the presence of ripple container
     expect(screen.getByTestId('motion-div')).toBeInTheDocument();

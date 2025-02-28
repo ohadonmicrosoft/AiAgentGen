@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { AnnouncementType } from '@/lib/accessibility';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface AnnouncerProps {
   /**
@@ -42,7 +42,9 @@ export function Announcer({
   clearAfter = true,
 }: AnnouncerProps) {
   const [currentMessage, setCurrentMessage] = useState(message);
-  const announcementTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const announcementTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   // Update the message when the prop changes
   useEffect(() => {

@@ -270,7 +270,11 @@ describe('memoize', () => {
   it('should memoize function results', async () => {
     const cache = new MemoryCache<string>();
 
-    const fn = jest.fn().mockImplementation((a: number, b: string) => Promise.resolve(`${a}-${b}`));
+    const fn = jest
+      .fn()
+      .mockImplementation((a: number, b: string) =>
+        Promise.resolve(`${a}-${b}`),
+      );
 
     const keyFn = (a: number, b: string) => `key:${a}:${b}`;
 
@@ -295,7 +299,11 @@ describe('memoize', () => {
   it('should respect TTL for memoized results', async () => {
     const cache = new MemoryCache<string>();
 
-    const fn = jest.fn().mockImplementation((a: number, b: string) => Promise.resolve(`${a}-${b}`));
+    const fn = jest
+      .fn()
+      .mockImplementation((a: number, b: string) =>
+        Promise.resolve(`${a}-${b}`),
+      );
 
     const keyFn = (a: number, b: string) => `key:${a}:${b}`;
 

@@ -1,6 +1,6 @@
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
-import path from 'path';
 import { exec } from 'child_process';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import path from 'path';
 import { promisify } from 'util';
 import { logger } from '../api/logs';
 

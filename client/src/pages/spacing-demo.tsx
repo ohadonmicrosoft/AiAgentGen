@@ -1,12 +1,18 @@
-import { MainLayout } from '@/layouts/main-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { fluidSpacingToClassName } from '@/hooks/use-fluid-spacing';
+import { MainLayout } from '@/layouts/main-layout';
+import { fluidSpaceScale } from '@/lib/fluid-spacing';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { fluidSpacingToClassName } from '@/hooks/use-fluid-spacing';
-import { fluidSpaceScale } from '@/lib/fluid-spacing';
 
 export default function SpacingDemo() {
   const [selectedTab, setSelectedTab] = useState<string>('containers');
@@ -22,13 +28,17 @@ export default function SpacingDemo() {
         <div>
           <h1 className="fluid-h1 font-bold">Dynamic Spacing System</h1>
           <p className="fluid-body text-muted-foreground mt-2 max-w-3xl">
-            Explore the dynamic spacing system that automatically adjusts spacing based on viewport
-            size. This creates more harmonious layouts that maintain visual hierarchy across all
-            device sizes.
+            Explore the dynamic spacing system that automatically adjusts
+            spacing based on viewport size. This creates more harmonious layouts
+            that maintain visual hierarchy across all device sizes.
           </p>
         </div>
 
-        <Tabs defaultValue="containers" onValueChange={setSelectedTab} value={selectedTab}>
+        <Tabs
+          defaultValue="containers"
+          onValueChange={setSelectedTab}
+          value={selectedTab}
+        >
           <TabsList className="grid w-full max-w-md grid-cols-4">
             <TabsTrigger value="containers">Containers</TabsTrigger>
             <TabsTrigger value="spacing">Spacing</TabsTrigger>
@@ -40,7 +50,8 @@ export default function SpacingDemo() {
             <section>
               <h2 className="fluid-h3 font-semibold mb-4">Fluid Containers</h2>
               <p className="fluid-body text-muted-foreground mb-6">
-                Containers with dynamic padding that adjusts based on screen size
+                Containers with dynamic padding that adjusts based on screen
+                size
               </p>
 
               <div className="space-y-8">
@@ -76,7 +87,9 @@ export default function SpacingDemo() {
 
           <TabsContent value="spacing" className="space-y-8 mt-6">
             <section>
-              <h2 className="fluid-h3 font-semibold mb-4">Fluid Spacing Scale</h2>
+              <h2 className="fluid-h3 font-semibold mb-4">
+                Fluid Spacing Scale
+              </h2>
               <p className="fluid-body text-muted-foreground mb-6">
                 Spacing values that scale proportionally with the viewport
               </p>
@@ -85,7 +98,9 @@ export default function SpacingDemo() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Padding Example</CardTitle>
-                    <CardDescription>Elements with fluid padding utilities</CardDescription>
+                    <CardDescription>
+                      Elements with fluid padding utilities
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {Object.entries(fluidSpaceScale).map(([key, value]) => (
@@ -94,7 +109,9 @@ export default function SpacingDemo() {
                           className={`bg-primary/10 border border-primary/30 rounded-md text-center ${fluidSpacingToClassName({ padding: key as any })}`}
                         >
                           <p className="text-sm">fluid-p-{key}</p>
-                          <p className="text-xs text-muted-foreground">Computed: {value}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Computed: {value}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -104,7 +121,9 @@ export default function SpacingDemo() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Margin Example</CardTitle>
-                    <CardDescription>Elements with fluid margin utilities</CardDescription>
+                    <CardDescription>
+                      Elements with fluid margin utilities
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-0">
                     <div className="bg-muted/30 p-4 rounded-md">
@@ -114,7 +133,9 @@ export default function SpacingDemo() {
                           className={`bg-primary/10 border border-primary/30 rounded-md text-center mb-1 ${fluidSpacingToClassName({ margin: key as any })}`}
                         >
                           <p className="text-sm">fluid-m-{key}</p>
-                          <p className="text-xs text-muted-foreground">Computed: {value}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Computed: {value}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -128,7 +149,8 @@ export default function SpacingDemo() {
             <section>
               <h2 className="fluid-h3 font-semibold mb-4">Fluid Grid Gaps</h2>
               <p className="fluid-body text-muted-foreground mb-6">
-                Grid layouts with fluid gap spacing that adjusts based on viewport
+                Grid layouts with fluid gap spacing that adjusts based on
+                viewport
               </p>
 
               <Tabs defaultValue="xs">
@@ -153,7 +175,9 @@ export default function SpacingDemo() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">fluid-gap-xs</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    fluid-gap-xs
+                  </p>
                 </TabsContent>
 
                 <TabsContent value="sm" className="mt-4">
@@ -169,7 +193,9 @@ export default function SpacingDemo() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">fluid-gap-sm</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    fluid-gap-sm
+                  </p>
                 </TabsContent>
 
                 <TabsContent value="md" className="mt-4">
@@ -185,7 +211,9 @@ export default function SpacingDemo() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">fluid-gap-md</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    fluid-gap-md
+                  </p>
                 </TabsContent>
 
                 <TabsContent value="lg" className="mt-4">
@@ -201,7 +229,9 @@ export default function SpacingDemo() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">fluid-gap-lg</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    fluid-gap-lg
+                  </p>
                 </TabsContent>
 
                 <TabsContent value="xl" className="mt-4">
@@ -217,7 +247,9 @@ export default function SpacingDemo() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">fluid-gap-xl</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    fluid-gap-xl
+                  </p>
                 </TabsContent>
               </Tabs>
             </section>
@@ -225,7 +257,9 @@ export default function SpacingDemo() {
 
           <TabsContent value="hierarchy" className="space-y-8 mt-6">
             <section>
-              <h2 className="fluid-h3 font-semibold mb-4">Content Hierarchy Example</h2>
+              <h2 className="fluid-h3 font-semibold mb-4">
+                Content Hierarchy Example
+              </h2>
               <p className="fluid-body text-muted-foreground mb-6">
                 Spacing that adjusts based on content importance
               </p>
@@ -234,7 +268,8 @@ export default function SpacingDemo() {
                 <div className="bg-primary/5 rounded-lg p-6 border border-primary/20">
                   <h3 className="fluid-h3 font-semibold">Primary Content</h3>
                   <p className="fluid-body mt-2 text-muted-foreground">
-                    Important content has more generous spacing (primary importance)
+                    Important content has more generous spacing (primary
+                    importance)
                   </p>
                 </div>
 
@@ -242,7 +277,8 @@ export default function SpacingDemo() {
                   <div className="bg-secondary/5 rounded-lg p-4 border border-secondary/20">
                     <h4 className="fluid-h5 font-medium">Secondary Content</h4>
                     <p className="fluid-body text-sm mt-2 text-muted-foreground">
-                      Secondary content has moderate spacing (secondary importance)
+                      Secondary content has moderate spacing (secondary
+                      importance)
                     </p>
                   </div>
 
@@ -257,7 +293,9 @@ export default function SpacingDemo() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="bg-muted/50 rounded-lg p-3 border">
-                      <h5 className="text-sm font-medium">Tertiary Item {i + 1}</h5>
+                      <h5 className="text-sm font-medium">
+                        Tertiary Item {i + 1}
+                      </h5>
                       <p className="text-xs mt-1 text-muted-foreground">
                         Tertiary content uses compact spacing
                       </p>
@@ -268,7 +306,9 @@ export default function SpacingDemo() {
             </section>
 
             <section>
-              <h2 className="fluid-h3 font-semibold mb-4">Content-Aware Spacing</h2>
+              <h2 className="fluid-h3 font-semibold mb-4">
+                Content-Aware Spacing
+              </h2>
               <p className="fluid-body text-muted-foreground mb-6">
                 Spacing that adjusts based on content length
               </p>
@@ -277,7 +317,9 @@ export default function SpacingDemo() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Short Content</CardTitle>
-                    <CardDescription>More spacing for brief content</CardDescription>
+                    <CardDescription>
+                      More spacing for brief content
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="bg-muted rounded-lg p-6">
@@ -289,15 +331,19 @@ export default function SpacingDemo() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Long Content</CardTitle>
-                    <CardDescription>Reduced spacing for longer content</CardDescription>
+                    <CardDescription>
+                      Reduced spacing for longer content
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="bg-muted rounded-lg p-4">
                       <p className="text-sm">
-                        This is a much longer paragraph that contains more information. When content
-                        is longer, we can reduce the spacing to make better use of the available
-                        space and maintain a good content density. This helps create a more balanced
-                        visual hierarchy and improves readability for longer blocks of text.
+                        This is a much longer paragraph that contains more
+                        information. When content is longer, we can reduce the
+                        spacing to make better use of the available space and
+                        maintain a good content density. This helps create a
+                        more balanced visual hierarchy and improves readability
+                        for longer blocks of text.
                       </p>
                     </div>
                   </CardContent>

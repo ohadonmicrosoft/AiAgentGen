@@ -1,12 +1,12 @@
 import express, { type Request, Response, NextFunction } from 'express';
-import { registerRoutes } from './routes';
-import { setupVite, serveStatic } from './vite';
-import { setupAuthRouter } from './api/auth';
 import { setupApiRouter } from './api/api';
+import { setupAuthRouter } from './api/auth';
 import { setupLogsRouter } from './api/logs';
-import { runMigrations, isDatabaseUpToDate } from './migrations';
 import { logger } from './api/logs';
 import { adaptiveRateLimiter } from './lib/rate-limiter';
+import { isDatabaseUpToDate, runMigrations } from './migrations';
+import { registerRoutes } from './routes';
+import { serveStatic, setupVite } from './vite';
 
 const app = express();
 app.use(express.json());
@@ -79,7 +79,9 @@ async function setupDatabase() {
       throw new Error('Database setup failed in production environment');
     } else {
       // In development, we can continue with mock storage
-      logger.warn('Continuing with mock storage due to database migration failure');
+      logger.warn(
+        'Continuing with mock storage due to database migration failure',
+      );
       process.env.USE_MOCK_STORAGE = 'true';
     }
   }

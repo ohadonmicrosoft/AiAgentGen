@@ -1,7 +1,7 @@
-import { ReactNode } from 'react';
 import { Card } from '@/components/ui/card';
-import { motion } from 'framer-motion';
 import { useScrollAnimation } from '@/hooks/animations';
+import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 import React from 'react';
 
 interface StatsCardProps {
@@ -32,7 +32,8 @@ export default function StatsCard({
     gray: 'bg-gray-500 text-white',
   };
 
-  const bgColorClass = colorMap[color as keyof typeof colorMap] || colorMap.primary;
+  const bgColorClass =
+    colorMap[color as keyof typeof colorMap] || colorMap.primary;
 
   // Animation for counting up the number
   const countVariants = {

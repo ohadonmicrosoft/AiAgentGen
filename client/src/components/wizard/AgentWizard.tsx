@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import WizardStepIndicator from './WizardStepIndicator';
+import { useState } from 'react';
 import AgentBasicInfo from './AgentBasicInfo';
 import AgentConfiguration from './AgentConfiguration';
 import AgentPrompt from './AgentPrompt';
 import AgentReview from './AgentReview';
+import WizardStepIndicator from './WizardStepIndicator';
 
 interface AgentWizardProps {
   preview?: boolean;
@@ -102,7 +102,11 @@ export default function AgentWizard({ preview = false }: AgentWizardProps) {
         )}
 
         {currentStep === 4 && (
-          <AgentReview formData={formData} onBack={handleBack} preview={preview} />
+          <AgentReview
+            formData={formData}
+            onBack={handleBack}
+            preview={preview}
+          />
         )}
       </div>
     </Card>

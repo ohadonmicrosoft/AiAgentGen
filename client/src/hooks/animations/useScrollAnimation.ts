@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, RefObject } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from './useReducedMotion';
 
 interface ScrollAnimationOptions {

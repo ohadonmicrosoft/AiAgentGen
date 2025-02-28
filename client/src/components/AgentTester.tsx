@@ -1,10 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { apiRequest, getQueryFn } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -13,32 +8,43 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import {
-  Loader2,
-  Send,
-  RotateCcw,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/components/ui/form';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Textarea } from '@/components/ui/textarea';
+import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest, getQueryFn } from '@/lib/queryClient';
+import { cn } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Agent, Conversation, Message as DBMessage } from '@shared/schema';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import {
   Bot,
-  User,
-  Clock,
-  Save,
-  Maximize2,
-  Minimize2,
-  X,
   ChevronDown,
   ChevronUp,
+  Clock,
   Download,
   Info,
+  Loader2,
+  Maximize2,
   MessageSquare,
+  Minimize2,
+  RotateCcw,
+  Save,
+  Send,
+  User,
+  X,
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Agent, Conversation, Message as DBMessage } from '@shared/schema';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { format } from 'date-fns';
-import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
+import React, { useState, useRef, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 // Form schema
 const formSchema = z.object({
@@ -70,7 +76,8 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
-  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [activeConversation, setActiveConversation] =
+    useState<Conversation | null>(null);
   const [showConversations, setShowConversations] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showTokens, setShowTokens] = useState(false);
@@ -120,7 +127,9 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
   };
 
   // Fetch user's conversations with this agent
-  const { data: conversations, isLoading: loadingConversations } = useQuery<Conversation[]>({
+  const { data: conversations, isLoading: loadingConversations } = useQuery<
+    Conversation[]
+  >({
     queryKey: ['/api/conversations', agent.id],
     queryFn: getQueryFn({ on401: 'throw' }),
     enabled: !!agent.id && showConversations,
@@ -140,12 +149,14 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
   useEffect(() => {
     if (conversationMessages) {
       // Convert DB messages to UI messages
-      const uiMessages: Message[] = conversationMessages.messages.map((msg) => ({
-        id: `${msg.role}-${msg.id}`,
-        role: msg.role as 'user' | 'assistant',
-        content: msg.content,
-        timestamp: new Date(msg.createdAt as unknown as string),
-      }));
+      const uiMessages: Message[] = conversationMessages.messages.map(
+        (msg) => ({
+          id: `${msg.role}-${msg.id}`,
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content,
+          timestamp: new Date(msg.createdAt as unknown as string),
+        }),
+      );
       setMessages(uiMessages);
     }
   }, [conversationMessages]);
@@ -162,7 +173,9 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
     onSuccess: (data: Conversation) => {
       setActiveConversation(data);
       setMessages([]);
-      queryClient.invalidateQueries({ queryKey: ['/api/conversations', agent.id] });
+      queryClient.invalidateQueries({
+        queryKey: ['/api/conversations', agent.id],
+      });
       setShowConversations(false);
       toast({
         title: 'Conversation created',
@@ -184,14 +197,22 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
       content,
       role,
       tokenCount,
-    }: { content: string; role: string; tokenCount?: number }) => {
+    }: {
+      content: string;
+      role: string;
+      tokenCount?: number;
+    }) => {
       if (!activeConversation?.id) throw new Error('No active conversation');
 
-      const res = await apiRequest('POST', `/api/conversations/${activeConversation.id}/messages`, {
-        content,
-        role,
-        tokenCount,
-      });
+      const res = await apiRequest(
+        'POST',
+        `/api/conversations/${activeConversation.id}/messages`,
+        {
+          content,
+          role,
+          tokenCount,
+        },
+      );
       return await res.json();
     },
     onSuccess: () => {
@@ -226,7 +247,8 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
       const res = await apiRequest('POST', '/api/agents/test', {
         agentId: agent.id,
         systemPrompt:
-          agent.systemPrompt || 'You are an AI assistant. Help the user with their questions.',
+          agent.systemPrompt ||
+          'You are an AI assistant. Help the user with their questions.',
         model: agent.model || 'gpt-4o',
         temperature: agent.temperature || 0.7,
         maxTokens: agent.maxTokens || 1000,
@@ -290,7 +312,8 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
         body: JSON.stringify({
           agentId: agent.id,
           systemPrompt:
-            agent.systemPrompt || 'You are an AI assistant. Help the user with their questions.',
+            agent.systemPrompt ||
+            'You are an AI assistant. Help the user with their questions.',
           model: agent.model || 'gpt-4o',
           temperature: agent.temperature || 0.7,
           maxTokens: agent.maxTokens || 1000,
@@ -339,7 +362,9 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
         console.log('Received chunk:', chunkText);
 
         // Try to parse each line as JSON
-        const lines = chunkText.split('\n').filter((line) => line.trim() !== '');
+        const lines = chunkText
+          .split('\n')
+          .filter((line) => line.trim() !== '');
 
         for (const line of lines) {
           try {
@@ -393,13 +418,17 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
 
         // Update the message content
         setMessages((prev) =>
-          prev.map((msg) => (msg.id === assistantMsgId ? { ...msg, content: accumulated } : msg)),
+          prev.map((msg) =>
+            msg.id === assistantMsgId ? { ...msg, content: accumulated } : msg,
+          ),
         );
       }
 
       // Finalize the message
       setMessages((prev) =>
-        prev.map((msg) => (msg.id === assistantMsgId ? { ...msg, isStreaming: false } : msg)),
+        prev.map((msg) =>
+          msg.id === assistantMsgId ? { ...msg, isStreaming: false } : msg,
+        ),
       );
     } catch (error: any) {
       toast({
@@ -414,7 +443,8 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
           msg.id === assistantMsgId
             ? {
                 ...msg,
-                content: "Sorry, I couldn't process your request. Please try again.",
+                content:
+                  "Sorry, I couldn't process your request. Please try again.",
                 isStreaming: false,
               }
             : msg,
@@ -440,7 +470,10 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
             await saveMessageMutation.mutateAsync({
               role: message.role,
               content: message.content,
-              tokenCount: message.role === 'assistant' ? tokenUsage?.totalTokens : undefined,
+              tokenCount:
+                message.role === 'assistant'
+                  ? tokenUsage?.totalTokens
+                  : undefined,
             });
           }
 
@@ -462,11 +495,17 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
   // Delete a conversation
   const deleteConversationMutation = useMutation({
     mutationFn: async (conversationId: number) => {
-      const res = await apiRequest('DELETE', `/api/conversations/${conversationId}`, {});
+      const res = await apiRequest(
+        'DELETE',
+        `/api/conversations/${conversationId}`,
+        {},
+      );
       return res;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/conversations', agent.id] });
+      queryClient.invalidateQueries({
+        queryKey: ['/api/conversations', agent.id],
+      });
       toast({
         title: 'Conversation deleted',
         description: 'The conversation has been deleted.',
@@ -531,7 +570,10 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
         }
       }
     } catch (error) {
-      console.error('Streaming failed, falling back to standard request:', error);
+      console.error(
+        'Streaming failed, falling back to standard request:',
+        error,
+      );
       // Fallback to non-streaming if streaming fails
       sendMessageMutation.mutate(values);
 
@@ -576,7 +618,11 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
         <CardHeader
           className={cn(
             'border-b transition-all',
-            isFullscreen ? 'px-3 py-2 md:px-4 md:py-3' : isMobile ? 'px-3 py-3' : 'px-6 py-4 pb-3',
+            isFullscreen
+              ? 'px-3 py-2 md:px-4 md:py-3'
+              : isMobile
+                ? 'px-3 py-3'
+                : 'px-6 py-4 pb-3',
           )}
         >
           <div
@@ -668,7 +714,9 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                 ) : (
                   <Maximize2 className="h-4 w-4" />
                 )}
-                <span className="sr-only">{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
+                <span className="sr-only">
+                  {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+                </span>
               </Button>
 
               {onClose && !isFullscreen && (
@@ -704,7 +752,12 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                   isFullscreen ? 'pb-1' : '',
                 )}
               >
-                <h3 className={cn('font-medium', isFullscreen ? 'text-base' : 'text-sm')}>
+                <h3
+                  className={cn(
+                    'font-medium',
+                    isFullscreen ? 'text-base' : 'text-sm',
+                  )}
+                >
                   Conversation History
                 </h3>
                 <Button
@@ -747,7 +800,9 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                     >
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <span className="text-sm truncate">{conversation.title}</span>
+                        <span className="text-sm truncate">
+                          {conversation.title}
+                        </span>
                       </div>
                       <div className="flex-shrink-0">
                         <Button
@@ -820,7 +875,12 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                     isFullscreen ? 'h-16 w-16' : 'h-12 w-12',
                   )}
                 />
-                <p className={cn('text-center', isFullscreen && !isMobile ? 'text-lg' : '')}>
+                <p
+                  className={cn(
+                    'text-center',
+                    isFullscreen && !isMobile ? 'text-lg' : '',
+                  )}
+                >
                   Start a conversation with your agent
                 </p>
                 <p
@@ -829,7 +889,8 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                     isFullscreen && !isMobile ? 'text-base max-w-[340px]' : '',
                   )}
                 >
-                  {agent.name ? agent.name : 'This agent'} will respond based on your configuration
+                  {agent.name ? agent.name : 'This agent'} will respond based on
+                  your configuration
                 </p>
               </div>
             ) : (
@@ -910,7 +971,9 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                             return message.content;
                           }
                         })()}
-                        {message.isStreaming && <span className="animate-pulse">▊</span>}
+                        {message.isStreaming && (
+                          <span className="animate-pulse">▊</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -937,7 +1000,11 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
         <CardFooter
           className={cn(
             'border-t transition-all',
-            isFullscreen ? 'px-3 py-3 md:px-6 md:py-4' : isMobile ? 'px-3 py-3' : 'px-6 py-4',
+            isFullscreen
+              ? 'px-3 py-3 md:px-6 md:py-4'
+              : isMobile
+                ? 'px-3 py-3'
+                : 'px-6 py-4',
           )}
         >
           <Form {...form}>
@@ -959,11 +1026,18 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className={cn('transition-all', isFullscreen ? 'h-8 w-8' : 'h-7 w-7')}
+                            className={cn(
+                              'transition-all',
+                              isFullscreen ? 'h-8 w-8' : 'h-7 w-7',
+                            )}
                             onClick={() => setShowTokens(!showTokens)}
                             title="Toggle Token Usage"
                           >
-                            <Info className={isFullscreen ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
+                            <Info
+                              className={
+                                isFullscreen ? 'h-4 w-4' : 'h-3.5 w-3.5'
+                              }
+                            />
                             <span className="sr-only">Tokens</span>
                           </Button>
                         )}
@@ -974,11 +1048,18 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className={cn('transition-all', isFullscreen ? 'h-8 w-8' : 'h-7 w-7')}
+                            className={cn(
+                              'transition-all',
+                              isFullscreen ? 'h-8 w-8' : 'h-7 w-7',
+                            )}
                             onClick={clearChat}
                             title="Clear Chat"
                           >
-                            <RotateCcw className={isFullscreen ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
+                            <RotateCcw
+                              className={
+                                isFullscreen ? 'h-4 w-4' : 'h-3.5 w-3.5'
+                              }
+                            />
                             <span className="sr-only">Clear</span>
                           </Button>
                         )}
@@ -996,23 +1077,36 @@ export default function AgentTester({ agent, onClose }: AgentTesterProps) {
                               : 'min-h-[70px] text-sm',
                           )}
                           {...field}
-                          disabled={isStreaming || sendMessageMutation.isPending}
+                          disabled={
+                            isStreaming || sendMessageMutation.isPending
+                          }
                         />
                         <Button
                           type="submit"
                           size="icon"
                           className={cn(
                             'self-end transition-all',
-                            isFullscreen ? 'h-10 w-10 md:h-12 md:w-12' : 'h-9 w-9',
+                            isFullscreen
+                              ? 'h-10 w-10 md:h-12 md:w-12'
+                              : 'h-9 w-9',
                           )}
-                          disabled={isStreaming || sendMessageMutation.isPending || !field.value}
+                          disabled={
+                            isStreaming ||
+                            sendMessageMutation.isPending ||
+                            !field.value
+                          }
                         >
                           {isStreaming || sendMessageMutation.isPending ? (
                             <Loader2
-                              className={cn('animate-spin', isFullscreen ? 'h-5 w-5' : 'h-4 w-4')}
+                              className={cn(
+                                'animate-spin',
+                                isFullscreen ? 'h-5 w-5' : 'h-4 w-4',
+                              )}
                             />
                           ) : (
-                            <Send className={isFullscreen ? 'h-5 w-5' : 'h-4 w-4'} />
+                            <Send
+                              className={isFullscreen ? 'h-5 w-5' : 'h-4 w-4'}
+                            />
                           )}
                         </Button>
                       </div>

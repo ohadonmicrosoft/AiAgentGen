@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from './use-reduced-motion';
 
 export interface InfiniteScrollOptions {
@@ -93,7 +93,9 @@ export function useInfiniteScroll({
     try {
       await onLoadMore();
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error loading more items'));
+      setError(
+        err instanceof Error ? err : new Error('Error loading more items'),
+      );
     } finally {
       setIsLoading(false);
     }
@@ -153,7 +155,14 @@ export function useInfiniteScroll({
       observer.observe(sentinelRef.current);
       observerRef.current = observer;
     }
-  }, [prefersReducedMotion, rootMargin, hasMore, isLoading, loadMore, scrollContainer]);
+  }, [
+    prefersReducedMotion,
+    rootMargin,
+    hasMore,
+    isLoading,
+    loadMore,
+    scrollContainer,
+  ]);
 
   return {
     sentinelRef,

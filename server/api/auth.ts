@@ -14,7 +14,9 @@ export function setupAuthRouter() {
         return next(err);
       }
       if (!user) {
-        return res.status(401).json({ error: info.message || 'Authentication failed' });
+        return res
+          .status(401)
+          .json({ error: info.message || 'Authentication failed' });
       }
       req.login(user, (err) => {
         if (err) {

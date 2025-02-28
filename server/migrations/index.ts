@@ -27,7 +27,9 @@ export async function runMigrations(migrationDir?: string) {
 
   // Check if DATABASE_URL is defined
   if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL environment variable is required for migrations');
+    throw new Error(
+      'DATABASE_URL environment variable is required for migrations',
+    );
   }
 
   // Check if migrations directory exists
@@ -41,7 +43,10 @@ export async function runMigrations(migrationDir?: string) {
 
   while (retryAttempts < MAX_RETRY_ATTEMPTS) {
     try {
-      logger.info('Starting database migration...', { migrationsDir, attempt: retryAttempts + 1 });
+      logger.info('Starting database migration...', {
+        migrationsDir,
+        attempt: retryAttempts + 1,
+      });
 
       // Create postgres client with specific migration settings
       client = postgres(process.env.DATABASE_URL, {
@@ -57,7 +62,10 @@ export async function runMigrations(migrationDir?: string) {
 
       // Create and run the migration
       const db = drizzle(client);
-      await migrate(db, { migrationsFolder: migrationsDir, migrationsTable: MIGRATION_TABLE });
+      await migrate(db, {
+        migrationsFolder: migrationsDir,
+        migrationsTable: MIGRATION_TABLE,
+      });
 
       logger.info('Database migrations completed successfully!');
       return;
@@ -75,7 +83,9 @@ export async function runMigrations(migrationDir?: string) {
         try {
           await client.end();
         } catch (closeErr) {
-          logger.error('Error closing database connection', { error: closeErr });
+          logger.error('Error closing database connection', {
+            error: closeErr,
+          });
         }
         client = null;
       }
@@ -85,8 +95,12 @@ export async function runMigrations(migrationDir?: string) {
         logger.info(`Retrying migration in ${RETRY_DELAY_MS}ms...`);
         await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
       } else {
-        logger.error('Database migration failed after maximum retry attempts', { error });
-        throw new Error(`Migration failed after ${MAX_RETRY_ATTEMPTS} attempts: ${error.message}`);
+        logger.error('Database migration failed after maximum retry attempts', {
+          error,
+        });
+        throw new Error(
+          `Migration failed after ${MAX_RETRY_ATTEMPTS} attempts: ${error.message}`,
+        );
       }
     }
   }
@@ -156,7 +170,9 @@ export async function getMigrationHistory() {
         try {
           await client.end();
         } catch (closeErr) {
-          logger.error('Error closing database connection', { error: closeErr });
+          logger.error('Error closing database connection', {
+            error: closeErr,
+          });
         }
         client = null;
       }
@@ -180,7 +196,9 @@ export async function getMigrationHistory() {
 /**
  * Check if database is up to date with all migrations
  */
-export async function isDatabaseUpToDate(migrationDir?: string): Promise<boolean> {
+export async function isDatabaseUpToDate(
+  migrationDir?: string,
+): Promise<boolean> {
   // Check if USE_MOCK_STORAGE is true
   if (process.env.USE_MOCK_STORAGE === 'true') {
     logger.info('Using mock storage - assuming database is up to date');
@@ -192,7 +210,9 @@ export async function isDatabaseUpToDate(migrationDir?: string): Promise<boolean
 
   // Check if migrations directory exists
   if (!fs.existsSync(migrationsDir)) {
-    logger.info('No migrations directory found - database is considered up to date');
+    logger.info(
+      'No migrations directory found - database is considered up to date',
+    );
     return true; // No migrations to apply
   }
 
@@ -204,7 +224,9 @@ export async function isDatabaseUpToDate(migrationDir?: string): Promise<boolean
       .sort();
 
     if (migrationFiles.length === 0) {
-      logger.info('No migration files found - database is considered up to date');
+      logger.info(
+        'No migration files found - database is considered up to date',
+      );
       return true; // No migrations to apply
     }
 

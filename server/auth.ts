@@ -1,11 +1,11 @@
-import passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
+import { randomBytes, scrypt, timingSafeEqual } from 'crypto';
+import { promisify } from 'util';
+import { User as SelectUser } from '@shared/schema';
 import { Express } from 'express';
 import session from 'express-session';
-import { scrypt, randomBytes, timingSafeEqual } from 'crypto';
-import { promisify } from 'util';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
 import { storage } from './storage';
-import { User as SelectUser } from '@shared/schema';
 
 declare global {
   namespace Express {
@@ -16,7 +16,8 @@ declare global {
 const scryptAsync = promisify(scrypt);
 
 // Flag to identify if we're in development testing mode
-const isDevelopmentTesting = !process.env.DATABASE_URL || process.env.USE_MOCK_STORAGE === 'true';
+const isDevelopmentTesting =
+  !process.env.DATABASE_URL || process.env.USE_MOCK_STORAGE === 'true';
 
 async function hashPassword(password: string) {
   // In testing mode, use a simplified format that's easier to work with
@@ -137,26 +138,29 @@ export function setupAuth(app: Express) {
 
   app.post('/api/login', (req, res, next) => {
     console.log('[Auth] Login attempt:', req.body.username);
-    passport.authenticate('local', (err: any, user: SelectUser | false, info: any) => {
-      if (err) {
-        console.error('[Auth] Login error:', err);
-        return next(err);
-      }
-
-      if (!user) {
-        console.log('[Auth] Login failed: Invalid credentials');
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-
-      req.login(user, (err) => {
+    passport.authenticate(
+      'local',
+      (err: any, user: SelectUser | false, info: any) => {
         if (err) {
-          console.error('[Auth] Session login failed:', err);
+          console.error('[Auth] Login error:', err);
           return next(err);
         }
-        console.log('[Auth] Login successful for user:', user.username);
-        return res.status(200).json(user);
-      });
-    })(req, res, next);
+
+        if (!user) {
+          console.log('[Auth] Login failed: Invalid credentials');
+          return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        req.login(user, (err) => {
+          if (err) {
+            console.error('[Auth] Session login failed:', err);
+            return next(err);
+          }
+          console.log('[Auth] Login successful for user:', user.username);
+          return res.status(200).json(user);
+        });
+      },
+    )(req, res, next);
   });
 
   app.post('/api/logout', (req, res, next) => {
@@ -172,7 +176,10 @@ export function setupAuth(app: Express) {
   });
 
   app.get('/api/user', (req, res) => {
-    console.log('[Auth] Get user check - is authenticated:', req.isAuthenticated());
+    console.log(
+      '[Auth] Get user check - is authenticated:',
+      req.isAuthenticated(),
+    );
     if (req.isAuthenticated()) {
       console.log('[Auth] User data returned:', req.user.username);
       return res.json(req.user);

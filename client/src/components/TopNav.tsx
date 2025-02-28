@@ -1,13 +1,20 @@
-import { Moon, Sun, Menu, Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useTheme } from '@/hooks/use-theme';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
-import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { useSidebarState } from '@/hooks/use-sidebar-state';
-import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { useSidebarState } from '@/hooks/use-sidebar-state';
+import { useTheme } from '@/hooks/use-theme';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  Moon,
+  Search,
+  Sun,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface TopNavProps {
   title: string;

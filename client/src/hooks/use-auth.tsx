@@ -1,8 +1,16 @@
-import { createContext, ReactNode, useContext } from 'react';
-import { useQuery, useMutation, UseMutationResult } from '@tanstack/react-query';
-import { insertUserSchema, User as SelectUser, InsertUser } from '@shared/schema';
-import { getQueryFn, apiRequest, queryClient } from '../lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import {
+  InsertUser,
+  User as SelectUser,
+  insertUserSchema,
+} from '@shared/schema';
+import {
+  UseMutationResult,
+  useMutation,
+  useQuery,
+} from '@tanstack/react-query';
+import { ReactNode, createContext, useContext } from 'react';
+import { apiRequest, getQueryFn, queryClient } from '../lib/queryClient';
 
 type AuthContextType = {
   user: SelectUser | null;

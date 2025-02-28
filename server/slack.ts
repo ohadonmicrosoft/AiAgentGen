@@ -1,8 +1,10 @@
-import { WebClient, ChatPostMessageArguments } from '@slack/web-api';
+import { ChatPostMessageArguments, WebClient } from '@slack/web-api';
 import { log } from './vite';
 
 // Initialize the Slack Web Client with the bot token
-const slack = process.env.SLACK_BOT_TOKEN ? new WebClient(process.env.SLACK_BOT_TOKEN) : null;
+const slack = process.env.SLACK_BOT_TOKEN
+  ? new WebClient(process.env.SLACK_BOT_TOKEN)
+  : null;
 
 // Default channel ID from environment
 const defaultChannelId = process.env.SLACK_CHANNEL_ID || '';

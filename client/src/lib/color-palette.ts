@@ -282,9 +282,12 @@ function calculateRelativeLuminance(rgb: RGB): number {
   const gsrgb = rgb.g / 255;
   const bsrgb = rgb.b / 255;
 
-  const r = rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
-  const g = gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
-  const b = bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
+  const r =
+    rsrgb <= 0.03928 ? rsrgb / 12.92 : Math.pow((rsrgb + 0.055) / 1.055, 2.4);
+  const g =
+    gsrgb <= 0.03928 ? gsrgb / 12.92 : Math.pow((gsrgb + 0.055) / 1.055, 2.4);
+  const b =
+    bsrgb <= 0.03928 ? bsrgb / 12.92 : Math.pow((bsrgb + 0.055) / 1.055, 2.4);
 
   // Calculate luminance using the formula: L = 0.2126 * R + 0.7152 * G + 0.0722 * B
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
@@ -329,7 +332,11 @@ export function generateThemeColors(primaryColor: string) {
     : { h: primary.h, s: Math.min(primary.s, 10), l: 5 };
 
   const background = { ...baseBackground };
-  const foreground = { h: background.h, s: background.s, l: 100 - background.l };
+  const foreground = {
+    h: background.h,
+    s: background.s,
+    l: 100 - background.l,
+  };
 
   // Generate accent based on complementary color but adjusted to match theme
   const compHsl = hexToHsl(getComplementaryColor(primaryColor));
@@ -363,7 +370,11 @@ export function generateThemeColors(primaryColor: string) {
       : { h: accent.h, s: accent.s, l: 10 };
 
   // Secondary color as a muted version of primary
-  const secondary = { h: primary.h, s: Math.max(primary.s - 30, 5), l: isDark ? 30 : 70 };
+  const secondary = {
+    h: primary.h,
+    s: Math.max(primary.s - 30, 5),
+    l: isDark ? 30 : 70,
+  };
   const secondaryForeground =
     getAccessibleTextColor(hslToHex(secondary)) === '#FFFFFF'
       ? { h: secondary.h, s: secondary.s, l: 98 }

@@ -1,14 +1,14 @@
-import * as React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useIsTablet } from '@/hooks/use-tablet';
+import { useReducedMotion } from '@/hooks/animations/useReducedMotion';
 import { useFluidSpacing } from '@/hooks/use-fluid-spacing';
 import { useHaptic } from '@/hooks/use-haptic';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsTablet } from '@/hooks/use-tablet';
+import { cn } from '@/lib/utils';
 import { NavItem } from '@/types';
-import { useReducedMotion } from '@/hooks/animations/useReducedMotion';
+import { AnimatePresence, motion } from 'framer-motion';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import * as React from 'react';
 
 interface BottomNavigationProps {
   /**
@@ -301,7 +301,9 @@ export function TouchTabBar({
             {isActive && (
               <motion.div
                 className="absolute inset-0 bg-background rounded-full shadow-sm"
-                layoutId={shouldReduceMotion ? undefined : 'activeTabBackground'}
+                layoutId={
+                  shouldReduceMotion ? undefined : 'activeTabBackground'
+                }
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
               />
             )}
@@ -313,11 +315,19 @@ export function TouchTabBar({
               transition={{ duration: 0.2 }}
             >
               {item.icon && (
-                <span className={isActive ? 'text-primary' : 'text-muted-foreground'}>
+                <span
+                  className={
+                    isActive ? 'text-primary' : 'text-muted-foreground'
+                  }
+                >
                   {item.icon}
                 </span>
               )}
-              <span className={isActive ? 'text-foreground' : 'text-muted-foreground'}>
+              <span
+                className={
+                  isActive ? 'text-foreground' : 'text-muted-foreground'
+                }
+              >
                 {item.label}
               </span>
             </motion.div>

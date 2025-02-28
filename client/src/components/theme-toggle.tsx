@@ -1,14 +1,14 @@
-import { Monitor, Moon, Sun, Palette } from 'lucide-react';
-import { useTheme } from '@/hooks/use-theme';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { useTheme } from '@/hooks/use-theme';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Monitor, Moon, Palette, Sun } from 'lucide-react';
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -35,9 +35,21 @@ export function ThemeToggle() {
           <AnimatePresence mode="wait">
             <motion.div
               key={theme}
-              initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, rotate: -90 }}
-              animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, rotate: 0 }}
-              exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, rotate: 90 }}
+              initial={
+                prefersReducedMotion
+                  ? { opacity: 1 }
+                  : { opacity: 0, rotate: -90 }
+              }
+              animate={
+                prefersReducedMotion
+                  ? { opacity: 1 }
+                  : { opacity: 1, rotate: 0 }
+              }
+              exit={
+                prefersReducedMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, rotate: 90 }
+              }
               transition={{ duration: 0.2 }}
             >
               {getButtonIcon()}

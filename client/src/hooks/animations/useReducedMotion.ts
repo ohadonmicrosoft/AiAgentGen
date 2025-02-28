@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 /**
  * Detects if the device is likely a low-power device based on
@@ -8,12 +8,14 @@ export function isLowPowerDevice(): boolean {
   if (typeof window === 'undefined') return false;
 
   // Check for hardware concurrency (CPU cores)
-  const lowConcurrency = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+  const lowConcurrency =
+    navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
 
   // Check for mobile devices
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent,
-  );
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent,
+    );
 
   // Check for battery status if available
   let isBatterySaving = false;
@@ -96,7 +98,9 @@ export interface AnimationConfig {
  * @param customConfig - Optional custom animation configuration
  * @returns Animation configuration object
  */
-export function useAnimationConfig(customConfig?: Partial<AnimationConfig>): AnimationConfig {
+export function useAnimationConfig(
+  customConfig?: Partial<AnimationConfig>,
+): AnimationConfig {
   const prefersReducedMotion = useReducedMotion();
 
   return useMemo(() => {

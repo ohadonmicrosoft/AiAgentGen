@@ -1,8 +1,8 @@
-import React, { forwardRef } from 'react';
-import { motion } from 'framer-motion';
 import { useDraggable } from '@/hooks/use-draggable';
-import { DraggableItem, DraggableConfig } from '@/types/drag-types';
 import { cn } from '@/lib/utils';
+import { DraggableConfig, DraggableItem } from '@/types/drag-types';
+import { motion } from 'framer-motion';
+import React, { forwardRef } from 'react';
 
 export interface DraggableProps extends React.HTMLAttributes<HTMLDivElement> {
   item: DraggableItem;
@@ -39,10 +39,8 @@ const Draggable = forwardRef<HTMLDivElement, DraggableProps>(
       onDragEnd,
     };
 
-    const { draggableProps, dragHandleProps, isDragging, animationControls } = useDraggable(
-      item,
-      config,
-    );
+    const { draggableProps, dragHandleProps, isDragging, animationControls } =
+      useDraggable(item, config);
 
     return (
       <motion.div
@@ -54,7 +52,9 @@ const Draggable = forwardRef<HTMLDivElement, DraggableProps>(
       >
         {children}
 
-        {dragHandleSelector && dragHandleRender && dragHandleRender(dragHandleProps)}
+        {dragHandleSelector &&
+          dragHandleRender &&
+          dragHandleRender(dragHandleProps)}
       </motion.div>
     );
   },

@@ -1,7 +1,7 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
-import { motion, useAnimation } from 'framer-motion';
 import { useDragContext } from '@/contexts/drag-context';
 import { DroppableConfig } from '@/types/drag-types';
+import { motion, useAnimation } from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Hook to make an element act as a drop target
@@ -23,7 +23,8 @@ export function useDroppable(config: DroppableConfig) {
   const controls = useAnimation();
 
   // Determine if this container is the current drop target
-  const isCurrentDropTarget = dragState.isDragging && dragState.targetContainerId === config.id;
+  const isCurrentDropTarget =
+    dragState.isDragging && dragState.targetContainerId === config.id;
 
   // Determine if this container can accept the currently dragged item
   const canAcceptDraggedItem =
@@ -40,7 +41,12 @@ export function useDroppable(config: DroppableConfig) {
     return () => {
       unregisterDropContainer(config.id);
     };
-  }, [registerDropContainer, unregisterDropContainer, config.id, config.accepts]);
+  }, [
+    registerDropContainer,
+    unregisterDropContainer,
+    config.id,
+    config.accepts,
+  ]);
 
   // Update isOver state when target container changes
   useEffect(() => {
@@ -71,7 +77,12 @@ export function useDroppable(config: DroppableConfig) {
       // Call callbacks if defined
       if (newIsOver && config.onDragEnter && dragState.draggedItem) {
         config.onDragEnter(dragState.draggedItem);
-      } else if (!newIsOver && isOver && config.onDragLeave && dragState.draggedItem) {
+      } else if (
+        !newIsOver &&
+        isOver &&
+        config.onDragLeave &&
+        dragState.draggedItem
+      ) {
         config.onDragLeave(dragState.draggedItem);
       }
     }

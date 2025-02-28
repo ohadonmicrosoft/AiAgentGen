@@ -13,6 +13,7 @@ Unit tests focus on testing individual components and functions in isolation:
 - **Hook Tests**: Tests for custom hooks like `useHaptic`, `useReducedMotion`, etc.
 
 Key unit test files:
+
 - `client/src/components/ui/__tests__/button.test.tsx`
 - `client/src/components/ui/__tests__/touch-button.test.tsx`
 - `client/src/components/ui/__tests__/offline-indicator.test.tsx`
@@ -31,6 +32,7 @@ Integration tests verify that different parts of the application work together c
 - **API Integration**: Tests the integration between frontend components and backend APIs.
 
 Key integration test files:
+
 - `client/src/__tests__/integration/login-flow.test.tsx`
 
 ### End-to-End Tests
@@ -41,6 +43,7 @@ E2E tests simulate real user interactions across the entire application:
 - **Cross-browser Testing**: Tests the application across different browsers and viewport sizes.
 
 Key E2E test files:
+
 - `e2e/agent-creation.spec.ts`
 - `e2e/visual-regression.spec.ts`
 
@@ -52,6 +55,7 @@ Performance tests ensure the application meets performance standards:
 - **Performance Metrics**: First Contentful Paint, Largest Contentful Paint, Time to Interactive, etc.
 
 Configuration:
+
 - `lighthouserc.js`
 
 ### Visual Regression Testing
@@ -64,6 +68,7 @@ Visual regression tests ensure UI consistency across changes:
 - **Dark Mode**: Tests appearance in dark mode.
 
 Key visual regression test files:
+
 - `e2e/visual-regression.spec.ts`
 
 ## Test Configuration
@@ -86,6 +91,7 @@ The testing strategy is integrated into the CI/CD pipeline:
 - **Deployment Gates**: Tests must pass before deployment to staging or production
 
 Configuration:
+
 - `.github/workflows/ci.yml`
 
 ## Running Tests Locally
@@ -113,6 +119,7 @@ npm run test:all
 ## Test Coverage
 
 Test coverage is tracked for:
+
 - Unit tests: `coverage/`
 - Integration tests: `coverage-integration/`
 
@@ -121,4 +128,4 @@ Test coverage is tracked for:
 - Add more integration tests for critical user flows
 - Expand E2E test coverage for additional user journeys
 - Implement API contract testing
-- Add load testing for high-traffic scenarios 
+- Add load testing for high-traffic scenarios

@@ -1,6 +1,6 @@
+import { logger } from '@/lib/logger';
 import { useCallback } from 'react';
 import { useIsMobile } from './use-mobile';
-import { logger } from '@/lib/logger';
 
 /**
  * Haptic patterns for different feedback types
@@ -24,7 +24,8 @@ export function useHaptic() {
   /**
    * Check if vibration is supported on this device
    */
-  const isSupported = typeof navigator !== 'undefined' && 'vibrate' in navigator;
+  const isSupported =
+    typeof navigator !== 'undefined' && 'vibrate' in navigator;
 
   /**
    * Trigger haptic feedback with the specified pattern.

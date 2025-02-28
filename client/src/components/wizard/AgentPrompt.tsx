@@ -1,19 +1,6 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
@@ -23,16 +10,31 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Info, Search, Star, BookOpen, Plus } from 'lucide-react';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
-import { useQuery } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Prompt } from '@shared/schema';
+import { useQuery } from '@tanstack/react-query';
+import { BookOpen, Info, Plus, Search, Star } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 const formSchema = z.object({
-  systemPrompt: z.string().min(10, 'System prompt must be at least 10 characters'),
+  systemPrompt: z
+    .string()
+    .min(10, 'System prompt must be at least 10 characters'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -80,10 +82,14 @@ export default function AgentPrompt({
       prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       prompt.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (Array.isArray(prompt.tags) &&
-        prompt.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))),
+        prompt.tags.some((tag: string) =>
+          tag.toLowerCase().includes(searchQuery.toLowerCase()),
+        )),
   );
 
-  const favoritePrompts = filteredPrompts?.filter((prompt) => prompt.isFavorite);
+  const favoritePrompts = filteredPrompts?.filter(
+    (prompt) => prompt.isFavorite,
+  );
 
   // Handle selecting a prompt from the library
   const handleSelectPrompt = (prompt: Prompt) => {
@@ -112,8 +118,8 @@ export default function AgentPrompt({
             <Info className="h-4 w-4" />
             <AlertTitle>System Prompt</AlertTitle>
             <AlertDescription>
-              The system prompt defines your agent's behavior and personality. It's the foundation
-              that guides how the AI responds.
+              The system prompt defines your agent's behavior and personality.
+              It's the foundation that guides how the AI responds.
             </AlertDescription>
           </Alert>
 
@@ -124,7 +130,10 @@ export default function AgentPrompt({
               <FormItem>
                 <div className="flex items-center justify-between">
                   <FormLabel>System Prompt</FormLabel>
-                  <Dialog open={isPromptLibraryOpen} onOpenChange={setIsPromptLibraryOpen}>
+                  <Dialog
+                    open={isPromptLibraryOpen}
+                    onOpenChange={setIsPromptLibraryOpen}
+                  >
                     <DialogTrigger asChild>
                       <Button
                         variant="outline"
@@ -140,7 +149,8 @@ export default function AgentPrompt({
                       <DialogHeader>
                         <DialogTitle>Prompt Library</DialogTitle>
                         <DialogDescription>
-                          Select a prompt from your library to use as a starting point.
+                          Select a prompt from your library to use as a starting
+                          point.
                         </DialogDescription>
                       </DialogHeader>
 
@@ -175,7 +185,9 @@ export default function AgentPrompt({
                               >
                                 <CardContent className="p-4">
                                   <div className="flex justify-between items-start mb-2">
-                                    <h3 className="font-medium">{prompt.title}</h3>
+                                    <h3 className="font-medium">
+                                      {prompt.title}
+                                    </h3>
                                     {prompt.isFavorite && (
                                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                                     )}
@@ -183,7 +195,11 @@ export default function AgentPrompt({
                                   <div className="flex flex-wrap gap-1 mb-2">
                                     {Array.isArray(prompt.tags) &&
                                       prompt.tags.map((tag: string) => (
-                                        <Badge key={tag} variant="secondary" className="text-xs">
+                                        <Badge
+                                          key={tag}
+                                          variant="secondary"
+                                          className="text-xs"
+                                        >
                                           {tag}
                                         </Badge>
                                       ))}
@@ -197,8 +213,8 @@ export default function AgentPrompt({
                             {filteredPrompts?.length === 0 && (
                               <div className="text-center py-8">
                                 <p className="text-muted-foreground">
-                                  No prompts found. Try a different search term or create prompts in
-                                  the Prompts page.
+                                  No prompts found. Try a different search term
+                                  or create prompts in the Prompts page.
                                 </p>
                               </div>
                             )}
@@ -215,13 +231,19 @@ export default function AgentPrompt({
                               >
                                 <CardContent className="p-4">
                                   <div className="flex justify-between items-start mb-2">
-                                    <h3 className="font-medium">{prompt.title}</h3>
+                                    <h3 className="font-medium">
+                                      {prompt.title}
+                                    </h3>
                                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                                   </div>
                                   <div className="flex flex-wrap gap-1 mb-2">
                                     {Array.isArray(prompt.tags) &&
                                       prompt.tags.map((tag: string) => (
-                                        <Badge key={tag} variant="secondary" className="text-xs">
+                                        <Badge
+                                          key={tag}
+                                          variant="secondary"
+                                          className="text-xs"
+                                        >
                                           {tag}
                                         </Badge>
                                       ))}
@@ -235,8 +257,8 @@ export default function AgentPrompt({
                             {favoritePrompts?.length === 0 && (
                               <div className="text-center py-8">
                                 <p className="text-muted-foreground">
-                                  No favorite prompts found. Star your favorite prompts to access
-                                  them quickly.
+                                  No favorite prompts found. Star your favorite
+                                  prompts to access them quickly.
                                 </p>
                               </div>
                             )}
@@ -254,8 +276,8 @@ export default function AgentPrompt({
                   />
                 </FormControl>
                 <FormDescription>
-                  This is the first instruction given to the AI model to set its behavior and
-                  context.
+                  This is the first instruction given to the AI model to set its
+                  behavior and context.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -263,7 +285,9 @@ export default function AgentPrompt({
           />
 
           <div className="bg-muted p-4 rounded-md">
-            <h3 className="text-sm font-medium mb-2">Tips for effective prompts:</h3>
+            <h3 className="text-sm font-medium mb-2">
+              Tips for effective prompts:
+            </h3>
             <ul className="text-sm text-muted-foreground space-y-1">
               <li>• Be clear about the agent's role and purpose</li>
               <li>• Specify the tone and style of responses</li>
@@ -274,7 +298,12 @@ export default function AgentPrompt({
         </div>
 
         <div className="flex justify-between mt-6">
-          <Button type="button" variant="outline" onClick={onBack} disabled={preview}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onBack}
+            disabled={preview}
+          >
             Back
           </Button>
           <Button type="submit" disabled={preview}>

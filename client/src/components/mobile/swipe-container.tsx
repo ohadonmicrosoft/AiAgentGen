@@ -1,13 +1,14 @@
-import * as React from 'react';
-import { motion, useAnimation, PanInfo } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import { withErrorBoundary } from '@/components/ui/error-boundary';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Logger } from '@/lib/logger';
+import { cn } from '@/lib/utils';
+import { PanInfo, motion, useAnimation } from 'framer-motion';
+import * as React from 'react';
 
 const logger = new Logger('SwipeContainer');
 
-export interface SwipeContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SwipeContainerProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Function called when user swipes left
    */
@@ -64,7 +65,10 @@ export interface SwipeContainerProps extends React.HTMLAttributes<HTMLDivElement
   children: React.ReactNode;
 }
 
-const SwipeContainerBase = React.forwardRef<HTMLDivElement, SwipeContainerProps>(
+const SwipeContainerBase = React.forwardRef<
+  HTMLDivElement,
+  SwipeContainerProps
+>(
   (
     {
       className,
@@ -95,18 +99,26 @@ const SwipeContainerBase = React.forwardRef<HTMLDivElement, SwipeContainerProps>
           if (!isSwipeEnabled) return;
 
           const { offset, velocity } = info;
-          const isHorizontalEnabled = direction === 'horizontal' || direction === 'both';
-          const isVerticalEnabled = direction === 'vertical' || direction === 'both';
+          const isHorizontalEnabled =
+            direction === 'horizontal' || direction === 'both';
+          const isVerticalEnabled =
+            direction === 'vertical' || direction === 'both';
 
           // Check if the horizontal swipe meets the threshold
           if (isHorizontalEnabled) {
             // Check if swipe distance exceeds threshold OR velocity is high enough
-            if (offset.x < -swipeThreshold || (offset.x < -20 && velocity.x < -0.5)) {
+            if (
+              offset.x < -swipeThreshold ||
+              (offset.x < -20 && velocity.x < -0.5)
+            ) {
               if (onSwipeLeft) {
                 onSwipeLeft();
                 logger.debug('Swipe left detected');
               }
-            } else if (offset.x > swipeThreshold || (offset.x > 20 && velocity.x > 0.5)) {
+            } else if (
+              offset.x > swipeThreshold ||
+              (offset.x > 20 && velocity.x > 0.5)
+            ) {
               if (onSwipeRight) {
                 onSwipeRight();
                 logger.debug('Swipe right detected');
@@ -116,12 +128,18 @@ const SwipeContainerBase = React.forwardRef<HTMLDivElement, SwipeContainerProps>
 
           // Check if the vertical swipe meets the threshold
           if (isVerticalEnabled) {
-            if (offset.y < -swipeThreshold || (offset.y < -20 && velocity.y < -0.5)) {
+            if (
+              offset.y < -swipeThreshold ||
+              (offset.y < -20 && velocity.y < -0.5)
+            ) {
               if (onSwipeUp) {
                 onSwipeUp();
                 logger.debug('Swipe up detected');
               }
-            } else if (offset.y > swipeThreshold || (offset.y > 20 && velocity.y > 0.5)) {
+            } else if (
+              offset.y > swipeThreshold ||
+              (offset.y > 20 && velocity.y > 0.5)
+            ) {
               if (onSwipeDown) {
                 onSwipeDown();
                 logger.debug('Swipe down detected');
@@ -136,7 +154,10 @@ const SwipeContainerBase = React.forwardRef<HTMLDivElement, SwipeContainerProps>
         controls.start({
           x: 0,
           y: 0,
-          transition: { type: useSpringAnimation ? 'spring' : 'tween', bounce: 0.2 },
+          transition: {
+            type: useSpringAnimation ? 'spring' : 'tween',
+            bounce: 0.2,
+          },
         });
       },
       [
@@ -160,8 +181,10 @@ const SwipeContainerBase = React.forwardRef<HTMLDivElement, SwipeContainerProps>
           if (!isSwipeEnabled || !visualFeedback) return;
 
           // Determine drag constraints based on direction
-          const isHorizontalEnabled = direction === 'horizontal' || direction === 'both';
-          const isVerticalEnabled = direction === 'vertical' || direction === 'both';
+          const isHorizontalEnabled =
+            direction === 'horizontal' || direction === 'both';
+          const isVerticalEnabled =
+            direction === 'vertical' || direction === 'both';
 
           // Update position if visual feedback is enabled
           controls.set({
@@ -183,13 +206,17 @@ const SwipeContainerBase = React.forwardRef<HTMLDivElement, SwipeContainerProps>
           disabled && 'pointer-events-none',
           className,
         )}
-        drag={isSwipeEnabled ? (direction === 'both' ? true : direction) : false}
+        drag={
+          isSwipeEnabled ? (direction === 'both' ? true : direction) : false
+        }
         dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
         dragElastic={0.1} // Add a bit of elasticity
         onDrag={handleDrag}
         onDragEnd={handleDragEnd}
         animate={controls}
-        whileTap={isSwipeEnabled && visualFeedback ? { scale: 0.98 } : undefined}
+        whileTap={
+          isSwipeEnabled && visualFeedback ? { scale: 0.98 } : undefined
+        }
         style={{
           // Hardware acceleration for smoother animations
           willChange: isSwipeEnabled ? 'transform' : 'auto',

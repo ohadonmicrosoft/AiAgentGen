@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
-import { log } from './vite';
 import { storage } from './storage';
+import { log } from './vite';
 
 // Create a mock OpenAI client for testing
 function createMockOpenAIClient() {
@@ -16,14 +16,16 @@ function createMockOpenAIClient() {
           );
 
           // Extract the user message
-          const userMessage = options.messages.find((m: any) => m.role === 'user')?.content || '';
+          const userMessage =
+            options.messages.find((m: any) => m.role === 'user')?.content || '';
 
           // Generate a mock response based on the user message
           let responseContent = `This is a mock response to: "${userMessage}"`;
 
           // Add some variety based on the content of the message
           if (userMessage.toLowerCase().includes('hello')) {
-            responseContent = "Hello! I'm a mock AI assistant. How can I help you today?";
+            responseContent =
+              "Hello! I'm a mock AI assistant. How can I help you today?";
           } else if (userMessage.toLowerCase().includes('help')) {
             responseContent =
               "I'd be happy to help! However, I'm currently running in mock mode without access to the real OpenAI API.";
@@ -73,7 +75,9 @@ const createOpenAIClient = (apiKey?: string) => {
     }
 
     if (!key) {
-      console.warn('[openai] No API key provided - falling back to mock client');
+      console.warn(
+        '[openai] No API key provided - falling back to mock client',
+      );
       return createMockOpenAIClient();
     } else {
       console.log(
@@ -267,16 +271,17 @@ export async function generateResponse(
 
   try {
     // Process and validate prompts
-    const { systemPrompt: processedSystemPrompt, userPrompt: processedUserPrompt } = processPrompts(
-      systemPrompt,
-      userPrompt,
-    );
+    const {
+      systemPrompt: processedSystemPrompt,
+      userPrompt: processedUserPrompt,
+    } = processPrompts(systemPrompt, userPrompt);
 
     // Call OpenAI API
     // Use the numeric temperature and maxTokens values
     const numericTemperature =
       typeof temperature === 'string' ? parseFloat(temperature) : temperature;
-    const numericMaxTokens = typeof maxTokens === 'string' ? parseInt(maxTokens) : maxTokens;
+    const numericMaxTokens =
+      typeof maxTokens === 'string' ? parseInt(maxTokens) : maxTokens;
 
     const response = await openai.chat.completions.create({
       model,
@@ -319,7 +324,9 @@ export async function generateResponse(
 
     // If it's an authentication error, fall back to the mock client
     if (error.message?.includes('401') || error.message?.includes('API key')) {
-      console.log('[openai] Authentication error, falling back to mock implementation');
+      console.log(
+        '[openai] Authentication error, falling back to mock implementation',
+      );
 
       // Create a mock response
       const mockOpenai = createMockOpenAIClient();
@@ -390,15 +397,16 @@ export async function* generateStreamingResponse(
     const openai = createOpenAIClient(apiKey || undefined);
 
     // Process and validate prompts
-    const { systemPrompt: processedSystemPrompt, userPrompt: processedUserPrompt } = processPrompts(
-      systemPrompt,
-      userPrompt,
-    );
+    const {
+      systemPrompt: processedSystemPrompt,
+      userPrompt: processedUserPrompt,
+    } = processPrompts(systemPrompt, userPrompt);
 
     // Use the numeric temperature and maxTokens values
     const numericTemperature =
       typeof temperature === 'string' ? parseFloat(temperature) : temperature;
-    const numericMaxTokens = typeof maxTokens === 'string' ? parseInt(maxTokens) : maxTokens;
+    const numericMaxTokens =
+      typeof maxTokens === 'string' ? parseInt(maxTokens) : maxTokens;
 
     // Add request timeout - break streaming after 45 seconds as a safeguard
     const abortController = new AbortController();
@@ -428,7 +436,8 @@ export async function* generateStreamingResponse(
     );
 
     let fullContent = '';
-    const promptTokensEstimate = processedSystemPrompt.length / 4 + processedUserPrompt.length / 4;
+    const promptTokensEstimate =
+      processedSystemPrompt.length / 4 + processedUserPrompt.length / 4;
     let completionTokensEstimate = 0;
     const streamStart = Date.now();
     let lastChunkTime = streamStart;
@@ -467,10 +476,13 @@ export async function* generateStreamingResponse(
 
       // Log total streaming performance
       const totalStreamTime = Date.now() - streamStart;
-      console.log(`[openai] Streaming complete: ${totalStreamTime}ms, ${chunkCount} chunks`);
+      console.log(
+        `[openai] Streaming complete: ${totalStreamTime}ms, ${chunkCount} chunks`,
+      );
 
       // Estimate token usage
-      const totalTokensEstimate = promptTokensEstimate + completionTokensEstimate;
+      const totalTokensEstimate =
+        promptTokensEstimate + completionTokensEstimate;
 
       // Track token usage
       trackTokenUsage({
@@ -527,7 +539,11 @@ export async function* generateStreamingResponse(
 /**
  * Test an agent with a user message
  */
-export async function testAgentResponse(agent: Partial<any>, userMessage: string, userId?: number) {
+export async function testAgentResponse(
+  agent: Partial<any>,
+  userMessage: string,
+  userId?: number,
+) {
   if (!agent.systemPrompt) {
     throw new Error('Agent system prompt is required');
   }

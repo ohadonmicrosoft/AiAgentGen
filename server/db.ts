@@ -14,7 +14,10 @@ class MockPostgresClient {
 
   // Mock the sql template literal tag function
   sql(strings: TemplateStringsArray, ...values: any[]) {
-    logger.debug('[Mock DB] SQL template:', { strings: strings.join(''), values });
+    logger.debug('[Mock DB] SQL template:', {
+      strings: strings.join(''),
+      values,
+    });
     return [];
   }
 
@@ -116,9 +119,12 @@ async function initializeDatabase() {
           },
           // Add retry logic for connection errors
           onretry: (err, attempts) => {
-            logger.warn(`Connection error, retrying (${attempts}/${MAX_CONNECTIONS * 2})`, {
-              error: err.message,
-            });
+            logger.warn(
+              `Connection error, retrying (${attempts}/${MAX_CONNECTIONS * 2})`,
+              {
+                error: err.message,
+              },
+            );
             return true; // Continue retrying
           },
         });
@@ -152,13 +158,18 @@ async function initializeDatabase() {
     }
 
     // All retry attempts failed
-    logger.error('[DB] Failed to establish database connection after multiple attempts', {
-      lastError,
-    });
+    logger.error(
+      '[DB] Failed to establish database connection after multiple attempts',
+      {
+        lastError,
+      },
+    );
 
     // Fallback to mock in development, but throw in production
     if (isDevelopment) {
-      logger.warn('[DB] Falling back to mock database since connection failed in development mode');
+      logger.warn(
+        '[DB] Falling back to mock database since connection failed in development mode',
+      );
 
       // Create a mock postgres client as fallback
       pool = new MockPostgresClient();
@@ -197,7 +208,9 @@ async function initializeDatabase() {
 
       return { pool, db };
     } else {
-      throw new Error('Failed to establish database connection in production environment');
+      throw new Error(
+        'Failed to establish database connection in production environment',
+      );
     }
   }
 }
@@ -260,7 +273,9 @@ export function startHealthCheck(intervalMs = 30000): void {
 
       // If we have several consecutive failures, restart the connection pool
       if (failedHealthChecks >= 3) {
-        logger.warn('Multiple database health check failures, attempting to reset pool');
+        logger.warn(
+          'Multiple database health check failures, attempting to reset pool',
+        );
         try {
           await pool.end({ timeout: 5 });
 
@@ -321,7 +336,9 @@ process.on('uncaughtException', (err: Error) => {
         logger.info('Database connection recovered after error');
       })
       .catch((recoveryErr) => {
-        logger.error('Failed to recover database connection', { error: recoveryErr.message });
+        logger.error('Failed to recover database connection', {
+          error: recoveryErr.message,
+        });
         // In production, exit after failed recovery to let the system restart
         if (process.env.NODE_ENV === 'production') {
           process.exit(1);
@@ -338,7 +355,9 @@ process.on('unhandledRejection', (reason: unknown) => {
       stack: reason.stack,
     });
   } else {
-    logger.error('Unhandled promise rejection with non-error reason:', { reason });
+    logger.error('Unhandled promise rejection with non-error reason:', {
+      reason,
+    });
   }
   // Don't exit process here to avoid constant restarts
 });

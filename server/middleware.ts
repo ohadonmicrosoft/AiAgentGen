@@ -1,9 +1,13 @@
-import { Request, Response, NextFunction } from 'express';
-import { Permission, PERMISSIONS, ROLES } from '@shared/schema';
+import { PERMISSIONS, Permission, ROLES } from '@shared/schema';
+import { NextFunction, Request, Response } from 'express';
 import { storage } from './storage';
 
 // Authentication middleware
-export function checkAuthenticated(req: Request, res: Response, next: NextFunction) {
+export function checkAuthenticated(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   if (req.isAuthenticated()) {
     return next();
   }
@@ -19,12 +23,17 @@ export function checkPermission(requiredPermission: Permission) {
 
     try {
       const userId = req.user!.id;
-      const hasPermission = await storage.hasPermission(userId, requiredPermission);
+      const hasPermission = await storage.hasPermission(
+        userId,
+        requiredPermission,
+      );
 
       if (hasPermission) {
         return next();
       } else {
-        console.warn(`[Permission] User ${userId} denied access to ${requiredPermission}`);
+        console.warn(
+          `[Permission] User ${userId} denied access to ${requiredPermission}`,
+        );
         return res.status(403).json({
           error: 'Forbidden',
           message: 'You do not have permission to perform this action',
@@ -72,7 +81,10 @@ export function checkResourceOwnership(
 
     try {
       // Check if the user has permission to manage any resource
-      const hasAnyPermission = await storage.hasPermission(userId, anyPermission);
+      const hasAnyPermission = await storage.hasPermission(
+        userId,
+        anyPermission,
+      );
       if (hasAnyPermission) {
         return next();
       }
@@ -98,7 +110,10 @@ export function checkResourceOwnership(
         message: 'You do not have permission to access this resource',
       });
     } catch (error) {
-      console.error(`[Permission] Error checking ${resourceType} ownership:`, error);
+      console.error(
+        `[Permission] Error checking ${resourceType} ownership:`,
+        error,
+      );
       return res.status(500).json({ error: 'Internal server error' });
     }
   };

@@ -64,7 +64,10 @@ function getAnnouncer(type: AnnouncementType): HTMLElement {
  * @param type The type of announcement
  * @returns An object with the current message and a function to set a new message
  */
-export function useAnnouncer(initialMessage = '', type: AnnouncementType = 'polite') {
+export function useAnnouncer(
+  initialMessage = '',
+  type: AnnouncementType = 'polite',
+) {
   const [message, setMessage] = useState(initialMessage);
 
   useEffect(() => {
@@ -165,7 +168,9 @@ export function useFocusTrap(active = true, onEscape?: () => void) {
 /**
  * Get all focusable elements within a container
  */
-export function getFocusableElements(container: HTMLElement | null): HTMLElement[] {
+export function getFocusableElements(
+  container: HTMLElement | null,
+): HTMLElement[] {
   if (!container) return [];
 
   const selector = [

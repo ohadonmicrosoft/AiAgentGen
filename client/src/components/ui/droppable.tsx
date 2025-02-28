@@ -1,8 +1,8 @@
-import React, { forwardRef } from 'react';
-import { motion } from 'framer-motion';
 import { useDroppable } from '@/hooks/use-droppable';
-import { DroppableConfig, DraggableItem, DragResult } from '@/types/drag-types';
 import { cn } from '@/lib/utils';
+import { DragResult, DraggableItem, DroppableConfig } from '@/types/drag-types';
+import { motion } from 'framer-motion';
+import React, { forwardRef } from 'react';
 
 export interface DroppableProps extends React.HTMLAttributes<HTMLDivElement> {
   id: string;
@@ -45,7 +45,8 @@ const Droppable = forwardRef<HTMLDivElement, DroppableProps>(
       onDrop,
     };
 
-    const { droppableProps, isOver, canAccept, animationControls } = useDroppable(config);
+    const { droppableProps, isOver, canAccept, animationControls } =
+      useDroppable(config);
 
     // Default placeholder if no children and an emptyPlaceholder is provided
     const hasChildren = React.Children.count(children) > 0;
@@ -57,7 +58,10 @@ const Droppable = forwardRef<HTMLDivElement, DroppableProps>(
         className={cn(
           'min-h-[50px] rounded-md transition-colors',
           orientation === 'vertical' ? 'flex flex-col' : 'flex flex-row',
-          highlightOnHover && isOver && canAccept && 'bg-primary/10 border-primary',
+          highlightOnHover &&
+            isOver &&
+            canAccept &&
+            'bg-primary/10 border-primary',
           highlightOnHover && !isOver && 'border-dashed',
           className,
         )}

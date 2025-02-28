@@ -1,16 +1,16 @@
-import * as React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useReducedMotion } from '@/hooks/use-reduced-motion';
-import { cn } from '@/lib/utils';
 import {
-  FormField,
-  FormItem,
   FormControl,
   FormDescription,
-  FormMessage,
+  FormField,
+  FormItem,
   FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'framer-motion';
+import * as React from 'react';
 import { ControllerProps, FieldPath, FieldValues } from 'react-hook-form';
 
 interface AnimatedFormFieldProps<
@@ -66,7 +66,9 @@ export function AnimatedFormField<
               <FormLabel>
                 {label}
                 {/* Required indicator */}
-                {props.rules?.required && <span className="text-destructive ml-1">*</span>}
+                {props.rules?.required && (
+                  <span className="text-destructive ml-1">*</span>
+                )}
               </FormLabel>
             )}
 
@@ -106,14 +108,22 @@ export function AnimatedFormField<
                     )}
                     initial={false}
                     animate={{
-                      y: hasValue || field.name === document.activeElement?.id ? 4 : 10,
-                      scale: hasValue || field.name === document.activeElement?.id ? 0.8 : 1,
+                      y:
+                        hasValue || field.name === document.activeElement?.id
+                          ? 4
+                          : 10,
+                      scale:
+                        hasValue || field.name === document.activeElement?.id
+                          ? 0.8
+                          : 1,
                       x: 0,
                     }}
                     transition={getTransition()}
                   >
                     {label}
-                    {props.rules?.required && <span className="text-destructive ml-1">*</span>}
+                    {props.rules?.required && (
+                      <span className="text-destructive ml-1">*</span>
+                    )}
                   </motion.span>
                 )}
 

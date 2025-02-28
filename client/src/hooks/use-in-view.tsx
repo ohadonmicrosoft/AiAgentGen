@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, MutableRefObject } from 'react';
+import { MutableRefObject, useEffect, useRef, useState } from 'react';
 
 export interface UseInViewOptions {
   /**
@@ -125,7 +125,10 @@ export function InView<T extends Element = Element>({
 }: UseInViewOptions & {
   children:
     | React.ReactNode
-    | ((inView: boolean, entry: IntersectionObserverEntry | null) => React.ReactNode);
+    | ((
+        inView: boolean,
+        entry: IntersectionObserverEntry | null,
+      ) => React.ReactNode);
   as?: React.ElementType;
   onChange?: (inView: boolean, entry: IntersectionObserverEntry | null) => void;
 }) {

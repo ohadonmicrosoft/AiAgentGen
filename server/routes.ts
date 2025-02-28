@@ -1,15 +1,15 @@
+import { type Server, createServer } from 'http';
+import { PERMISSIONS, ROLES, userRoleUpdateSchema } from '@shared/schema';
 import type { Express } from 'express';
-import { createServer, type Server } from 'http';
 import { setupAuth } from './auth';
-import { storage } from './storage';
 import {
-  checkAuthenticated,
   checkAdmin,
+  checkAuthenticated,
   checkPermission,
   checkResourceOwnership,
 } from './middleware';
 import openaiService, { testAgentResponse } from './openai';
-import { PERMISSIONS, ROLES, userRoleUpdateSchema } from '@shared/schema';
+import { storage } from './storage';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
@@ -24,7 +24,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const prompts = await storage.getPromptsByUserId(userId);
 
       res.json({
-        activeAgents: agents.filter((agent) => agent.status === 'active').length,
+        activeAgents: agents.filter((agent) => agent.status === 'active')
+          .length,
         savedPrompts: prompts.length,
         totalInteractions: 0, // Would be calculated from an interactions table in a real implementation
       });
@@ -39,11 +40,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user!.id;
 
       // Check if user has permission to view all agents
-      const canViewAllAgents = await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT);
+      const canViewAllAgents = await storage.hasPermission(
+        userId,
+        PERMISSIONS.VIEW_ANY_AGENT,
+      );
 
       let agents;
       if (canViewAllAgents) {
-        console.log(`[Agents] User ${userId} has permission to view all agents`);
+        console.log(
+          `[Agents] User ${userId} has permission to view all agents`,
+        );
         agents = await storage.getAllAgents();
       } else {
         agents = await storage.getAgentsByUserId(userId);
@@ -61,7 +67,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user!.id;
 
       // Check if user has permission to create agents
-      const canCreateAgents = await storage.hasPermission(userId, PERMISSIONS.CREATE_AGENT);
+      const canCreateAgents = await storage.hasPermission(
+        userId,
+        PERMISSIONS.CREATE_AGENT,
+      );
 
       if (!canCreateAgents) {
         return res.status(403).json({
@@ -157,11 +166,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user!.id;
 
       // Check if user has permission to view all prompts
-      const canViewAllPrompts = await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_PROMPT);
+      const canViewAllPrompts = await storage.hasPermission(
+        userId,
+        PERMISSIONS.VIEW_ANY_PROMPT,
+      );
 
       let prompts;
       if (canViewAllPrompts) {
-        console.log(`[Prompts] User ${userId} has permission to view all prompts`);
+        console.log(
+          `[Prompts] User ${userId} has permission to view all prompts`,
+        );
         prompts = await storage.getAllPrompts();
       } else {
         prompts = await storage.getPromptsByUserId(userId);
@@ -179,7 +193,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user!.id;
 
       // Check if user has permission to create prompts
-      const canCreatePrompts = await storage.hasPermission(userId, PERMISSIONS.CREATE_PROMPT);
+      const canCreatePrompts = await storage.hasPermission(
+        userId,
+        PERMISSIONS.CREATE_PROMPT,
+      );
 
       if (!canCreatePrompts) {
         return res.status(403).json({
@@ -307,7 +324,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           agent.userId !== userId &&
           !(await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT))
         ) {
-          return res.status(403).json({ error: "You don't have permission to use this agent" });
+          return res
+            .status(403)
+            .json({ error: "You don't have permission to use this agent" });
         }
       } else {
         // Use a temporary agent configuration from request body
@@ -339,7 +358,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const response = await testAgentResponse(agent, message, userId);
 
       // Send Slack notification for agent usage
-      if (agent.id && process.env.SLACK_BOT_TOKEN && process.env.SLACK_CHANNEL_ID) {
+      if (
+        agent.id &&
+        process.env.SLACK_BOT_TOKEN &&
+        process.env.SLACK_CHANNEL_ID
+      ) {
         import('./slack').then(({ default: slackService }) => {
           const tokenUsage = {
             promptTokens: 0,
@@ -373,7 +396,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               tokenUsage.completionTokens = response.usage.completion_tokens;
             }
 
-            if ('totalTokens' in response.usage && typeof response.usage.totalTokens === 'number') {
+            if (
+              'totalTokens' in response.usage &&
+              typeof response.usage.totalTokens === 'number'
+            ) {
               tokenUsage.totalTokens = response.usage.totalTokens;
             } else if (
               'total_tokens' in response.usage &&
@@ -458,7 +484,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         agent = await storage.getAgent(agentIdNumber);
 
         if (agent) {
-          console.log(`[Stream] Using agent: "${agent.name}" (ID: ${agent.id})`);
+          console.log(
+            `[Stream] Using agent: "${agent.name}" (ID: ${agent.id})`,
+          );
 
           // Check if user can access this agent
           if (
@@ -466,7 +494,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             !(await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT))
           ) {
             clearTimeout(connectionTimeout);
-            return res.status(403).json({ error: "You don't have permission to use this agent" });
+            return res
+              .status(403)
+              .json({ error: "You don't have permission to use this agent" });
           }
         } else {
           console.warn(`[Stream] Agent not found: ${agentId}`);
@@ -521,7 +551,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.setHeader('X-Accel-Buffering', 'no'); // Prevents proxy buffering
 
       // Import the streaming function dynamically
-      const { generateStreamingResponse, getTokenUsage } = await import('./openai');
+      const { generateStreamingResponse, getTokenUsage } = await import(
+        './openai'
+      );
 
       // Start streaming the AI response
       const stream = generateStreamingResponse(agent.systemPrompt, message, {
@@ -534,7 +566,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Send Slack notification about agent usage (if configured)
-      if (agentIdNumber && process.env.SLACK_BOT_TOKEN && process.env.SLACK_CHANNEL_ID) {
+      if (
+        agentIdNumber &&
+        process.env.SLACK_BOT_TOKEN &&
+        process.env.SLACK_CHANNEL_ID
+      ) {
         const user = await storage.getUser(userId);
         try {
           const { notifyAgentUsed } = await import('./slack');
@@ -585,14 +621,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Set a new timeout for the next chunk
         connectionTimeout = setTimeout(() => {
           console.error('[Stream] Response streaming timed out after 30s');
-          res.write(JSON.stringify({ error: 'Streaming timed out', done: true }));
+          res.write(
+            JSON.stringify({ error: 'Streaming timed out', done: true }),
+          );
           res.end();
         }, 30000); // 30-second timeout between chunks
       }
 
       // End the response
       res.end();
-      console.log(`[Stream] Request completed in ${Date.now() - requestStartTime}ms`);
+      console.log(
+        `[Stream] Request completed in ${Date.now() - requestStartTime}ms`,
+      );
     } catch (error: any) {
       console.error('[Stream] Error processing request:', error);
 
@@ -624,7 +664,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!apiKey && !process.env.OPENAI_API_KEY) {
         return res.status(400).json({
-          error: 'No API key found. Please add your OpenAI API key in the settings page.',
+          error:
+            'No API key found. Please add your OpenAI API key in the settings page.',
         });
       }
 
@@ -676,7 +717,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(userWithoutPassword);
     } catch (error: any) {
       console.error('[UserSettings] Profile update error:', error);
-      res.status(500).json({ error: error.message || 'Failed to update profile' });
+      res
+        .status(500)
+        .json({ error: error.message || 'Failed to update profile' });
     }
   });
 
@@ -688,7 +731,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { currentPassword, newPassword } = req.body;
       if (!currentPassword || !newPassword) {
-        return res.status(400).json({ error: 'Current password and new password are required' });
+        return res
+          .status(400)
+          .json({ error: 'Current password and new password are required' });
       }
 
       // Get current user
@@ -711,7 +756,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'Password updated successfully' });
     } catch (error: any) {
       console.error('[UserSettings] Password change error:', error);
-      res.status(500).json({ error: error.message || 'Failed to update password' });
+      res
+        .status(500)
+        .json({ error: error.message || 'Failed to update password' });
     }
   });
 
@@ -727,7 +774,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ hasApiKey: !!apiKey });
     } catch (error: any) {
       console.error('[UserSettings] Get API key error:', error);
-      res.status(500).json({ error: error.message || 'Failed to get API key status' });
+      res
+        .status(500)
+        .json({ error: error.message || 'Failed to get API key status' });
     }
   });
 
@@ -745,7 +794,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'API key saved successfully' });
     } catch (error: any) {
       console.error('[UserSettings] Save API key error:', error);
-      res.status(500).json({ error: error.message || 'Failed to save API key' });
+      res
+        .status(500)
+        .json({ error: error.message || 'Failed to save API key' });
     }
   });
 
@@ -767,7 +818,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(Object.values(PERMISSIONS));
     } catch (error: any) {
       console.error('[RBAC] Get permissions error:', error);
-      res.status(500).json({ error: error.message || 'Failed to fetch permissions' });
+      res
+        .status(500)
+        .json({ error: error.message || 'Failed to fetch permissions' });
     }
   });
 
@@ -801,9 +854,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate request body using the schema
       const validation = userRoleUpdateSchema.safeParse(req.body);
       if (!validation.success) {
-        return res
-          .status(400)
-          .json({ error: 'Invalid role update data', details: validation.error });
+        return res.status(400).json({
+          error: 'Invalid role update data',
+          details: validation.error,
+        });
       }
 
       const { role, customPermissions } = validation.data;
@@ -817,14 +871,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Update the user's role
-      const updatedUser = await storage.updateUserRole(userId, role, customPermissions);
+      const updatedUser = await storage.updateUserRole(
+        userId,
+        role,
+        customPermissions,
+      );
 
       // Don't send password back
       const { password, ...userWithoutPassword } = updatedUser;
       res.json(userWithoutPassword);
     } catch (error: any) {
       console.error('[RBAC] Update user role error:', error);
-      res.status(500).json({ error: error.message || 'Failed to update user role' });
+      res
+        .status(500)
+        .json({ error: error.message || 'Failed to update user role' });
     }
   });
 
@@ -836,7 +896,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(permissions);
     } catch (error: any) {
       console.error('[RBAC] Get user permissions error:', error);
-      res.status(500).json({ error: error.message || 'Failed to fetch user permissions' });
+      res
+        .status(500)
+        .json({ error: error.message || 'Failed to fetch user permissions' });
     }
   });
 
@@ -864,7 +926,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         agent.userId !== userId &&
         !(await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT))
       ) {
-        return res.status(403).json({ error: "You don't have permission to use this agent" });
+        return res
+          .status(403)
+          .json({ error: "You don't have permission to use this agent" });
       }
 
       // Create the conversation
@@ -877,7 +941,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(conversation);
     } catch (error: any) {
       console.error('[Conversations] Error creating conversation:', error);
-      res.status(500).json({ error: error.message || 'Failed to create conversation' });
+      res
+        .status(500)
+        .json({ error: error.message || 'Failed to create conversation' });
     }
   });
 
@@ -904,39 +970,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(conversations);
     } catch (error: any) {
       console.error('[Conversations] Error fetching conversations:', error);
-      res.status(500).json({ error: error.message || 'Failed to fetch conversations' });
+      res
+        .status(500)
+        .json({ error: error.message || 'Failed to fetch conversations' });
     }
   });
 
   // Get conversations for a specific agent
-  app.get('/api/agents/:id/conversations', checkAuthenticated, async (req, res) => {
-    try {
-      const agentId = parseInt(req.params.id);
-      const userId = req.user!.id;
-      console.log('[Conversations] Fetching conversations for agent', agentId);
+  app.get(
+    '/api/agents/:id/conversations',
+    checkAuthenticated,
+    async (req, res) => {
+      try {
+        const agentId = parseInt(req.params.id);
+        const userId = req.user!.id;
+        console.log(
+          '[Conversations] Fetching conversations for agent',
+          agentId,
+        );
 
-      // Check if user has permission to view this agent
-      const agent = await storage.getAgent(agentId);
-      if (!agent) {
-        return res.status(404).json({ error: 'Agent not found' });
+        // Check if user has permission to view this agent
+        const agent = await storage.getAgent(agentId);
+        if (!agent) {
+          return res.status(404).json({ error: 'Agent not found' });
+        }
+
+        if (
+          agent.userId !== userId &&
+          !(await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT))
+        ) {
+          return res.status(403).json({
+            error:
+              "You don't have permission to view this agent's conversations",
+          });
+        }
+
+        const conversations = await storage.getConversationsByAgentId(agentId);
+        res.json(conversations);
+      } catch (error: any) {
+        console.error(
+          '[Conversations] Error fetching agent conversations:',
+          error,
+        );
+        res
+          .status(500)
+          .json({ error: error.message || 'Failed to fetch conversations' });
       }
-
-      if (
-        agent.userId !== userId &&
-        !(await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_AGENT))
-      ) {
-        return res
-          .status(403)
-          .json({ error: "You don't have permission to view this agent's conversations" });
-      }
-
-      const conversations = await storage.getConversationsByAgentId(agentId);
-      res.json(conversations);
-    } catch (error: any) {
-      console.error('[Conversations] Error fetching agent conversations:', error);
-      res.status(500).json({ error: error.message || 'Failed to fetch conversations' });
-    }
-  });
+    },
+  );
 
   // Get a specific conversation with its messages
   app.get('/api/conversations/:id', checkAuthenticated, async (req, res) => {
@@ -954,15 +1035,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has permission to view this conversation
       if (
         conversation.userId !== userId &&
-        !(await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_CONVERSATION))
+        !(await storage.hasPermission(
+          userId,
+          PERMISSIONS.VIEW_ANY_CONVERSATION,
+        ))
       ) {
-        return res
-          .status(403)
-          .json({ error: "You don't have permission to view this conversation" });
+        return res.status(403).json({
+          error: "You don't have permission to view this conversation",
+        });
       }
 
       // Get messages for this conversation
-      const messages = await storage.getMessagesByConversationId(conversationId);
+      const messages =
+        await storage.getMessagesByConversationId(conversationId);
 
       res.json({
         conversation,
@@ -970,56 +1055,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error('[Conversations] Error fetching conversation:', error);
-      res.status(500).json({ error: error.message || 'Failed to fetch conversation' });
+      res
+        .status(500)
+        .json({ error: error.message || 'Failed to fetch conversation' });
     }
   });
 
   // Add a message to a conversation
-  app.post('/api/conversations/:id/messages', checkAuthenticated, async (req, res) => {
-    try {
-      const conversationId = parseInt(req.params.id);
-      const userId = req.user!.id;
-      const { content, role, tokenCount } = req.body;
-      console.log('[Conversations] Adding message to conversation', conversationId);
+  app.post(
+    '/api/conversations/:id/messages',
+    checkAuthenticated,
+    async (req, res) => {
+      try {
+        const conversationId = parseInt(req.params.id);
+        const userId = req.user!.id;
+        const { content, role, tokenCount } = req.body;
+        console.log(
+          '[Conversations] Adding message to conversation',
+          conversationId,
+        );
 
-      if (!content || !role) {
-        return res.status(400).json({ error: 'Content and role are required' });
+        if (!content || !role) {
+          return res
+            .status(400)
+            .json({ error: 'Content and role are required' });
+        }
+
+        // Check if conversation exists and user has access to it
+        const conversation = await storage.getConversation(conversationId);
+        if (!conversation) {
+          return res.status(404).json({ error: 'Conversation not found' });
+        }
+
+        if (
+          conversation.userId !== userId &&
+          !(await storage.hasPermission(
+            userId,
+            PERMISSIONS.VIEW_ANY_CONVERSATION,
+          ))
+        ) {
+          return res.status(403).json({
+            error: "You don't have permission to access this conversation",
+          });
+        }
+
+        // Create message
+        const message = await storage.createMessage({
+          conversationId,
+          content,
+          role,
+          tokenCount: tokenCount || 0,
+        });
+
+        // Update conversation's updatedAt timestamp
+        await storage.updateConversation(conversationId, {
+          updatedAt: new Date(),
+        });
+
+        res.status(201).json(message);
+      } catch (error: any) {
+        console.error('[Conversations] Error adding message:', error);
+        res
+          .status(500)
+          .json({ error: error.message || 'Failed to add message' });
       }
-
-      // Check if conversation exists and user has access to it
-      const conversation = await storage.getConversation(conversationId);
-      if (!conversation) {
-        return res.status(404).json({ error: 'Conversation not found' });
-      }
-
-      if (
-        conversation.userId !== userId &&
-        !(await storage.hasPermission(userId, PERMISSIONS.VIEW_ANY_CONVERSATION))
-      ) {
-        return res
-          .status(403)
-          .json({ error: "You don't have permission to access this conversation" });
-      }
-
-      // Create message
-      const message = await storage.createMessage({
-        conversationId,
-        content,
-        role,
-        tokenCount: tokenCount || 0,
-      });
-
-      // Update conversation's updatedAt timestamp
-      await storage.updateConversation(conversationId, {
-        updatedAt: new Date(),
-      });
-
-      res.status(201).json(message);
-    } catch (error: any) {
-      console.error('[Conversations] Error adding message:', error);
-      res.status(500).json({ error: error.message || 'Failed to add message' });
-    }
-  });
+    },
+  );
 
   // Delete a conversation
   app.delete('/api/conversations/:id', checkAuthenticated, async (req, res) => {
@@ -1038,9 +1139,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         conversation.userId !== userId &&
         !(await storage.hasPermission(userId, PERMISSIONS.MANAGE_CONVERSATIONS))
       ) {
-        return res
-          .status(403)
-          .json({ error: "You don't have permission to delete this conversation" });
+        return res.status(403).json({
+          error: "You don't have permission to delete this conversation",
+        });
       }
 
       // Delete conversation (this should cascade delete all messages)
@@ -1049,7 +1150,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.sendStatus(204);
     } catch (error: any) {
       console.error('[Conversations] Error deleting conversation:', error);
-      res.status(500).json({ error: error.message || 'Failed to delete conversation' });
+      res
+        .status(500)
+        .json({ error: error.message || 'Failed to delete conversation' });
     }
   });
 

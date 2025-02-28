@@ -1,8 +1,8 @@
-import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
-import { OfflineIndicator } from '../offline-indicator';
-import * as offlineForms from '@/lib/offline-forms';
 import { useToast } from '@/hooks/use-toast';
+import * as offlineForms from '@/lib/offline-forms';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import React from 'react';
+import { OfflineIndicator } from '../offline-indicator';
 
 // Mock the offline forms functionality
 jest.mock('@/lib/offline-forms', () => ({
@@ -24,7 +24,10 @@ describe('OfflineIndicator Component', () => {
     // Default to online with no pending forms
     (offlineForms.isOnline as jest.Mock).mockReturnValue(true);
     (offlineForms.getPendingForms as jest.Mock).mockResolvedValue([]);
-    (offlineForms.syncOfflineForms as jest.Mock).mockResolvedValue({ success: 0, failed: 0 });
+    (offlineForms.syncOfflineForms as jest.Mock).mockResolvedValue({
+      success: 0,
+      failed: 0,
+    });
 
     // Mock the toast hook
     (useToast as jest.Mock).mockReturnValue({
@@ -133,7 +136,10 @@ describe('OfflineIndicator Component', () => {
         retries: 0,
       },
     ]);
-    (offlineForms.syncOfflineForms as jest.Mock).mockResolvedValue({ success: 1, failed: 0 });
+    (offlineForms.syncOfflineForms as jest.Mock).mockResolvedValue({
+      success: 1,
+      failed: 0,
+    });
 
     const mockToast = jest.fn();
     (useToast as jest.Mock).mockReturnValue({
@@ -180,7 +186,9 @@ describe('OfflineIndicator Component', () => {
     ]);
 
     // Mock sync failure
-    (offlineForms.syncOfflineForms as jest.Mock).mockRejectedValue(new Error('Sync failed'));
+    (offlineForms.syncOfflineForms as jest.Mock).mockRejectedValue(
+      new Error('Sync failed'),
+    );
 
     const mockToast = jest.fn();
     (useToast as jest.Mock).mockReturnValue({

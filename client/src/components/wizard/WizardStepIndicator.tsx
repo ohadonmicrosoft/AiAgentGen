@@ -8,7 +8,10 @@ interface WizardStepIndicatorProps {
   currentStep: number;
 }
 
-export default function WizardStepIndicator({ steps, currentStep }: WizardStepIndicatorProps) {
+export default function WizardStepIndicator({
+  steps,
+  currentStep,
+}: WizardStepIndicatorProps) {
   return (
     <div className="flex justify-between mt-2">
       {steps.map((step) => (
@@ -26,7 +29,9 @@ export default function WizardStepIndicator({ steps, currentStep }: WizardStepIn
           </div>
           <div
             className={`text-xs font-medium ${
-              step.number === currentStep ? 'text-foreground' : 'text-muted-foreground'
+              step.number === currentStep
+                ? 'text-foreground'
+                : 'text-muted-foreground'
             }`}
           >
             {step.label}

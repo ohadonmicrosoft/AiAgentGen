@@ -1,12 +1,12 @@
-import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/auth-context';
 import { ToastProvider } from '@/contexts/toast-context';
-import LoginPage from '@/pages/login';
 import DashboardPage from '@/pages/dashboard';
+import LoginPage from '@/pages/login';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 // Mock API calls
 jest.mock('@/lib/api', () => ({
@@ -69,10 +69,14 @@ describe('Login Flow Integration', () => {
     renderWithProviders();
 
     // Check that the login form is rendered
-    expect(screen.getByRole('heading', { name: /sign in/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /sign in/i }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /sign in/i }),
+    ).toBeInTheDocument();
   });
 
   it('should show validation errors for empty fields', async () => {
@@ -159,11 +163,15 @@ describe('Login Flow Integration', () => {
 
     // Should show error message
     await waitFor(() => {
-      expect(screen.getByText(/invalid email or password/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/invalid email or password/i),
+      ).toBeInTheDocument();
     });
 
     // Should not redirect
-    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /sign in/i }),
+    ).toBeInTheDocument();
   });
 
   it('should handle network errors during login', async () => {

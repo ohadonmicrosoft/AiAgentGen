@@ -14,8 +14,8 @@ Code splitting allows us to split the application bundle into smaller chunks tha
 
 ```tsx
 // Example from App.tsx
-const Dashboard = lazy(() => import("@/pages/dashboard"));
-const Agents = lazy(() => import("@/pages/agents"));
+const Dashboard = lazy(() => import('@/pages/dashboard'));
+const Agents = lazy(() => import('@/pages/agents'));
 
 // Usage with Suspense
 <Suspense fallback={<LoadingFallback />}>
@@ -24,7 +24,7 @@ const Agents = lazy(() => import("@/pages/agents"));
     <Route path="/" component={Dashboard} />
     {/* Other routes */}
   </Switch>
-</Suspense>
+</Suspense>;
 ```
 
 ### Benefits:
@@ -40,6 +40,7 @@ A service worker provides offline capabilities and caching strategies to improve
 ### Implementation Details:
 
 - **Cache Strategies**:
+
   - **Network-first** for HTML pages (with cache fallback)
   - **Cache-first** for static assets like JS, CSS, and images
   - **Network-only** for API requests
@@ -78,19 +79,19 @@ export default defineConfig({
     terserOptions: {
       compress: {
         drop_console: true,
-        drop_debugger: true
-      }
+        drop_debugger: true,
+      },
     },
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'wouter'],
           ui: ['@/components/ui'],
-          utils: ['@/lib/utils']
-        }
-      }
-    }
-  }
+          utils: ['@/lib/utils'],
+        },
+      },
+    },
+  },
 });
 ```
 
@@ -192,4 +193,4 @@ To ensure continued performance:
 2. Lighthouse audits run on each PR
 3. Real User Metrics are reviewed weekly
 4. Bundle analysis is performed before major releases
-5. Performance regression tests run automatically 
+5. Performance regression tests run automatically

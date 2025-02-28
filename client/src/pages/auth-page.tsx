@@ -1,9 +1,4 @@
-import { useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -12,8 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
@@ -22,9 +15,16 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { insertUserSchema } from '@shared/schema';
 import { Bot } from 'lucide-react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useLocation } from 'wouter';
+import { z } from 'zod';
 
 const loginSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -105,11 +105,16 @@ export default function AuthPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Login</CardTitle>
-                  <CardDescription>Enter your credentials to access your account</CardDescription>
+                  <CardDescription>
+                    Enter your credentials to access your account
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Form {...loginForm}>
-                    <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                    <form
+                      onSubmit={loginForm.handleSubmit(onLoginSubmit)}
+                      className="space-y-4"
+                    >
                       <FormField
                         control={loginForm.control}
                         name="username"
@@ -117,7 +122,10 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                              <Input placeholder="Enter your username" {...field} />
+                              <Input
+                                placeholder="Enter your username"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -131,14 +139,22 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="Enter your password" {...field} />
+                              <Input
+                                type="password"
+                                placeholder="Enter your password"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
 
-                      <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={loginMutation.isPending}
+                      >
                         {loginMutation.isPending ? 'Logging in...' : 'Login'}
                       </Button>
                     </form>
@@ -211,7 +227,9 @@ export default function AuthPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Create an account</CardTitle>
-                  <CardDescription>Enter your details to create a new account</CardDescription>
+                  <CardDescription>
+                    Enter your details to create a new account
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Form {...registerForm}>
@@ -226,7 +244,10 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                              <Input placeholder="Choose a username" {...field} />
+                              <Input
+                                placeholder="Choose a username"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -240,7 +261,11 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="Choose a password" {...field} />
+                              <Input
+                                type="password"
+                                placeholder="Choose a password"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -270,7 +295,9 @@ export default function AuthPage() {
                         className="w-full"
                         disabled={registerMutation.isPending}
                       >
-                        {registerMutation.isPending ? 'Creating account...' : 'Register'}
+                        {registerMutation.isPending
+                          ? 'Creating account...'
+                          : 'Register'}
                       </Button>
                     </form>
                   </Form>
@@ -284,11 +311,14 @@ export default function AuthPage() {
       {/* Right side - Hero */}
       <div className="hidden md:flex flex-1 bg-primary/5 p-8 items-center justify-center">
         <div className="max-w-md">
-          <h2 className="text-3xl font-bold mb-4">Build powerful AI agents with ease</h2>
+          <h2 className="text-3xl font-bold mb-4">
+            Build powerful AI agents with ease
+          </h2>
           <p className="text-muted-foreground mb-6">
-            Create, manage, and deploy AI-powered agents through an intuitive step-by-step
-            interface. Our platform offers real-time AI response previews, prompt engineering tools,
-            and REST API integration for automation.
+            Create, manage, and deploy AI-powered agents through an intuitive
+            step-by-step interface. Our platform offers real-time AI response
+            previews, prompt engineering tools, and REST API integration for
+            automation.
           </p>
           <ul className="space-y-2">
             <li className="flex items-center">

@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Check, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useLocation } from 'wouter';
-import { useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useMutation } from '@tanstack/react-query';
+import { Check, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { useLocation } from 'wouter';
 
 interface AgentReviewProps {
   formData: any;
@@ -14,7 +14,11 @@ interface AgentReviewProps {
   preview?: boolean;
 }
 
-export default function AgentReview({ formData, onBack, preview = false }: AgentReviewProps) {
+export default function AgentReview({
+  formData,
+  onBack,
+  preview = false,
+}: AgentReviewProps) {
   const [isTestingAgent, setIsTestingAgent] = useState(false);
   const [testMessage, setTestMessage] = useState('');
   const [testResponse, setTestResponse] = useState('');
@@ -25,8 +29,19 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
 
   // Mutation for testing an agent
   const testAgentMutation = useMutation({
-    mutationFn: async ({ config, message }: { config: any; message: string }) => {
-      console.log('Testing agent with config:', config, 'and message:', message);
+    mutationFn: async ({
+      config,
+      message,
+    }: {
+      config: any;
+      message: string;
+    }) => {
+      console.log(
+        'Testing agent with config:',
+        config,
+        'and message:',
+        message,
+      );
       const res = await apiRequest('POST', '/api/agents/test', {
         systemPrompt: config.systemPrompt,
         model: config.model,
@@ -106,7 +121,8 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
     if (!testMessage.trim()) {
       toast({
         title: 'Test message required',
-        description: "Please enter a test message to check your agent's response.",
+        description:
+          "Please enter a test message to check your agent's response.",
       });
       return;
     }
@@ -115,7 +131,8 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
     if (!formData.systemPrompt?.trim()) {
       toast({
         title: 'System prompt required',
-        description: 'Please go back and provide a system prompt for your agent.',
+        description:
+          'Please go back and provide a system prompt for your agent.',
         variant: 'destructive',
       });
       return;
@@ -143,7 +160,8 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
       <div>
         <h3 className="text-lg font-medium mb-4">Review Agent Configuration</h3>
         <p className="text-muted-foreground mb-6">
-          Please review the information below to ensure your agent is configured correctly.
+          Please review the information below to ensure your agent is configured
+          correctly.
         </p>
       </div>
 
@@ -158,7 +176,9 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
 
               <div className="space-y-1">
                 <p className="text-sm font-medium">Agent Type</p>
-                <p className="text-sm capitalize">{formData.type || 'Custom'}</p>
+                <p className="text-sm capitalize">
+                  {formData.type || 'Custom'}
+                </p>
               </div>
 
               <div className="space-y-1">
@@ -173,7 +193,9 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
           <CardContent className="p-4">
             <div className="space-y-3">
               <p className="text-sm font-medium">Description</p>
-              <p className="text-sm">{formData.description || 'No description provided'}</p>
+              <p className="text-sm">
+                {formData.description || 'No description provided'}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -198,7 +220,9 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
 
               <div className="space-y-1">
                 <p className="text-sm font-medium">Response Style</p>
-                <p className="text-sm capitalize">{formData.responseStyle || 'Formal'}</p>
+                <p className="text-sm capitalize">
+                  {formData.responseStyle || 'Formal'}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -255,7 +279,9 @@ export default function AgentReview({ formData, onBack, preview = false }: Agent
                   <div className="mt-4 space-y-2">
                     <p className="text-sm font-medium">Agent Response:</p>
                     <div className="bg-muted p-3 rounded-md overflow-auto max-h-[200px]">
-                      <p className="text-sm whitespace-pre-wrap">{testResponse}</p>
+                      <p className="text-sm whitespace-pre-wrap">
+                        {testResponse}
+                      </p>
                     </div>
                   </div>
                 )}

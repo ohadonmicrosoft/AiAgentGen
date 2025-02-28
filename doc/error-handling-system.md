@@ -11,6 +11,7 @@ Error boundaries are React components that catch JavaScript errors in their chil
 #### Components
 
 - **`ErrorBoundary`** (`/client/src/components/ui/error-boundary.tsx`)
+
   - A class component that implements React's error boundary lifecycle methods
   - Catches errors in child components and renders fallback UI
   - Provides error handling callbacks and reset functionality
@@ -53,13 +54,9 @@ For functional components, we provide React hooks that simplify error handling.
 
 ```tsx
 function MyComponent() {
-  const { 
-    ErrorBoundaryWrapper, 
-    hasError, 
-    error, 
-    resetBoundary 
-  } = useErrorBoundary();
-  
+  const { ErrorBoundaryWrapper, hasError, error, resetBoundary } =
+    useErrorBoundary();
+
   return (
     <ErrorBoundaryWrapper>
       <ComponentThatMightThrow />
@@ -75,6 +72,7 @@ Standardized error fallback components provide consistent error presentation.
 #### Components
 
 - **`ErrorFallback`** (`/client/src/components/ui/error-fallback.tsx`)
+
   - A full-size error display with error details and retry functionality
   - Designed for primary content areas
 
@@ -110,6 +108,7 @@ Utilities for standardized API error handling.
 #### Utilities
 
 - **`ApiError`** class (`/client/src/lib/api-error.ts`)
+
   - Extended Error class with additional context for API errors
   - Includes status code, endpoint information, and response data
   - Provides helpers for identifying error types (auth, server, etc.)
@@ -154,14 +153,14 @@ A React hook that simplifies API requests with built-in error handling.
 ```tsx
 function UserProfile() {
   const [fetchApi, { data, isLoading, error }] = useApi<User>();
-  
+
   useEffect(() => {
     fetchApi('/api/user/profile');
   }, [fetchApi]);
-  
+
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage error={error} />;
-  
+
   return data ? <div>Hello, {data.name}!</div> : null;
 }
 ```
@@ -216,18 +215,22 @@ This ensures that errors are caught at the appropriate level and handled gracefu
 When working with the error handling system, follow these guidelines:
 
 1. **Wrap uncertain components in error boundaries**
+
    - Use error boundaries for components that might throw errors
    - Place boundaries strategically to isolate failures
 
 2. **Use specific error types**
+
    - Extend the `ApiError` class for domain-specific errors
    - Provide meaningful error messages
 
 3. **Implement recovery mechanisms**
+
    - Provide retry functionality where appropriate
    - Preserve user input when possible
 
 4. **Log appropriately**
+
    - Include context in log messages
    - Use appropriate log levels (debug, info, warn, error)
    - Add tags for better filtering
@@ -260,10 +263,12 @@ For API errors:
 The logging system automatically captures and reports errors to the server. This includes:
 
 1. **Uncaught exceptions**
+
    - JavaScript errors not caught by error boundaries
    - Runtime exceptions
 
 2. **Unhandled promise rejections**
+
    - Failed async operations without catch handlers
 
 3. **API errors**
@@ -283,10 +288,12 @@ All errors are logged to the server with contextual information, including:
 The error handling system can be tested using:
 
 1. **Component Tests**
+
    - Test that error boundaries catch errors and render fallback UI
    - Verify that error callbacks are called
 
 2. **Hook Tests**
+
    - Test that hooks like `useApi` handle errors correctly
    - Verify loading and error states
 
@@ -303,4 +310,4 @@ The error handling and resilience system provides a comprehensive approach to ha
 3. Developers can easily debug issues
 4. The application remains stable even in the face of errors
 
-This system is a critical part of providing a reliable and user-friendly experience in the AI Agent Generator application. 
+This system is a critical part of providing a reliable and user-friendly experience in the AI Agent Generator application.

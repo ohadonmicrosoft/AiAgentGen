@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useSidebarState } from '@/hooks/use-sidebar-state';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { useSidebarState } from '@/hooks/use-sidebar-state';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import * as React from 'react';
 
 interface SidebarToggleProps {
   className?: string;
@@ -19,7 +19,10 @@ export function SidebarToggle({ className }: SidebarToggleProps) {
       variant="ghost"
       size="icon"
       onClick={toggleCollapsed}
-      className={cn('h-8 w-8 p-0 rounded-full bg-background border shadow-sm', className)}
+      className={cn(
+        'h-8 w-8 p-0 rounded-full bg-background border shadow-sm',
+        className,
+      )}
       aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       aria-expanded={!isCollapsed}
       aria-controls="main-sidebar"

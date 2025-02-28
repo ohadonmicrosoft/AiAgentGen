@@ -22,7 +22,6 @@ Our accessibility improvements follow the Web Content Accessibility Guidelines (
   - `aria-expanded` for collapsible elements
   - `aria-hidden="true"` for decorative elements
   - `role="menu"` and `role="menuitem"` for navigation menus
-  
 - **Announcer Component**: Implemented a screen reader announcer that provides context for dynamic content changes, such as:
   - Form submission results
   - Loading states
@@ -36,7 +35,6 @@ Our accessibility improvements follow the Web Content Accessibility Guidelines (
   - Automatic focus on the first interactive element
   - Restoration of focus when the dialog closes
   - Proper handling of the Escape key
-  
 - **Dynamic Content**: Implemented focus management for dynamically loaded content to ensure users don't lose their place when content changes.
 
 ### 4. Semantic HTML
@@ -56,6 +54,7 @@ Our accessibility improvements follow the Web Content Accessibility Guidelines (
 The accessibility enhancements have been tested using:
 
 1. **Automated Tools**:
+
    - Lighthouse
    - axe DevTools
    - WAVE Web Accessibility Evaluation Tool
@@ -77,4 +76,4 @@ While we've made significant progress, we plan to continue improving accessibili
 
 - [Web Content Accessibility Guidelines (WCAG) 2.1](https://www.w3.org/TR/WCAG21/)
 - [WAI-ARIA Authoring Practices](https://www.w3.org/TR/wai-aria-practices-1.1/)
-- [Inclusive Components](https://inclusive-components.design/) 
+- [Inclusive Components](https://inclusive-components.design/)

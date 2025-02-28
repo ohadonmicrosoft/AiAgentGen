@@ -1,20 +1,22 @@
-import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { type VariantProps, cva } from 'class-variance-authority';
+import * as React from 'react';
 
-import { cn } from '@/lib/utils';
 import { withErrorBoundary } from '@/components/ui/error-boundary';
 import { logger } from '@/lib/logger';
+import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 active:scale-95 hover:scale-[1.02] relative overflow-hidden',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90 border border-transparent',
+        default:
+          'bg-primary text-primary-foreground hover:bg-primary/90 border border-transparent',
         destructive:
           'bg-background text-destructive border border-destructive hover:bg-destructive/10',
-        outline: 'border border-input bg-background hover:bg-accent/50 hover:border-accent',
+        outline:
+          'border border-input bg-background hover:bg-accent/50 hover:border-accent',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-transparent',
         ghost: 'hover:bg-accent/50',
@@ -94,7 +96,10 @@ const Button = withErrorBoundary(ButtonBase, {
   // Use a minimal fallback to avoid disrupting layouts
   fallback: (
     <button
-      className={cn(buttonVariants({ variant: 'outline' }), 'opacity-70 cursor-not-allowed')}
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'opacity-70 cursor-not-allowed',
+      )}
       disabled
     >
       Error
