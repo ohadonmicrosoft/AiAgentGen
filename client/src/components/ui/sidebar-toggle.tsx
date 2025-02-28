@@ -24,6 +24,8 @@ export function SidebarToggle({ className }: SidebarToggleProps) {
         className
       )}
       aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+      aria-expanded={!isCollapsed}
+      aria-controls="main-sidebar"
     >
       <motion.div
         animate={{ rotate: isCollapsed ? 180 : 0 }}
@@ -31,11 +33,12 @@ export function SidebarToggle({ className }: SidebarToggleProps) {
           duration: prefersReducedMotion ? 0 : 0.2,
           ease: "easeInOut",
         }}
+        aria-hidden="true"
       >
         {isCollapsed ? (
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4" aria-hidden="true" />
         ) : (
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
         )}
       </motion.div>
     </Button>

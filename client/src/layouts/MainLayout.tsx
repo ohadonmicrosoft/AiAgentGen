@@ -6,6 +6,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Backdrop } from "@/components/ui/backdrop";
 import { SidebarProvider, useSidebarState } from "@/hooks/use-sidebar-state";
 import { motion } from "framer-motion";
+import { SkipLink } from "@/components/SkipLink";
+import { useAnnouncer, useFocusTrap } from "@/lib/accessibility";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -17,6 +19,15 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
   const { isCollapsed, isHovering } = useSidebarState();
+  
+  // Set up announcer for dynamic content changes
+  const { announce } = useAnnouncer();
+  
+  // Focus trap for mobile sidebar
+  const sidebarFocusTrapRef = useFocusTrap(
+    isMobile && sidebarOpen,
+    () => setSidebarOpen(false)
+  );
 
   // Close sidebar when transitioning from mobile to desktop
   useEffect(() => {
@@ -38,7 +49,15 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
   }, [sidebarOpen]);
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    const newState = !sidebarOpen;
+    setSidebarOpen(newState);
+    
+    // Announce sidebar state change to screen readers
+    if (newState) {
+      announce("Navigation sidebar opened");
+    } else {
+      announce("Navigation sidebar closed");
+    }
   };
 
   // Prevent scrolling on body when mobile sidebar is open
@@ -58,6 +77,10 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
 
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Skip links for keyboard navigation */}
+      <SkipLink targetId="main-content">Skip to main content</SkipLink>
+      <SkipLink targetId="main-navigation">Skip to navigation</SkipLink>
+      
       {/* Improved backdrop with blur effect for mobile */}
       <Backdrop 
         show={isMobile && sidebarOpen}
@@ -65,11 +88,13 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
         className="z-30 backdrop-blur-md bg-background/70"
       />
       
-      {/* Enhanced Sidebar with smooth transitions */}
-      <Sidebar 
-        open={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-      />
+      {/* Enhanced Sidebar with accessibility improvements */}
+      <div ref={sidebarFocusTrapRef}>
+        <Sidebar 
+          open={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)} 
+        />
+      </div>
 
       {/* Main content area with responsive adjustments */}
       <motion.div 
@@ -94,12 +119,19 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
         <TopNav title={title} onMenuClick={toggleSidebar} />
 
         {/* Main content with enhanced spacing and transitions */}
-        <main className={cn(
-          "flex-grow transition-all duration-300 ease-in-out",
-          isMobile ? "px-4 py-5" : "px-6 md:px-8 py-6"
-        )}>
+        <main 
+          id="main-content"
+          className={cn(
+            "flex-grow transition-all duration-300 ease-in-out",
+            isMobile ? "px-4 py-5" : "px-6 md:px-8 py-6"
+          )}
+          tabIndex={-1} // Makes it focusable for skip link without affecting tab order
+        >
           {/* Page container with max width and auto centering */}
           <div className="mx-auto w-full max-w-7xl">
+            {/* Page title for screen readers if needed */}
+            {title && <h1 className="sr-only">{title}</h1>}
+            
             {/* Animated page entry */}
             <div className="animate-in fade-in duration-500">
               {children}
@@ -108,11 +140,15 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
         </main>
 
         {/* Enhanced footer with better responsive styling */}
-        <footer className={cn(
-          "py-4 md:py-5 mt-auto border-t shadow-soft",
-          isMobile ? "px-4" : "px-6",
-          "bg-glass"
-        )}>
+        <footer
+          className={cn(
+            "py-4 md:py-5 mt-auto border-t shadow-soft",
+            isMobile ? "px-4" : "px-6",
+            "bg-glass"
+          )}
+          role="contentinfo"
+          aria-label="Footer"
+        >
           <div className="mx-auto w-full max-w-7xl">
             <div className="flex flex-col md:flex-row justify-between items-center gap-3">
               <div className="flex items-center">
@@ -121,11 +157,19 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
                 </p>
               </div>
               
-              <div className="flex gap-6 text-sm text-muted-foreground">
-                <a href="#" className="hover:text-primary transition-colors hover:underline">Terms</a>
-                <a href="#" className="hover:text-primary transition-colors hover:underline">Privacy</a>
-                <a href="#" className="hover:text-primary transition-colors hover:underline">Support</a>
-              </div>
+              <nav aria-label="Footer navigation">
+                <ul className="flex gap-6 text-sm text-muted-foreground">
+                  <li>
+                    <a href="#" className="hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm">Terms</a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm">Privacy</a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm">Support</a>
+                  </li>
+                </ul>
+              </nav>
             </div>
           </div>
         </footer>

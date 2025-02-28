@@ -31,13 +31,19 @@ import { useSidebarState } from "@/hooks/use-sidebar-state";
 import { SidebarToggle } from "@/components/ui/sidebar-toggle";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { NavItem } from "@/types";
+import { usePreferences } from "@/context/preferences-context";
+import { useAuth as useAuthContext } from "@/context/auth-context";
 
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
+  navItems: NavItem[];
+  demoItems: NavItem[];
+  adminItems: NavItem[];
 }
 
-export default function Sidebar({ open, onClose }: SidebarProps) {
+export default function Sidebar({ open, onClose, navItems, demoItems, adminItems }: SidebarProps) {
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
   const isMobile = useIsMobile();
@@ -63,32 +69,6 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   // Check if user has admin access
   const isAdmin = user?.role === 'admin' || (user?.customPermissions && 
     user.customPermissions.includes(PERMISSIONS.MANAGE_USERS));
-
-  const navItems = [
-    { path: "/", label: "Dashboard", icon: <Home className="h-5 w-5" /> },
-    { path: "/agents", label: "Agents", icon: <Bot className="h-5 w-5" /> },
-    { path: "/prompts", label: "Prompts", icon: <MessageSquare className="h-5 w-5" /> },
-    { path: "/settings", label: "Settings", icon: <Settings className="h-5 w-5" /> },
-  ];
-  
-  // Admin routes
-  const adminItems = [
-    { path: "/admin/users", label: "Manage Users", icon: <Users className="h-5 w-5" /> },
-    { path: "/admin/agents", label: "All Agents", icon: <Zap className="h-5 w-5" /> },
-  ];
-
-  // Demo routes
-  const demoItems = [
-    { path: "/form-demo", label: "Form Animations", icon: <FormInput className="h-5 w-5" /> },
-    { path: "/typography-demo", label: "Typography System", icon: <MessageSquare className="h-5 w-5" /> },
-    { path: "/palette-demo", label: "Color Palette", icon: <Palette className="h-5 w-5" /> },
-    { path: "/spacing-demo", label: "Dynamic Spacing", icon: <Layout className="h-4 w-4" /> },
-    { path: "/drag-drop-demo", label: "Drag & Drop", icon: <ListFilter className="h-4 w-4" /> },
-    { path: "/infinite-scroll-demo", label: "Infinite Scroll", icon: <ScrollText className="h-4 w-4" /> },
-    { path: "/contrast-checker-demo", label: "Contrast Checker", icon: <EyeIcon className="h-4 w-4" /> },
-    { path: "/performance-dashboard", label: "Performance", icon: <BarChart2 className="h-4 w-4" /> },
-    { path: "/error-handling-demo", label: "Error Handling", icon: <AlertTriangle className="h-5 w-5" /> },
-  ];
 
   const sidebarVariants = {
     expanded: { width: "16rem" },  // 64 = 16rem
@@ -127,27 +107,19 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   }
 
   // Renders nav item with appropriate animations
-  const renderNavItem = (item: any, index: number, isActive: boolean) => {
+  const renderNavItem = (item: NavItem, index: number, isActive = false) => {
     const itemContent = (
-      <motion.div 
+      <motion.div
         className={cn(
-          "flex items-center w-full px-3 py-2 text-sm font-medium rounded-md",
-          "transition-all duration-150",
-          isActive
-            ? "bg-muted text-foreground font-medium" 
-            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          "group relative flex items-center px-3 py-2 rounded-md text-muted-foreground",
+          isActive && "text-foreground font-medium",
+          !isActive && "hover:text-foreground hover:bg-accent/50"
         )}
-        initial={false}
-        animate={isCollapsed ? "collapsed" : "expanded"}
-        whileHover={{ 
-          scale: isActive ? 1 : 1.02,
-          backgroundColor: isActive ? "" : "var(--muted)" 
-        }}
-        variants={{
-          expanded: { x: 0 },
-          collapsed: { x: 0 },
-        }}
+        variants={navItemVariants}
+        whileTap={{ scale: 0.98 }}
         transition={getTransition()}
+        role="menuitem"
+        aria-current={isActive ? "page" : undefined}
       >
         {/* Left accent bar for active item */}
         {isActive && (
@@ -156,6 +128,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             initial={{ scaleY: 0 }}
             animate={{ scaleY: 1 }}
             transition={{ duration: 0.2 }}
+            aria-hidden="true"
           />
         )}
         
@@ -165,6 +138,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             "flex-shrink-0",
             isCollapsed ? "mx-auto" : "mr-3"
           )}
+          aria-hidden="true"
         >
           {item.icon}
         </motion.span>
@@ -183,6 +157,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.1 }}
+            aria-hidden="true"
           />
         )}
       </motion.div>
@@ -197,6 +172,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               href={item.path}
               onClick={handleLinkClick}
               className="block"
+              aria-label={`Navigate to ${item.label}`}
             >
               {itemContent}
             </Link>
@@ -212,6 +188,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         href={item.path}
         onClick={handleLinkClick}
         className="block"
+        aria-label={`Navigate to ${item.label}`}
       >
         {itemContent}
       </Link>
@@ -227,6 +204,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       <motion.h2 
         className="mb-1 fluid-small font-semibold tracking-wider text-muted-foreground uppercase"
         variants={sectionLabelVariants}
+        id={`section-${title.toLowerCase().replace(/\s+/g, '-')}`}
       >
         {title}
       </motion.h2>
@@ -236,12 +214,14 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           expanded: { opacity: 1 },
           collapsed: { opacity: 0.5 }
         }}
+        aria-hidden="true"
       />
     </motion.div>
   );
 
   return (
     <motion.aside
+      id="main-sidebar"
       className={cn(
         "fixed inset-y-0 left-0 z-30 flex flex-col max-h-screen overflow-hidden bg-background border-r",
         "transition-all lg:translate-x-0 lg:static",
@@ -254,12 +234,14 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       transition={getTransition()}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
+      aria-label="Main navigation"
+      aria-expanded={!isCollapsed}
     >
       <div className="flex items-center justify-between flex-shrink-0 p-4 border-b">
         <div className="flex items-center" onClick={handleLinkClick}>
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2" aria-label="Go to home page">
             <div className="flex items-center justify-center w-8 h-8 rounded-md border">
-              <Bot className="h-4 w-4" />
+              <Bot className="h-4 w-4" aria-hidden="true" />
             </div>
             <motion.span 
               className="text-base font-medium"
@@ -278,7 +260,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             className="lg:hidden h-8 w-8"
             aria-label="Close sidebar"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" aria-hidden="true" />
           </Button>
         ) : (
           <SidebarToggle className={cn(
@@ -295,20 +277,20 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         </div>
       )}
 
-      <nav className="flex-1 overflow-y-auto">
-        <ul className="p-3 space-y-1">
+      <nav className="flex-1 overflow-y-auto" aria-label="Application">
+        <ul className="p-3 space-y-1" role="menu">
           {navItems.map((item, index) => (
-            <li key={item.path}>
+            <li key={item.path} role="none">
               {renderNavItem(item, index, location === item.path)}
             </li>
           ))}
           
           {/* Demo section */}
-          <li className="pt-2">
+          <li className="pt-2" role="none">
             {renderSectionLabel("UI Demos")}
           </li>
           {demoItems.map((item, index) => (
-            <li key={item.path}>
+            <li key={item.path} role="none">
               {renderNavItem(item, index, location === item.path)}
             </li>
           ))}
@@ -316,11 +298,11 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           {/* Admin section - only shown to users with admin privileges */}
           {isAdmin && (
             <>
-              <li className="pt-2">
+              <li className="pt-2" role="none">
                 {renderSectionLabel("Admin")}
               </li>
               {adminItems.map((item, index) => (
-                <li key={item.path}>
+                <li key={item.path} role="none">
                   {renderNavItem(item, index, location === item.path)}
                 </li>
               ))}
@@ -367,7 +349,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               title="Log out"
               aria-label="Log out"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4" aria-hidden="true" />
             </Button>
           </motion.div>
         </div>
