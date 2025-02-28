@@ -3,7 +3,13 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useHaptic } from "@/hooks/use-haptic";
 import { withErrorBoundary } from "@/components/ui/error-boundary";
+import { useReducedMotion } from "@/hooks/animations/useReducedMotion";
+import { useFluidSpacing } from "@/hooks/use-fluid-spacing";
+
+// Define haptic feedback types
+type HapticType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | boolean;
 
 interface TouchButtonProps extends ButtonProps {
   /**
@@ -31,10 +37,34 @@ interface TouchButtonProps extends ButtonProps {
   tapHighlightColor?: string;
   
   /**
-   * Whether to add haptic feedback on press (if supported)
+   * The type of haptic feedback to apply when pressed
+   * @default "light"
+   */
+  hapticFeedback?: HapticType;
+  
+  /**
+   * Whether to show a ripple effect when pressed
+   * @default false
+   */
+  showRipple?: boolean;
+  
+  /**
+   * The color of the ripple effect
+   * @default "currentColor"
+   */
+  rippleColor?: string;
+  
+  /**
+   * The size of the touch target padding (in pixels or fluid spacing value)
+   * @default "xs" for mobile, "none" for desktop
+   */
+  touchPadding?: string;
+  
+  /**
+   * Whether to add tactile animation when pressed
    * @default true
    */
-  hapticFeedback?: boolean;
+  tactileAnimation?: boolean;
 }
 
 /**
@@ -48,12 +78,40 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
   pressDuration = 0.2,
   tapHighlight = true,
   tapHighlightColor = "rgba(0, 0, 0, 0.1)",
-  hapticFeedback = true,
+  hapticFeedback = "light",
+  showRipple = false,
+  rippleColor = "currentColor",
+  touchPadding,
+  tactileAnimation = true,
   onClick,
+  disabled,
   ...props
 }, ref) => {
   const isMobile = useIsMobile();
+  const { getSpacing } = useFluidSpacing();
+  const shouldReduceMotion = useReducedMotion();
   const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const [isPressed, setIsPressed] = React.useState(false);
+  
+  // Get haptic feedback methods from hook
+  const {
+    triggerLightFeedback,
+    triggerMediumFeedback,
+    triggerHeavyFeedback,
+    triggerSuccessFeedback,
+    triggerWarningFeedback,
+    triggerErrorFeedback
+  } = useHaptic();
+  
+  // Manage ripple effect state
+  const [ripples, setRipples] = React.useState<Array<{
+    id: number,
+    x: number,
+    y: number,
+    size: number
+  }>>([]);
+  const rippleCount = React.useRef(0);
+  
   // Merge refs to support both forwarded ref and internal ref
   const mergedRef = React.useMemo(() => {
     return (elementRef: HTMLButtonElement) => {
@@ -70,14 +128,99 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
     };
   }, [ref]);
   
-  // Handle click with optional haptic feedback
-  const handleClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+  // Handle haptic feedback based on type
+  const triggerAppropriateHaptic = React.useCallback(() => {
+    if (!hapticFeedback || disabled) return;
+    
     try {
-      if (hapticFeedback && isMobile && navigator.vibrate) {
-        // Short vibration for tactile feedback (if supported)
-        navigator.vibrate(10);
+      switch (hapticFeedback) {
+        case 'light':
+          triggerLightFeedback();
+          break;
+        case 'medium':
+          triggerMediumFeedback();
+          break;
+        case 'heavy':
+          triggerHeavyFeedback();
+          break;
+        case 'success':
+          triggerSuccessFeedback();
+          break;
+        case 'warning':
+          triggerWarningFeedback();
+          break;
+        case 'error':
+          triggerErrorFeedback();
+          break;
+        case true:
+          triggerLightFeedback();
+          break;
+        default:
+          // No haptic feedback if false or unrecognized
+          break;
+      }
+    } catch (error) {
+      console.warn("Haptic feedback failed:", error);
+      // Fail silently - haptic is an enhancement, not critical functionality
+    }
+  }, [
+    hapticFeedback, disabled, 
+    triggerLightFeedback, triggerMediumFeedback, triggerHeavyFeedback,
+    triggerSuccessFeedback, triggerWarningFeedback, triggerErrorFeedback
+  ]);
+  
+  // Create a ripple effect centered on the touch/click point
+  const createRipple = React.useCallback((e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>) => {
+    if (!showRipple || disabled) return;
+    
+    try {
+      const button = buttonRef.current;
+      if (!button) return;
+      
+      // Get button dimensions and position
+      const rect = button.getBoundingClientRect();
+      
+      // Get coordinates (handle both touch and mouse events)
+      let x, y;
+      if ('touches' in e) {
+        // Touch event
+        x = e.touches[0].clientX - rect.left;
+        y = e.touches[0].clientY - rect.top;
+      } else {
+        // Mouse event
+        x = e.clientX - rect.left;
+        y = e.clientY - rect.top;
       }
       
+      // Calculate ripple size based on button dimensions
+      const size = Math.max(rect.width, rect.height) * 2;
+      
+      // Add new ripple
+      const id = rippleCount.current++;
+      setRipples(prev => [...prev, { id, x, y, size }]);
+      
+      // Remove ripple after animation completes
+      setTimeout(() => {
+        setRipples(prev => prev.filter(ripple => ripple.id !== id));
+      }, 600); // Match with CSS animation duration
+    } catch (error) {
+      console.warn("Ripple effect failed:", error);
+      // Fail silently - ripple is just a visual enhancement
+    }
+  }, [showRipple, disabled]);
+  
+  // Handle click with haptic feedback and ripple effect
+  const handleClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    try {
+      if (disabled) return;
+      
+      // Trigger haptic feedback
+      triggerAppropriateHaptic();
+      
+      // Create ripple effect
+      createRipple(e);
+      
+      // Call original onClick handler
       if (onClick) {
         onClick(e);
       }
@@ -89,12 +232,33 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
         onClick(e);
       }
     }
-  }, [hapticFeedback, isMobile, onClick]);
+  }, [disabled, triggerAppropriateHaptic, createRipple, onClick]);
+  
+  // Handle touch start event for immediate feedback
+  const handleTouchStart = React.useCallback((e: React.TouchEvent<HTMLButtonElement>) => {
+    if (disabled) return;
+    
+    setIsPressed(true);
+    createRipple(e);
+  }, [disabled, createRipple]);
+  
+  // Handle touch end event
+  const handleTouchEnd = React.useCallback(() => {
+    setIsPressed(false);
+  }, []);
+  
+  // Determine padding for touch targets
+  const padValue = React.useMemo(() => {
+    if (touchPadding !== undefined) {
+      return touchPadding;
+    }
+    return isMobile ? getSpacing('xs') : '0';
+  }, [touchPadding, isMobile, getSpacing]);
   
   // Add touch-specific styles for mobile devices
   const touchStyles = isMobile ? {
     // Increase touch target size
-    padding: "0.75rem 1rem",
+    padding: padValue,
     // Remove outline on touch devices
     WebkitTapHighlightColor: tapHighlight ? tapHighlightColor : "transparent",
     // Prevent text selection during taps
@@ -102,12 +266,21 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
     userSelect: "none" as const,
     // Prevent double-tap zoom
     touchAction: "manipulation" as const,
+    // Position relative for ripple container
+    position: "relative" as const,
+    // Isolate z-index stacking context
+    zIndex: 1,
+    // Ensure content doesn't get clipped
+    overflow: "hidden" as const
   } : {};
   
-  // Use useWhileTap for lighter-weight animation on mobile
+  // Determine animation based on device and preferences
+  const shouldAnimate = isMobile && tactileAnimation && !shouldReduceMotion;
+  
   return (
     <motion.div
-      whileTap={{ scale: isMobile ? pressScale : 1 }}
+      whileTap={shouldAnimate ? { scale: pressScale } : undefined}
+      animate={isPressed && shouldAnimate ? { scale: pressScale } : { scale: 1 }}
       transition={{ 
         duration: pressDuration,
         // Use more performant animations on mobile
@@ -127,13 +300,39 @@ const TouchButtonComponent = React.forwardRef<HTMLButtonElement, TouchButtonProp
         ref={mergedRef}
         className={cn(
           "transition-all duration-200",
-          isMobile && "mobile-optimized",
+          isMobile && "mobile-optimized touch-manipulation",
+          showRipple && "overflow-hidden",
           className
         )}
         onClick={handleClick}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
         style={touchStyles}
+        disabled={disabled}
         {...props}
       >
+        {/* Ripple effects container */}
+        {showRipple && (
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {ripples.map(ripple => (
+              <span
+                key={ripple.id}
+                className="absolute rounded-full opacity-30 animate-ripple"
+                style={{
+                  left: ripple.x,
+                  top: ripple.y,
+                  width: ripple.size,
+                  height: ripple.size,
+                  backgroundColor: rippleColor,
+                  transform: 'translate(-50%, -50%) scale(0)',
+                }}
+              />
+            ))}
+          </div>
+        )}
+        
+        {/* Button content */}
         {children}
       </Button>
     </motion.div>
