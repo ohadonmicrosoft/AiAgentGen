@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect, createContext, useContext } from "react";
 import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,9 @@ import { useBreakpoint } from "@/hooks/use-breakpoint";
 import { Icons } from "@/components/ui/icons";
 import { PERMISSIONS } from "@/constants";
 import { NavItem } from "@/types";
-import { Bot, Home, Users, MessagesSquare, Compass, Settings, Sparkles, Database } from "lucide-react";
+import { Bot, Home, Users, MessagesSquare, Compass, Settings, Sparkles, Database, AlertTriangle, Menu, X } from "lucide-react";
+import { FocusTrap } from "@radix-ui/react-focus-trap";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -73,7 +75,19 @@ const adminItems: NavItem[] = [
   },
 ];
 
-// Inner layout component that uses the sidebar state
+// Create context for sidebar state
+export const SidebarContext = createContext<{
+  sidebarOpen: boolean;
+  setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}>({
+  sidebarOpen: false,
+  setSidebarOpen: () => {},
+});
+
+// Hook to consume sidebar context
+export const useSidebar = () => useContext(SidebarContext);
+
+// Main layout inner component
 function MainLayoutInner({ children, title }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -135,116 +149,114 @@ function MainLayoutInner({ children, title }: MainLayoutProps) {
   }, [sidebarOpen, isMobile]);
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Skip links for keyboard navigation */}
-      <SkipLink targetId="main-content">Skip to main content</SkipLink>
-      <SkipLink targetId="main-navigation">Skip to navigation</SkipLink>
-      
-      {/* Improved backdrop with blur effect for mobile */}
-      <Backdrop 
-        show={isMobile && sidebarOpen}
-        onClick={() => setSidebarOpen(false)}
-        className="z-30 backdrop-blur-md bg-background/70"
-      />
-      
-      {/* Enhanced Sidebar with accessibility improvements */}
-      <div ref={sidebarFocusTrapRef}>
-        <Sidebar 
-          open={sidebarOpen} 
-          onClose={() => setSidebarOpen(false)} 
-          navItems={navItems}
-          demoItems={demoItems}
-          adminItems={adminItems}
-        />
-      </div>
-
-      {/* Main content area with responsive adjustments */}
-      <motion.div 
-        className={cn(
-          "flex flex-col flex-grow min-h-screen transition-all duration-300 ease-in-out",
-          isMobile 
-            ? "w-full" 
-            : isCollapsed && !isHovering 
-              ? "lg:ml-[4.5rem]" 
-              : "lg:ml-64"
+    <SidebarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
+      <div className="min-h-screen flex flex-col bg-background text-foreground antialiased transition-colors duration-300">
+        {/* Skip link for accessibility */}
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-background focus:text-foreground"
+        >
+          Skip to content
+        </a>
+        
+        {/* Mobile overlay */}
+        {isMobile && sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30"
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
+          />
         )}
-        animate={{
-          marginLeft: isMobile
-            ? 0
-            : isCollapsed && !isHovering
-              ? "4.5rem"
-              : "16rem",
-        }}
-        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      >
-        {/* Top navigation with improved styling */}
-        <TopNav title={title} onMenuClick={toggleSidebar} />
-
-        {/* Main content with enhanced spacing and transitions */}
-        <main 
-          id="main-content"
-          className={cn(
-            "flex-grow transition-all duration-300 ease-in-out",
-            isMobile ? "px-4 py-5" : "px-6 md:px-8 py-6"
-          )}
-          tabIndex={-1} // Makes it focusable for skip link without affecting tab order
-        >
-          {/* Page container with max width and auto centering */}
-          <div className="mx-auto w-full max-w-7xl">
-            {/* Page title for screen readers if needed */}
-            {title && <h1 className="sr-only">{title}</h1>}
-            
-            {/* Animated page entry */}
-            <div className="animate-in fade-in duration-500">
-              {children}
-            </div>
-          </div>
-        </main>
-
-        {/* Enhanced footer with better responsive styling */}
-        <footer
-          className={cn(
-            "py-4 md:py-5 mt-auto border-t shadow-soft",
-            isMobile ? "px-4" : "px-6",
-            "bg-glass"
-          )}
-          role="contentinfo"
-          aria-label="Footer"
-        >
-          <div className="mx-auto w-full max-w-7xl">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-3">
-              <div className="flex items-center">
-                <p className="text-sm text-muted-foreground">
-                  © {new Date().getFullYear()} AI Agent Generator
-                </p>
+        
+        {/* Sidebar */}
+        <FocusTrap active={isMobile && sidebarOpen}>
+          <aside 
+            className={`
+              fixed inset-y-0 left-0 z-40 
+              w-64 transform transition-transform duration-300 ease-in-out
+              lg:translate-x-0 lg:static lg:w-auto lg:flex-shrink-0
+              ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+              flex-shrink-0
+            `}
+          >
+            <Sidebar 
+              open={sidebarOpen} 
+              onClose={() => setSidebarOpen(false)} 
+              navItems={navItems}
+              demoItems={demoItems}
+              adminItems={adminItems}
+            />
+          </aside>
+        </FocusTrap>
+        
+        {/* Main content area */}
+        <div className="flex-1 flex flex-col min-h-screen lg:pl-64">
+          {/* Top navigation */}
+          <TopNav title={title} onMenuClick={toggleSidebar} />
+          
+          {/* Main content */}
+          <main 
+            id="main-content" 
+            className="flex-1 transition-all duration-300 pt-16 pb-8 px-4 md:px-6"
+          >
+            <ErrorBoundary 
+              fallback={
+                <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
+                  <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
+                  <h2 className="text-2xl font-semibold mb-2">Something went wrong</h2>
+                  <p className="text-muted-foreground mb-4">
+                    An error occurred while loading this page content.
+                  </p>
+                  <button 
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
+                  >
+                    Try again
+                  </button>
+                </div>
+              }
+            >
+              {/* Page container with max width and auto centering */}
+              <div className="mx-auto w-full max-w-7xl">
+                {/* Page title for screen readers if needed */}
+                {title && <h1 className="sr-only">{title}</h1>}
+                
+                {/* Animated page entry */}
+                <div className="animate-in fade-in duration-500">
+                  {children}
+                </div>
               </div>
-              
-              <nav aria-label="Footer navigation">
-                <ul className="flex gap-6 text-sm text-muted-foreground">
-                  <li>
-                    <a href="#" className="hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm">Terms</a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm">Privacy</a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm">Support</a>
-                  </li>
-                </ul>
-              </nav>
+            </ErrorBoundary>
+          </main>
+          
+          {/* Footer */}
+          <footer className="py-4 px-6 border-t border-border/50 text-center text-sm text-muted-foreground">
+            <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+              <p>© {new Date().getFullYear()} AI Agent Generator</p>
+              <div className="flex items-center space-x-4">
+                <a href="#" className="hover:text-foreground transition-colors">
+                  Terms
+                </a>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  Privacy
+                </a>
+                <a href="#" className="hover:text-foreground transition-colors">
+                  Help
+                </a>
+              </div>
             </div>
-          </div>
-        </footer>
-      </motion.div>
-    </div>
+          </footer>
+        </div>
+      </div>
+    </SidebarContext.Provider>
   );
 }
 
-// Wrapper component that provides the sidebar state
+// Export MainLayout with error boundary
 export default function MainLayout(props: MainLayoutProps) {
   return (
-    <SidebarProvider>
+    <ErrorBoundary>
       <MainLayoutInner {...props} />
-    </SidebarProvider>
+    </ErrorBoundary>
   );
 }
