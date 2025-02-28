@@ -3,9 +3,13 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import { withErrorBoundary } from "@/components/ui/error-boundary"
+import { Logger } from "@/lib/logger"
+
+const logger = new Logger('Button');
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-95 hover:scale-[1.02] relative overflow-hidden",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 active:scale-95 hover:scale-[1.02] relative overflow-hidden",
   {
     variants: {
       variant: {
@@ -41,18 +45,65 @@ export interface ButtonProps
   asChild?: boolean
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, onClick, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
+    
+    // Create a safe click handler that prevents event propagation issues
+    const handleClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+      try {
+        // Prevent propagation issues with nested event handlers
+        if (event.target !== event.currentTarget) {
+          // Make sure the event doesn't bubble up in a problematic way
+          // This prevents double-firing in some cases
+          event.stopPropagation();
+        }
+        
+        // Call the original onClick handler
+        if (onClick) {
+          onClick(event);
+        }
+      } catch (error) {
+        // Log the error but don't crash the component
+        logger.error('Error in button click handler:', { error });
+        
+        // Try to proceed with default behavior if possible
+        if (!event.defaultPrevented) {
+          // For links or other buttons that should still work even if the handler fails
+          if (asChild && props.href) {
+            window.location.href = props.href as string;
+          }
+        }
+      }
+    }, [onClick, asChild, props.href]);
+    
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        onClick={handleClick}
         {...props}
       />
     )
   }
 )
+ButtonBase.displayName = "ButtonBase"
+
+// Create a version wrapped with error boundary
+const Button = withErrorBoundary(ButtonBase, {
+  // Use a minimal fallback to avoid disrupting layouts
+  fallback: (
+    <button 
+      className={cn(
+        buttonVariants({ variant: "outline" }),
+        "opacity-70 cursor-not-allowed"
+      )}
+      disabled
+    >
+      Error
+    </button>
+  )
+});
 Button.displayName = "Button"
 
-export { Button, buttonVariants }
+export { Button, ButtonBase, buttonVariants }
